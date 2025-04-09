@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (model.includes("largus")) price = "2600 руб/сутки";
 
       const status = car.status || "—";
-      const statusClass = status.toLowerCase();
+      const statusClass = typeof statusRaw === 'string' ? statusRaw.toLowerCase() : '';
       const image = car.avatar || 'img/granta1.jpg';
 
       card.innerHTML = `
