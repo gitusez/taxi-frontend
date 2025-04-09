@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Детали автомобиля | Яндекс.Такси</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="node_modules/swiper/swiper-bundle.min.css">
+</head>
+<body>
+  <header class="header-bar">
+    <a href="index.html" class="back-button">❮ Назад</a>
+    <img src="img/logo.png" alt="Лого" class="logo">
+  </header>
+
+  <main>
+    <section class="car-detail">
+      <div class="photo-box">
+        <div class="swiper-container">
+          <div class="swiper-wrapper"><!-- Фото вставляется динамически --></div>
+        </div>
+      </div>
+      <div class="car-details-box">
+        <h3>Характеристики</h3>
+        <br>
+        <div class="details-grid">
+          <div class="detail-row"><div class="detail-label">Марка</div><div class="detail-value detail-brand"></div></div>
+          <div class="detail-row"><div class="detail-label">Модель</div><div class="detail-value detail-model"></div></div>
+          <div class="detail-row"><div class="detail-label">Год выпуска</div><div class="detail-value detail-year"></div></div>
+          <div class="detail-row"><div class="detail-label">Цвет</div><div class="detail-value detail-color"></div></div>
+          <div class="detail-row"><div class="detail-label">Номер</div><div class="detail-value detail-number"></div></div>
+          <div class="detail-row"><div class="detail-label">Пробег</div><div class="detail-value detail-mileage"></div></div>
+          <div class="detail-row"><div class="detail-label">Статус</div><div class="detail-value detail-status"></div></div>
+        </div>
+        <br>
+        <div class="description">
+          <h3>Описание</h3>
+          <p class="detail-description"></p>
+        </div>
+        <a href="tel:+79282624344" class="call-button-details">📞 Позвонить</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer-bar">
+    <nav>
+      <a href="index.html" class="footer-link">Главная</a>
+      <a href="about.html" class="footer-link">О нас</a>
+      <a href="contact.html" class="footer-link">Связь</a>
+    </nav>
+  </footer>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-header">
+      <span class="lightbox-close" onclick="closeLightbox()">×</span>
+      <span class="lightbox-counter" id="lightboxCounter"></span>
+    </div>
+    <div class="lightbox-content">
+      <div class="swiper-container fullscreen-swiper">
+        <div class="swiper-wrapper" id="lightboxSwiperWrapper"></div>
+        <div class="fullscreen-pagination swiper-pagination-fraction"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Скрипты -->
+  <script src="node_modules/swiper/swiper-bundle.min.js"></script>
+  <script type="module" src="js/car-details.js"></script>
+</body>
+</html>

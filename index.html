@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Автопарк | Яндекс.Такси</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Подключаем crypto-js для SHA1 -->
+  <script src="js/crypto-js/crypto-js.js"></script>
+</head>
+<body>
+  <!-- Шапка -->
+  <header class="header-bar">
+    <img src="img/logo.jpg" alt="Лого" class="logo">
+  </header>
+
+  <!-- Фильтры -->
+  <section class="filters-bar">
+    <div class="filter-row">
+      <div class="filter-col">
+        <label for="searchInput" class="filter-label">Поиск</label>
+        <input type="text" id="searchInput" placeholder="Например, Granta">
+      </div>
+      <div class="filter-col">
+        <label for="sortSelect" class="filter-label">Сортировка</label>
+        <select id="sortSelect">
+          <option value="">Без сортировки</option>
+          <option value="year_desc">Год (новее в начале)</option>
+          <option value="year_asc">Год (старее в начале)</option>
+          <option value="brand_asc">Марка (А–Я)</option>
+          <option value="brand_desc">Марка (Я–А)</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Контейнер для карточек -->
+  <main class="cars-grid">
+    <!-- Карточки будут добавляться динамически -->
+  </main>
+
+  <!-- Пагинация -->
+  <div class="pagination-container">
+    <button id="prevPage" class="btn">← Назад</button>
+    <span id="pageIndicator">Страница 1 из 1</span>
+    <button id="nextPage" class="btn">Вперёд →</button>
+  </div>
+
+  <!-- Футер -->
+  <footer class="footer-bar">
+    <nav>
+      <a href="index.html" class="footer-link">Главная</a>
+      <a href="about.html" class="footer-link">О нас</a>
+      <a href="contact.html" class="footer-link">Связь</a>
+    </nav>
+  </footer>
+
+  <!-- Дополнительные элементы -->
+  <div class="loader"></div>
+  <div class="error-message"></div>
+
+  <!-- Подключаем скрипт приложения -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <!-- Запрещаем масштабирование, чтобы верстка не ломалась -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>О нас | Яндекс.Такси</title>
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    /* Контейнер всей страницы */
+    .about-container {
+      max-width: 800px;    /* Центрируем и ограничиваем ширину */
+      margin: -20px auto;
+      padding: 10px;
+    }
+
+    /* Блок с информацией */
+    .about-content {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 15px;
+      margin-bottom: 5px; /* Отступ снизу перед картой */
+      color: var(--text-color);
+      line-height: 1.4;
+      font-size: 0.95rem;
+    }
+    .about-content h1 {
+      margin-bottom: -20px;
+      color: var(--text-color);
+      font-size: 1.2rem;
+    }
+    .about-content p {
+      margin-bottom: -1rem;
+    }
+
+    /* Карта фиксированной высоты */
+    .custom-map-container {
+      margin: 0 auto 75px; /* Отступ снизу 30px */
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      background: var(--card-bg);
+      width: 100%;
+      height: 200px; /* при необходимости можно изменить */
+    }
+    .map-iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* Футер остаётся без изменений */
+    .footer-bar {
+      background: var(--black);
+      padding: 5%;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: 10%;
+    }
+    .footer-link {
+      color: var(--white);
+      text-decoration: none;
+      margin: 0 15px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .footer-link:hover {
+      color: var(--yellow);
+    }
+  </style>
+</head>
+<body>
+  <!-- Шапка -->
+  <header class="header-bar">
+    <img src="img/logo.jpg" alt="Лого" class="logo">
+  </header>
+
+  <div class="about-container">
+    <!-- Текстовый блок -->
+    <div class="about-content">
+      <h1>О нашей компании</h1>
+      <p>
+        Мы — Автофинанс, надёжный сервис аренды, проката и выкупа автомобилей. Работаем, чтобы сделать передвижение по городу и за его пределами удобным, доступным и выгодным.
+      </p>
+      <p>
+        Нужен автомобиль на день, неделю или месяц? Предлагаем простые и прозрачные условия аренды. Хотите выкупить авто? Поможем с оформлением быстро и без лишней волокиты.
+      </p>
+      <p>
+        Мы рядом — смотрите местоположение на карте и заезжайте в ближайший офис.
+      </p>
+      <p>
+        Автофинанс — свобода передвижения начинается здесь.
+      </p>
+    </div>
+
+    <!-- Блок карты -->
+    <div class="custom-map-container">
+      <div class="map-iframe">
+        <script
+          type="text/javascript"
+          charset="utf-8"
+          async
+          src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3A47265ac09679344c6cb18d2db8faddb01dc57ad56d29568e7e4c5e74a3b25b6c&amp;width=100%25&amp;height=100%25&amp;lang=ru_RU&amp;scroll=true">
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer-bar">
+    <nav>
+      <a href="index.html" class="footer-link">Главная</a>
+      <a href="about.html" class="footer-link">О нас</a>
+      <a href="contact.html" class="footer-link">Связь</a>
+    </nav>
+  </footer>
+</body>
+</html>

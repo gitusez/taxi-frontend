@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Связь | Яндекс.Такси</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Шапка -->
+  <header class="header-bar">
+    <img src="img/logo.jpg" alt="Лого" class="logo">
+  </header>
+
+  <!-- Основной контент -->
+  <section class="contact-section">
+    <h2 class="section-heading">Связь</h2>
+    <div class="contact-info">
+      <p><strong>Адрес:</strong> г. Пятигорск, ул. Розы Люксембург, 45</p>
+      <p><strong>Телефон:</strong> <a href="tel:+79282624344">+7 (777) 777-77-77</a></p>
+    </div>
+    <div class="feedback-buttons">
+      <a href="https://wa.me/79282624344" target="_blank" class="btn whatsapp">WhatsApp</a>
+      <button class="btn contact" onclick="openModal()">Отправить заявку</button>
+      <a href="tel:+79282624344" class="btn call">Позвонить</a>
+    </div>
+  </section>
+
+  <!-- Футер -->
+  <footer class="footer-bar">
+    <nav>
+      <a href="index.html" class="footer-link">Главная</a>
+      <a href="about.html" class="footer-link">О нас</a>
+      <a href="contact.html" class="footer-link">Связь</a>
+    </nav>
+  </footer>
+
+  <!-- Модальное окно с формой обратной связи -->
+  <div id="feedbackModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">×</span>
+      <h3>Оставьте заявку</h3>
+      <form id="feedbackForm">
+        <input type="text" name="name" placeholder="Ваше имя" required>
+        <input type="tel" name="phone" placeholder="Ваш номер" required>
+        <button type="submit" class="btn contact">Отправить заявку</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openModal() {
+      document.getElementById("feedbackModal").style.display = "flex";
+    }
+    function closeModal() {
+      document.getElementById("feedbackModal").style.display = "none";
+    }
+    window.onclick = function(event) {
+      const modal = document.getElementById("feedbackModal");
+      if (event.target === modal) {
+        closeModal();
+      }
+    }
+    document.getElementById("feedbackForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const name = this.name.value.trim();
+      const phone = this.phone.value.trim();
+      if (name && phone) {
+        alert("Спасибо! Ваша заявка отправлена.");
+        this.reset();
+        closeModal();
+      } else {
+        alert("Пожалуйста, заполните все поля.");
+      }
+    });
+  </script>
+</body>
+</html>

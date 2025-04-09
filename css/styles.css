@@ -1,0 +1,912 @@
+:root {
+  --yellow: #ffcc00;
+  --black: #000000;
+  --white: #ffffff;
+
+  /* Светлая тема */
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --card-bg: #f9f9f9;
+
+  --border-radius: 8px;
+  --transition-speed: 0.3s;
+  --font: 'Arial', sans-serif;
+
+  --heading-size: 1.1rem;
+  --price-size: 1rem;
+  --text-size: 0.9rem;
+}
+
+
+
+/* Тёмная тема */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #1c1c1c;
+    --text-color: #dcdcdc;
+    --card-bg: #2a2a2a;
+  }
+}
+
+* {
+  margin: 0; padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font);
+}
+
+body {
+  background: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1;
+  overflow-x: hidden;
+}
+
+/* Шапка */
+.header-bar {
+  position: relative;
+  padding: 8px;
+  background: white;
+  text-align: center;
+}
+
+.logo {
+  width: 55%;
+  height: auto;
+}
+
+/* Кнопка «Назад» */
+.back-button {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: black;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Подвал */
+.footer-bar {
+  background: var(--black);
+  padding: 5%;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 10%;
+  
+}
+
+.footer-link {
+  color: var(--white);
+  text-decoration: none;
+  margin: 0 25px;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.footer-link:hover {
+  color: var(--yellow);
+}
+
+/* Фильтр */
+.filters-bar {
+  background: var(--card-bg);
+  padding: 15px;
+  margin: 10px;
+  border-radius: var(--border-radius);
+}
+
+.filter-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.filter-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-label {
+  font-size: var(--text-size);
+  margin-bottom: 5px;
+}
+
+#searchInput {
+  width: 100%;
+  background-color: var(--card-bg);
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: var(--border-radius);
+  font-size: var(--text-size);
+  color: var(--text-color);
+}
+
+#sortSelect {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--card-bg);
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: var(--border-radius);
+  font-size: var(--text-size);
+  color: var(--text-color);
+  background-image: url("data:image/svg+xml,%3Csvg fill='%23aaa' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M0 2l5 5 5-5H0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+
+/* Заголовок раздела */
+.section-heading {
+  /* margin: 10px; */
+  font-size: 1.2rem;
+  color:white;
+  text-align: center;
+  margin-top: 5%;
+}
+
+/* Сетка PREMIUM */
+.premium-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px; /* Уменьшили до 5px */
+  padding: 3.5%;
+  margin-bottom: 20px;
+  justify-items: center;
+}
+
+/* Сетка обычных машин */
+.cars-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px; /* Уменьшили до 5px */
+  padding: 3.5%;
+  margin-bottom: 60px;
+  justify-items: center;
+}
+
+/* Карточки */
+.card, .car-card, .premium-card {
+  background: none;
+  width: 220px;
+  height: 300px;
+  margin: 0;
+  padding: 3.5%;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  text-align: left;
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.card:hover, .car-card:hover, .premium-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+/* Изображения карточек */
+.dish-img, .car-img-wrap {
+  width: 100%;
+  /* height: 120px; */
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+/* Цена сверху (белая, крупная) */
+.price, .card .price {
+  font-size: 16px; /* Крупный шрифт */
+  color: white;    /* Белый цвет */
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Название авто, год */
+.car-title, .card h3 {
+  font-size: 14px;
+  font-weight: normal;
+  color: #ddd;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+/* Пробег и т.д. (мелким шрифтом) */
+.car-props, .card .car-props {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 2px;
+}
+
+/* Страница деталей */
+.car-detail {
+  margin: 10px;
+  margin-bottom: 40%;
+}
+
+.car-details-box {
+  margin: 10px 0;
+  padding: 15px;
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  color: var(--text-color);
+}
+
+/* Сетка характеристик */
+.details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* отступ между строками */
+}
+
+/* Каждая строка – flex, с пространством между колонками */
+.detail-row {
+  display: flex;
+  /* align-items: center; */
+  justify-content: center; 
+  /* При желании: align-items: center; */
+  font-size: 0.95rem; /* подберите нужный размер */
+}
+
+/*.detail-item {
+   display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border-radius: var(--border-radius);
+  padding: 8px;
+  color: var(--text-color); 
+
+  margin-bottom: 10px;
+}*/
+
+/* Левая колонка */
+.detail-label {
+  flex: 1;
+  text-align: left;
+  color: #ccc; /* Светло-серый, как на фото */
+  font-weight: normal; /* или bold, если нужно */
+  margin-right: 10px;
+}
+
+/* Правая колонка */
+.detail-value {
+  flex: 1;
+  text-align: left;
+  color: #fff; /* Белый текст, если тёмный фон */
+  /* при желании: width: 50%; или auto */
+}
+
+.description {
+  background: none;
+  color: var(--text-color);
+  padding: 10px;
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--yellow);
+  margin-bottom: 10px;
+  font-size: var(--text-size);
+}
+
+/* Кнопка Позвонить */
+.call-button-details {
+  position: fixed;
+  text-decoration: none;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: var(--yellow);
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--border-radius);
+  font-weight: bold;
+  cursor: pointer;
+  font-size: var(--text-size);
+  color: var(--black);
+  height: 8%;
+  width: 70%;
+
+    /* Новые свойства для центрирования */
+    display: flex;             /* включаем флексбокс */
+    align-items: center;       /* по вертикали по центру */
+    justify-content: center;   /* по горизонтали по центру */
+}
+
+.call-button-details:hover {
+  background: #ffd633;
+}
+
+/* Блок photo-box (слайдер) */
+.photo-box {
+  /* background: var(--card-bg); */
+  border-radius: var(--border-radius);
+  margin: 10px 0;
+  /* padding: 15px; */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.photo-box .swiper-container {
+  width: 100%;
+  height: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.photo-box .swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.photo-box .swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+}
+
+/* .fullscreen-pagination {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.6);
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: bold;
+  z-index: 10000;
+} */
+
+.fullscreen-pagination.swiper-pagination-fraction {
+  position: absolute;
+  top: 3.7%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: bold;
+  z-index: 10000;
+  margin: 0; /* на случай, если swiper задаёт margin */
+  text-align: center; /* если нужно */
+  height: fit-content;
+  width: fit-content;
+}
+
+
+.swiper-pagination-current {
+  color: var(--yellow);
+}
+
+.swiper-pagination-total {
+  color: var(--white);
+}
+
+.divider {
+  color: #fff;
+  margin: 0 2px;
+}
+
+/* Убираем стрелки слайдера */
+.swiper-button-next,
+.swiper-button-prev {
+  display: none !important;
+}
+
+/* Лайтбокс с листанием */
+.lightbox {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000;
+  z-index: 9999;
+  overflow: hidden; /* скрываем скролл */
+  transition: opacity 0.3s ease;
+}
+
+.lightbox-header {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 25%;
+  left: 3%;
+  font-size: 2rem;
+  color: white;
+  cursor: pointer;
+  z-index: 10000;
+}
+
+.lightbox-counter {
+  color: white;
+  font-size: 1rem;
+  background: rgba(0,0,0,0.5);
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.lightbox-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  touch-action: none;               /* Отключаем системную прокрутку/масштаб */
+  overscroll-behavior: none;       /* Запрещаем «прокручивание» за границы */
+  /* Можно также указать: overscroll-behavior-y: contain; */
+  overscroll-behavior-y: contain;
+}
+
+.lightbox-content img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  cursor: zoom-in;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 3rem;
+  color: white;
+  cursor: pointer;
+  padding: 0 10px;
+  user-select: none;
+}
+
+.lightbox-prev {
+  left: 10px;
+}
+
+.lightbox-next {
+  right: 10px;
+}
+
+/* Запрещаем прокрутку фоновой страницы, когда лайтбокс открыт */
+body.lightbox-open {
+  overflow: hidden;
+}
+
+/* Плавная анимация для смены фото в лайтбоксе */
+#lightboxImage {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  border-radius: 3px;
+}
+
+.fullscreen-swiper {
+  width: 100%;
+  height: 100%;
+}
+.fullscreen-swiper .swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  cursor: zoom-in;
+  
+}
+
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+  /* .dish-img, .car-img-wrap {
+    height: 100px;
+  } */
+  .photo-box .swiper-container {
+    height: 220px;
+  }
+}
+
+@media (max-width: 400px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+  /* .dish-img, .car-img-wrap {
+    height: 90px;
+  } */
+  .photo-box .swiper-container {
+    height: 180px;
+  }
+}
+
+/* Mobile S (до 320px) */
+@media (max-width: 320px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+  /* .dish-img, .car-img-wrap {
+    height: 100px;
+  } */
+  .photo-box .swiper-container {
+    height: 220px;
+  }
+}
+
+/* Mobile M (до 375px) */
+@media (max-width: 375px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+  /* .dish-img, .car-img-wrap {
+    height: 100px;
+  } */
+  .photo-box .swiper-container {
+    height: 220px;
+  }
+}
+
+/* Mobile L (до 425px) */
+@media (max-width: 425px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+  /* .dish-img, .car-img-wrap {
+    height: 100px;
+  } */
+  .photo-box .swiper-container {
+    height: 220px;
+  }
+}
+
+/* Laptop (до 1024px) */
+@media (max-width: 1024px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+  /* .dish-img, .car-img-wrap {
+    height: 100px;
+  } */
+  .photo-box .swiper-container {
+    height: 220px;
+  }
+}
+
+/* Laptop (до 1440px) */
+@media (max-width: 1440px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+  /* .dish-img, .car-img-wrap {
+    height: 100px;
+  } */
+  .photo-box .swiper-container {
+    height: 220px;
+  }
+
+  .loader {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 4px solid #3498db;
+    animation: spin 1s linear infinite;
+    z-index: 9999;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .load-more-btn {
+    display: none;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background: var(--yellow);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .error-message {
+    color: #ff4444;
+    text-align: center;
+    padding: 20px;
+    font-size: 1.1rem;
+  }
+
+  /* Стили для страницы "Связь" */
+.contact-section {
+  padding: 20px;
+  margin: 20px;
+  background-color: var(--card-bg); /* Если в вашем проекте определён цвет карточек */
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.contact-section .section-heading {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  color: var(--text-color);
+}
+
+.contact-info p {
+  font-size: 1.1rem;
+  margin: 5px 0;
+}
+
+.contact-info a {
+  color: var(--yellow);
+  text-decoration: none;
+}
+
+/* Стили для кнопок обратной связи */
+.feedback-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.btn {
+  display: inline-block;
+  width: 100%;
+  max-width: 280px;
+  padding: 14px 20px;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.2s;
+  color: var(--white);
+}
+
+.btn.whatsapp {
+  background-color: #25D366;
+}
+
+.btn.contact {
+  background-color: #ffcc00;
+}
+
+.btn.call {
+  background-color: #000000;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+/* Стили для модального окна */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: var(--bg-color, #fff);
+  padding: 30px 20px;
+  border-radius: var(--border-radius);
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  position: relative;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: var(--text-color);
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 15px;
+}
+
+.close-btn {
+  position: absolute;
+  right: 16px;
+  top: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #aaa;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* Блок пагинации */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin: 20px auto 100px auto;
+  padding: 0 10px;
+  text-align: center;
+  /* Если нужно, чтобы не закрывалось футером:
+     margin-bottom: 80px; 
+     или что-то в этом духе
+  */
+}
+
+.pagination-container .btn {
+  /* Используем твои стили кнопок, можно взять за основу .btn из contact */
+  background-color: var(--black);
+  color: var(--white);
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* При наведении — чуть светлее */
+.pagination-container .btn:hover {
+  opacity: 0.8;
+}
+
+/* Если кнопка отключена */
+.pagination-container .btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Стиль индикатора "Страница X из Y" */
+#pageIndicator {
+  font-size: 0.95rem;
+  color: var(--text-color);
+  font-weight: bold;
+}
+
+.car-img {
+  width: 100%;
+  height: 100%;
+  /* object-fit: cover; */
+  border-radius: var(--border-radius);
+  margin-bottom: 10px;
+}
+
+.car-price {
+  font-size: 16px;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.car-title {
+  font-size: 15px;
+  font-weight: normal;
+  color: #ddd;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.car-detal {
+  font-size: 14px;
+  font-weight: normal;
+  color: #aaa;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+/* Добавьте эти стили в ваш CSS-файл */
+.about-content {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.about-content h1 {
+  color: var(--text-color);
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.about-content p {
+  color: var(--text-color);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  font-size: 16px;
+  text-align: justify;
+  white-space: pre-line;
+}
+
+.about-content p:last-child {
+  margin-bottom: -5px;
+}
+
+/* Стили для темной темы */
+@media (prefers-color-scheme: dark) {
+  .about-content h1 {
+    color: var(--white);
+  }
+  
+  .about-content p {
+    color: #dcdcdc;
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .about-content {
+    padding: 0 1rem;
+    margin: 1.5rem auto;
+  }
+  
+  .about-content h1 {
+    font-size: 1.75rem;
+    margin-bottom: 1.2rem;
+  }
+  
+  .about-content p {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-content h1 {
+    font-size: 1.5rem;
+  }
+  
+  .about-content p {
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+}
+
+}
