@@ -35,13 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const requestData = {
         filters: {},
-        items: 9999,
+        items: config.itemsPerPage,
         offset: 0
       };
 
       const response = await fetch(config.apiUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(requestData)
       });
 
@@ -54,11 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ? result.cars_list
         : Object.values(result.cars_list || {});
 
-      const newCars = rawCars.filter(car =>
-        config.allowedOwners.includes(String(car.owner_id).toLowerCase().trim())
+      const allowedIds = config.allowedOwners.map(id => id.toLowerCase().trim());
+
+      allCars = rawCars.filter(car =>
+        allowedIds.includes(String(car.owner_id).toLowerCase().trim())
       );
 
-      allCars = newCars;
       filteredCars = [...allCars];
       currentPage = 1;
       renderCars();
@@ -86,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (model.includes("largus")) price = "2600 руб/сутки";
 
       const status = car.status || "—";
-      const statusClass = typeof statusRaw === 'string' ? statusRaw.toLowerCase() : '';
+      const statusClass = typeof status === 'string' ? status.toLowerCase() : '';
       const image = car.avatar || 'img/granta1.jpg';
 
       card.innerHTML = `
