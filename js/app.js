@@ -35,8 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const requestData = {
         items: config.itemsPerPage,
-        offset: 0,
-        allowedOwners: config.allowedOwners  // ✅ добавлено
+        offset: 0
       };
 
       const response = await fetch(config.apiUrl, {
@@ -49,13 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const result = await response.json();
-  
+
       if (!result.success) throw new Error(result.error || "Ошибка сервера");
-  
+
       const rawCars = Array.isArray(result.cars_list)
         ? result.cars_list
         : Object.values(result.cars_list || {});
-  
+
       allCars = rawCars;
       filteredCars = [...allCars];
       currentPage = 1;
@@ -64,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showError(error.message);
     }
   }
+
   function renderCars() {
     const grid = document.querySelector('.cars-grid');
     if (!grid) return;
