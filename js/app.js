@@ -34,9 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadCars() {
     try {
       const requestData = {
-        filters: {},
         items: config.itemsPerPage,
-        offset: 0
+        offset: 0,
+        allowedOwners: config.allowedOwners  // ✅ добавлено
       };
 
       const response = await fetch(config.apiUrl, {
@@ -48,20 +48,15 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-
       const result = await response.json();
+  
       if (!result.success) throw new Error(result.error || "Ошибка сервера");
-
+  
       const rawCars = Array.isArray(result.cars_list)
         ? result.cars_list
         : Object.values(result.cars_list || {});
-
-      const allowedIds = config.allowedOwners.map(id => id.toLowerCase().trim());
-
-      allCars = rawCars.filter(car =>
-        allowedIds.includes(String(car.owner_id).toLowerCase().trim())
-      );
-
+  
+      allCars = rawCars;
       filteredCars = [...allCars];
       currentPage = 1;
       renderCars();
@@ -69,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
       showError(error.message);
     }
   }
-
   function renderCars() {
     const grid = document.querySelector('.cars-grid');
     if (!grid) return;
