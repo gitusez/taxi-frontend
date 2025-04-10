@@ -1,5 +1,5 @@
 export const config = {
-  apiUrl: "http://89.111.172.49/api/cars/combined",
+  apiUrl: "https://autofinanceapp.ru/api/cars/combined",
   itemsPerPage: 30,
   allowedOwners: [
     "08bd7d68-9c8f-5d7c-b73c-5fca59168f7b",
