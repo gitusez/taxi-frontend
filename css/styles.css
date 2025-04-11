@@ -909,4 +909,28 @@ body.lightbox-open {
   }
 }
 
+.load-more-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.load-more-btn:hover {
+  background-color: #333;
+}
+
+.load-more-btn:disabled {
+  background-color: #888;
+  cursor: not-allowed;
+}
+
+
 }
