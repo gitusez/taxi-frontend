@@ -1,4 +1,5 @@
 export const config = {
   apiUrl: "https://autofinanceapp.ru/api/cars/combined",
-  itemsPerPage: 30
+  itemsInitial: 15,
+  itemsLoadMore: 10
 };
