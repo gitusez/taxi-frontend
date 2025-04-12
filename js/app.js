@@ -8,8 +8,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const loader = document.querySelector('.loader');
   const errorBox = document.querySelector('.error-message');
   const grid = document.querySelector('.cars-grid');
-  const loadMoreBtn = document.getElementById('loadMoreBtn');
-  const noMoreCarsNotice = document.getElementById('noMoreCarsNotice');
+  const feedbackReminder = document.getElementById('noMoreCarsNotice');
+  const contactModal = document.getElementById('contactModal');
+  const loadMoreContainer = document.querySelector('.pagination-container');
+
+  const loadMoreBtn = document.createElement('button');
+  loadMoreBtn.id = 'loadMoreBtn';
+  loadMoreBtn.className = 'btn load-more-btn';
+  loadMoreBtn.textContent = "Загрузить ещё";
+  loadMoreBtn.addEventListener('click', () => {
+    if (!allLoaded) loadCars(config.itemsLoadMore);
+  });
+  loadMoreContainer.appendChild(loadMoreBtn);
 
   initEventListeners();
   loadCars(config.itemsInitial);
@@ -20,12 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
       sortCars();
       renderCars();
     });
-
-    if (loadMoreBtn) {
-      loadMoreBtn.addEventListener('click', () => {
-        if (!allLoaded) loadCars(config.itemsLoadMore);
-      });
-    }
   }
 
   async function loadCars(itemsCount) {
@@ -49,13 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (rawCars.length === 0) {
         allLoaded = true;
-        if (loadMoreBtn) loadMoreBtn.disabled = true;
+        loadMoreBtn.disabled = true;
 
-        // Показать уведомление через 5 секунд
         setTimeout(() => {
-          if (noMoreCarsNotice) {
-            noMoreCarsNotice.style.display = "block";
-          }
+          if (feedbackReminder) feedbackReminder.style.display = "block";
         }, 5000);
 
         return;
@@ -74,9 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderCars() {
-    if (!grid) return;
     grid.innerHTML = "";
-
     allCars.forEach(car => {
       const card = document.createElement('div');
       card.className = 'car-card';
@@ -146,4 +145,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     console.error(message);
   }
+
+  // Модалка
+  window.openContactForm = () => {
+    contactModal.style.display = "flex";
+  };
+  window.closeContactForm = () => {
+    contactModal.style.display = "none";
+  };
+  window.onclick = (event) => {
+    if (event.target === contactModal) {
+      contactModal.style.display = "none";
+    }
+  };
 });
