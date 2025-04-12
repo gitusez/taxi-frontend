@@ -158,4 +158,14 @@ document.addEventListener('DOMContentLoaded', () => {
       contactModal.style.display = "none";
     }
   };
+
+  window.openContactForm = function () {
+    const modal = document.getElementById('contactModal');
+    if (modal) modal.style.display = "flex";
+  };
+  
+  window.closeContactForm = function () {
+    const modal = document.getElementById('contactModal');
+    if (modal) modal.style.display = "none";
+  };
 });
