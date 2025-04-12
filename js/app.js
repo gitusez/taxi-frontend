@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const errorBox = document.querySelector('.error-message');
   const grid = document.querySelector('.cars-grid');
   const loadMoreBtn = document.getElementById('loadMoreBtn');
-  const feedbackReminder = document.querySelector('.feedback-reminder');
+  const noMoreCarsNotice = document.getElementById('noMoreCarsNotice');
 
   initEventListeners();
   loadCars(config.itemsInitial);
@@ -49,10 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (rawCars.length === 0) {
         allLoaded = true;
-        loadMoreBtn.disabled = true;
+        if (loadMoreBtn) loadMoreBtn.disabled = true;
 
+        // Показать уведомление через 5 секунд
         setTimeout(() => {
-          feedbackReminder.style.display = "block";
+          if (noMoreCarsNotice) {
+            noMoreCarsNotice.style.display = "block";
+          }
         }, 5000);
 
         return;
@@ -71,7 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderCars() {
+    if (!grid) return;
     grid.innerHTML = "";
+
     allCars.forEach(car => {
       const card = document.createElement('div');
       card.className = 'car-card';
