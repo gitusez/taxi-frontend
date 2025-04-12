@@ -8,25 +8,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const loader = document.querySelector('.loader');
   const errorBox = document.querySelector('.error-message');
   const grid = document.querySelector('.cars-grid');
-  const feedbackReminder = document.getElementById('noMoreCarsNotice');
-  const contactModal = document.getElementById('contactModal');
   const loadMoreContainer = document.querySelector('.pagination-container');
-
   const loadMoreBtn = document.createElement('button');
-  loadMoreBtn.id = 'loadMoreBtn';
-  loadMoreBtn.className = 'btn load-more-btn';
   loadMoreBtn.textContent = "Загрузить ещё";
+  loadMoreBtn.className = "btn load-more-btn";
   loadMoreBtn.addEventListener('click', () => {
     if (!allLoaded) loadCars(config.itemsLoadMore);
   });
   loadMoreContainer.appendChild(loadMoreBtn);
 
+  const feedbackNotice = document.getElementById('noMoreCarsNotice');
+
   initEventListeners();
   loadCars(config.itemsInitial);
 
   function initEventListeners() {
-    document.getElementById('searchInput')?.addEventListener('input', debounce(searchCars, 300));
-    document.getElementById('sortSelect')?.addEventListener('change', () => {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.addEventListener('input', debounce(searchCars, 300));
+
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) sortSelect.addEventListener('change', () => {
       sortCars();
       renderCars();
     });
@@ -47,22 +48,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await response.json();
       if (!result.success) throw new Error(result.error || "Ошибка сервера");
 
-      const rawCars = Array.isArray(result.cars_list)
+      const newCars = Array.isArray(result.cars_list)
         ? result.cars_list
         : Object.values(result.cars_list || {});
 
-      if (rawCars.length === 0) {
+      if (newCars.length === 0) {
         allLoaded = true;
         loadMoreBtn.disabled = true;
 
         setTimeout(() => {
-          if (feedbackReminder) feedbackReminder.style.display = "block";
+          if (feedbackNotice) feedbackNotice.style.display = "block";
         }, 5000);
 
         return;
       }
 
-      allCars = allCars.concat(rawCars);
+      allCars = allCars.concat(newCars);
       offset += itemsCount;
 
       sortCars();
@@ -101,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <p>Статус: <span class="status-${statusClass}">${status}</span></p>
         </div>
       `;
+
       card.onclick = () => window.location.href = `car-details.html?car=${car.id}`;
       grid.appendChild(card);
     });
@@ -119,23 +121,47 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function searchCars() {
-    const query = document.getElementById('searchInput').value.toLowerCase();
+    const query = document.getElementById('searchInput')?.value.toLowerCase();
     const filtered = allCars.filter(car => {
       const name = ((car.brand || '') + ' ' + (car.model || '')).toLowerCase();
       return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(
         query.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       );
     });
-    allCars = filtered;
-    renderCars();
+    renderFiltered(filtered);
   }
 
-  function debounce(func, delay) {
-    let timeout;
-    return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), delay);
-    };
+  function renderFiltered(filteredCars) {
+    grid.innerHTML = "";
+    filteredCars.forEach(car => {
+      const card = document.createElement('div');
+      card.className = 'car-card';
+
+      const model = (car.model || "").toLowerCase();
+      let price = "—";
+      if (model.includes("granta")) price = "1700 руб/сутки";
+      else if (model.includes("vesta")) price = "2400 руб/сутки";
+      else if (model.includes("largus")) price = "2600 руб/сутки";
+
+      const status = car.status || "—";
+      const statusClass = typeof status === 'string' ? status.toLowerCase() : '';
+      const image = car.avatar || 'img/granta1.jpg';
+
+      card.innerHTML = `
+        <img src="${image}" alt="Фото авто" class="car-img">
+        <h3 class="car-price">Цена: ${price}</h3>
+        <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
+        <div class="car-detal">
+          <p>Год: ${car.year || '—'}</p>
+          <p>Цвет: ${car.color || '—'}</p>
+          <p>Номер: ${car.number || '—'}</p>
+          <p>Статус: <span class="status-${statusClass}">${status}</span></p>
+        </div>
+      `;
+
+      card.onclick = () => window.location.href = `car-details.html?car=${car.id}`;
+      grid.appendChild(card);
+    });
   }
 
   function showError(message) {
@@ -145,27 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     console.error(message);
   }
-
-  // Модалка
-  window.openContactForm = () => {
-    contactModal.style.display = "flex";
-  };
-  window.closeContactForm = () => {
-    contactModal.style.display = "none";
-  };
-  window.onclick = (event) => {
-    if (event.target === contactModal) {
-      contactModal.style.display = "none";
-    }
-  };
-
-  window.openContactForm = function () {
-    const modal = document.getElementById('contactModal');
-    if (modal) modal.style.display = "flex";
-  };
-  
-  window.closeContactForm = function () {
-    const modal = document.getElementById('contactModal');
-    if (modal) modal.style.display = "none";
-  };
 });
+
+// ✅ Эти функции видимы в index.html
+window.openContactForm = () => {
+  const modal = document.getElementById('contactModal');
+  if (modal) modal.style.display = "flex";
+};
+
+window.closeContactForm = () => {
+  const modal = document.getElementById('contactModal');
+  if (modal) modal.style.display = "none";
+};
