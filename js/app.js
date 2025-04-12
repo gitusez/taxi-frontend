@@ -14,6 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
   loadMoreBtn.className = "btn load-more-btn";
   loadMoreBtn.addEventListener('click', () => {
     if (!allLoaded) loadCars(config.itemsLoadMore);
+
+    document.getElementById('openContactBtn')?.addEventListener('click', () => {
+      const modal = document.getElementById('contactModal');
+      if (modal) modal.style.display = "flex";
+    });
+    
+    document.querySelector('.close-btn')?.addEventListener('click', () => {
+      const modal = document.getElementById('contactModal');
+      if (modal) modal.style.display = "none";
+    });
+    
   });
   loadMoreContainer.appendChild(loadMoreBtn);
 
@@ -172,14 +183,3 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error(message);
   }
 });
-
-// ✅ Эти функции видимы в index.html
-window.openContactForm = () => {
-  const modal = document.getElementById('contactModal');
-  if (modal) modal.style.display = "flex";
-};
-
-window.closeContactForm = () => {
-  const modal = document.getElementById('contactModal');
-  if (modal) modal.style.display = "none";
-};
