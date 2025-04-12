@@ -709,7 +709,7 @@ body.lightbox-open {
 
 /* Стили для модального окна */
 .modal {
-  /* display: none; */
+  display: none;
   position: fixed;
   z-index: 9999;
   left: 0;
@@ -719,6 +719,10 @@ body.lightbox-open {
   background-color: rgba(0, 0, 0, 0.5);
   justify-content: center;
   align-items: center;
+}
+
+.modal.show {
+  display: flex;
 }
 
 .modal-content {

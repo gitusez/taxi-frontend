@@ -39,24 +39,23 @@
   <!-- Кнопка Загрузить ещё -->
   <div class="pagination-container"></div>
 
-  <!-- Уведомление о конце списка -->
-  <div id="noMoreCarsNotice" class="notice" style="display: none; text-align: center; margin: 20px;">
-    <p style="margin-bottom: 10px;">Не нашли авто мечты, обратитесь к менеджеру</p>
-<!-- стало -->
-<button class="btn contact" id="openContactBtn">Оставить заявку</button>
-  </div>
+<!-- Уведомление о конце списка -->
+<div id="noMoreCarsNotice" class="notice" style="display: none;">
+  <p>Не нашли авто мечты, обратитесь к менеджеру</p>
+  <button class="btn contact" id="openContactBtn">Оставить заявку</button>
+</div>
 
-  <!-- Модальное окно с заявкой -->
-  <div id="contactModal" class="modal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeContactForm()">&times;</span>
-      <h3>Заявка на авто</h3>
-      <input type="text" placeholder="Ваше имя">
-      <input type="text" placeholder="Телефон">
-      <input type="text" placeholder="Какая машина вам нужна?">
-      <button class="btn contact">Отправить</button>
-    </div>
+<!-- Модальное окно с заявкой -->
+<div id="contactModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close-btn" id="closeContactBtn">&times;</span>
+    <h3>Заявка на авто</h3>
+    <input type="text" id="userName" placeholder="Ваше имя">
+    <input type="text" id="userPhone" placeholder="Телефон">
+    <input type="text" id="userRequest" placeholder="Какая машина вам нужна?">
+    <button class="btn contact" id="submitRequestBtn">Отправить</button>
   </div>
+</div>
 
   <!-- Подвал -->
   <footer class="footer-bar">

@@ -1,3 +1,4 @@
+
 import { config } from './config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -12,26 +13,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadMoreBtn = document.createElement('button');
   loadMoreBtn.textContent = "Загрузить ещё";
   loadMoreBtn.className = "btn load-more-btn";
-  loadMoreBtn.addEventListener('click', () => {
-    if (!allLoaded) loadCars(config.itemsLoadMore);
-
-    document.getElementById('openContactBtn')?.addEventListener('click', () => {
-      const modal = document.getElementById('contactModal');
-      if (modal) modal.style.display = "flex";
-    });
-    
-    document.querySelector('.close-btn')?.addEventListener('click', () => {
-      const modal = document.getElementById('contactModal');
-      if (modal) modal.style.display = "none";
-    });
-    
-  });
   loadMoreContainer.appendChild(loadMoreBtn);
 
   const feedbackNotice = document.getElementById('noMoreCarsNotice');
+  const openContactBtn = document.getElementById('openContactBtn');
+  const contactModal = document.getElementById('contactModal');
+  const closeBtn = document.querySelector('.close-btn');
+
+  if (openContactBtn) {
+    openContactBtn.addEventListener('click', () => {
+      if (contactModal) contactModal.style.display = 'flex';
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      if (contactModal) contactModal.style.display = 'none';
+    });
+  }
+
+  const sendBtn = document.querySelector('#contactModal .btn.contact');
+  if (sendBtn) {
+    sendBtn.addEventListener('click', () => {
+      const inputs = contactModal.querySelectorAll('input');
+      const data = {
+        name: inputs[0].value.trim(),
+        phone: inputs[1].value.trim(),
+        request: inputs[2].value.trim()
+      };
+      console.log("Форма отправлена:", data);
+      contactModal.style.display = 'none';
+    });
+  }
 
   initEventListeners();
   loadCars(config.itemsInitial);
+
+  loadMoreBtn.addEventListener('click', () => {
+    if (!allLoaded) loadCars(config.itemsLoadMore);
+  });
 
   function initEventListeners() {
     const searchInput = document.getElementById('searchInput');
@@ -70,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
           if (feedbackNotice) feedbackNotice.style.display = "block";
         }, 5000);
-
         return;
       }
 
@@ -135,8 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const query = document.getElementById('searchInput')?.value.toLowerCase();
     const filtered = allCars.filter(car => {
       const name = ((car.brand || '') + ' ' + (car.model || '')).toLowerCase();
-      return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(
-        query.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      return name.normalize("NFD").replace(/[̀-ͯ]/g, "").includes(
+        query.normalize("NFD").replace(/[̀-ͯ]/g, "")
       );
     });
     renderFiltered(filtered);
@@ -183,3 +202,11 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error(message);
   }
 });
+
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
