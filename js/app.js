@@ -117,8 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (model.includes("vesta")) price = "2400 руб/сутки";
       else if (model.includes("largus")) price = "2600 руб/сутки";
 
-      const status = car.status || "—";
-      const statusClass = typeof status === 'string' ? status.toLowerCase() : '';
+      const fuelType = car.fuel_type || "—";
+      const fuelTypeClass = typeof fuelType === 'string' ? fuelType.toLowerCase().replace(/\s/g, '-') : '';
       const image = car.avatar || 'img/granta1.jpg';
 
       card.innerHTML = `
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <p>Год: ${car.year || '—'}</p>
           <p>Цвет: ${car.color || '—'}</p>
           <p>Номер: ${car.number || '—'}</p>
-          <p>Статус: <span class="status-${statusClass}">${status}</span></p>
+          <p>Тип топлива: <span class="fuel-${fuelTypeClass}">${fuelType}</span></p>
         </div>
       `;
 
