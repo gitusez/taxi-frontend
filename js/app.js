@@ -105,22 +105,57 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // function renderCars() {
+  //   grid.innerHTML = "";
+  //   allCars.forEach(car => {
+  //     const card = document.createElement('div');
+  //     card.className = 'car-card';
+
+  //     const model = (car.model || "").toLowerCase();
+  //     let price = "—";
+  //     if (model.includes("granta")) price = "1700 руб/сутки";
+  //     else if (model.includes("vesta")) price = "2400 руб/сутки";
+  //     else if (model.includes("largus")) price = "2600 руб/сутки";
+
+  //     const fuelType = car.fuel_type || "—";
+  //     const fuelTypeClass = typeof fuelType === 'string' ? fuelType.toLowerCase().replace(/\s/g, '-') : '';
+  //     const image = car.avatar || 'img/granta1.jpg';
+
+  //     card.innerHTML = `
+  //       <img src="${image}" alt="Фото авто" class="car-img">
+  //       <h3 class="car-price">Цена: ${price}</h3>
+  //       <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
+  //       <div class="car-detal">
+  //         <p>Год: ${car.year || '—'}</p>
+  //         <p>Цвет: ${car.color || '—'}</p>
+  //         <p>Номер: ${car.number || '—'}</p>
+  //         <p>Тип топлива: <span class="fuel-${fuelTypeClass}">${fuelType}</span></p>
+  //       </div>
+  //     `;
+
+  //     card.onclick = () => window.location.href = `car-details.html?car=${car.id}`;
+  //     grid.appendChild(card);
+  //   });
+  // }
+
   function renderCars() {
     grid.innerHTML = "";
     allCars.forEach(car => {
       const card = document.createElement('div');
       card.className = 'car-card';
-
+  
       const model = (car.model || "").toLowerCase();
       let price = "—";
       if (model.includes("granta")) price = "1700 руб/сутки";
       else if (model.includes("vesta")) price = "2400 руб/сутки";
       else if (model.includes("largus")) price = "2600 руб/сутки";
-
+  
       const fuelType = car.fuel_type || "—";
+      const transmission = car.transmission || "—";
+      const equipment = car.equipment || "—";
       const fuelTypeClass = typeof fuelType === 'string' ? fuelType.toLowerCase().replace(/\s/g, '-') : '';
       const image = car.avatar || 'img/granta1.jpg';
-
+  
       card.innerHTML = `
         <img src="${image}" alt="Фото авто" class="car-img">
         <h3 class="car-price">Цена: ${price}</h3>
@@ -130,9 +165,11 @@ document.addEventListener('DOMContentLoaded', () => {
           <p>Цвет: ${car.color || '—'}</p>
           <p>Номер: ${car.number || '—'}</p>
           <p>Тип топлива: <span class="fuel-${fuelTypeClass}">${fuelType}</span></p>
+          <p>Коробка передач: ${transmission}</p>
+          <p>Комплектация: ${equipment}</p>
         </div>
       `;
-
+  
       card.onclick = () => window.location.href = `car-details.html?car=${car.id}`;
       grid.appendChild(card);
     });
@@ -161,22 +198,57 @@ document.addEventListener('DOMContentLoaded', () => {
     renderFiltered(filtered);
   }
 
+  // function renderFiltered(filteredCars) {
+  //   grid.innerHTML = "";
+  //   filteredCars.forEach(car => {
+  //     const card = document.createElement('div');
+  //     card.className = 'car-card';
+
+  //     const model = (car.model || "").toLowerCase();
+  //     let price = "—";
+  //     if (model.includes("granta")) price = "1700 руб/сутки";
+  //     else if (model.includes("vesta")) price = "2400 руб/сутки";
+  //     else if (model.includes("largus")) price = "2600 руб/сутки";
+
+  //     const fuelType = car.fuel_type || "—";
+  //     const fuelTypeClass = typeof fuelType === 'string' ? fuelType.toLowerCase().replace(/\s/g, '-') : '';      
+  //     const image = car.avatar || 'img/granta1.jpg';
+
+  //     card.innerHTML = `
+  //       <img src="${image}" alt="Фото авто" class="car-img">
+  //       <h3 class="car-price">Цена: ${price}</h3>
+  //       <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
+  //       <div class="car-detal">
+  //         <p>Год: ${car.year || '—'}</p>
+  //         <p>Цвет: ${car.color || '—'}</p>
+  //         <p>Номер: ${car.number || '—'}</p>
+  //         <p>Тип топлива: <span class="fuel-${fuelTypeClass}">${fuelType}</span></p>
+  //       </div>
+  //     `;
+
+  //     card.onclick = () => window.location.href = `car-details.html?car=${car.id}`;
+  //     grid.appendChild(card);
+  //   });
+  // }
+
   function renderFiltered(filteredCars) {
     grid.innerHTML = "";
     filteredCars.forEach(car => {
       const card = document.createElement('div');
       card.className = 'car-card';
-
+  
       const model = (car.model || "").toLowerCase();
       let price = "—";
       if (model.includes("granta")) price = "1700 руб/сутки";
       else if (model.includes("vesta")) price = "2400 руб/сутки";
       else if (model.includes("largus")) price = "2600 руб/сутки";
-
+  
       const fuelType = car.fuel_type || "—";
-      const fuelTypeClass = typeof fuelType === 'string' ? fuelType.toLowerCase().replace(/\s/g, '-') : '';      
+      const transmission = car.transmission || "—";
+      const equipment = car.equipment || "—";
+      const fuelTypeClass = typeof fuelType === 'string' ? fuelType.toLowerCase().replace(/\s/g, '-') : '';
       const image = car.avatar || 'img/granta1.jpg';
-
+  
       card.innerHTML = `
         <img src="${image}" alt="Фото авто" class="car-img">
         <h3 class="car-price">Цена: ${price}</h3>
@@ -186,9 +258,11 @@ document.addEventListener('DOMContentLoaded', () => {
           <p>Цвет: ${car.color || '—'}</p>
           <p>Номер: ${car.number || '—'}</p>
           <p>Тип топлива: <span class="fuel-${fuelTypeClass}">${fuelType}</span></p>
+          <p>Коробка передач: ${transmission}</p>
+          <p>Комплектация: ${equipment}</p>
         </div>
       `;
-
+  
       card.onclick = () => window.location.href = `car-details.html?car=${car.id}`;
       grid.appendChild(card);
     });
