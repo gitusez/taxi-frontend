@@ -942,7 +942,7 @@ body.lightbox-open {
   color: var(--text-color);
   border-radius: var(--border-radius);
   padding: 20px;
-  margin: 20px auto 120px auto;
+  margin: -100px auto 110px auto;
   text-align: center;
   max-width: 90%;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
