@@ -50,21 +50,26 @@ body {
 }
 
 .logo {
-  width: 55%;
+  /* width: 55%;
+  height: auto; */
+
+  width: 100%;
   height: auto;
+  max-width: 1549px; /* Задаем максимальную ширину для логотипа */
+  margin: 0 auto; /* Выравниваем логотип по центру */
 }
 
 /* Логотип для темной темы */
 @media (prefers-color-scheme: dark) {
   .logo {
-    content: url('img/logo2.jpg');
+    content: url('img/logo.jpg');
   }
 }
 
 /* Логотип для светлой темы */
 @media (prefers-color-scheme: light) {
   .logo {
-    content: url('img/logo.jpg');
+    content: url('img/logo2.jpg');
   }
 }
 
