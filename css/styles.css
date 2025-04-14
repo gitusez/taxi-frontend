@@ -15,6 +15,9 @@
   --heading-size: 1.1rem;
   --price-size: 1rem;
   --text-size: 0.9rem;
+
+  --label-color: #ccc;
+  --value-color: #fff;
 }
 
 
@@ -22,6 +25,8 @@ body.light-theme {
   --bg-color: #ffffff;
   --text-color: #000000;
   --card-bg: #f9f9f9;
+  --label-color: #444;
+  --value-color: #000;
 }
 body.dark-theme {
   --bg-color: #1c1c1c;
@@ -85,9 +90,9 @@ body {
 .back-button {
   position: absolute;
   left: 10px;
-  top: 50%;
+  top: 15%;
   transform: translateY(-50%);
-  color: black;
+  color: #ffcc00;
   text-decoration: none;
   font-size: 1.2rem;
   font-weight: bold;
@@ -298,7 +303,7 @@ body {
 .detail-label {
   flex: 1;
   text-align: left;
-  color: #ccc; /* Светло-серый, как на фото */
+  color: var(--label-color);
   font-weight: normal; /* или bold, если нужно */
   margin-right: 10px;
 }
@@ -307,8 +312,7 @@ body {
 .detail-value {
   flex: 1;
   text-align: left;
-  color: #fff; /* Белый текст, если тёмный фон */
-  /* при желании: width: 50%; или auto */
+  color: var(--value-color);
 }
 
 .description {
