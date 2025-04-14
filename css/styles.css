@@ -44,7 +44,7 @@ body {
 /* Шапка */
 .header-bar {
   position: relative;
-  padding: 8px;
+  /* padding: 8px; */
   background: white;
   text-align: center;
 }
