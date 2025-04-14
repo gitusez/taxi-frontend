@@ -56,8 +56,14 @@ function renderCarDetails(car) {
     color: car.color,
     number: car.number,
     mileage: car.mileage ? `${car.mileage} км` : null,
-    vin: car.vin,
-    status: car.status
+
+    fuel: car.fuel_type,
+    transmission: car.transmission,
+    equipment: car.equipment
+    
+    // vin: car.vin,
+    // status: car.status
+
   };
 
   Object.entries(fields).forEach(([key, value]) => {
