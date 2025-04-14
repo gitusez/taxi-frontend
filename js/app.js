@@ -246,7 +246,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // Слушаем изменения в настройках темы
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
     logo.src = e.matches ? 'img/logo2.jpg' : 'img/logo.jpg'; // Меняем логотип при переключении темы
+    toggleTheme(e.matches);
   });
+
+  // Устанавливаем начальную тему
+  if (prefersDarkTheme) {
+    toggleTheme(true);
+  } else {
+    toggleTheme(false);
+  }
+
+  // Функция для изменения темы
+  function toggleTheme(isDark) {
+    if (isDark) {
+      document.body.classList.add('dark-theme');
+      document.body.classList.remove('light-theme');
+    } else {
+      document.body.classList.add('light-theme');
+      document.body.classList.remove('dark-theme');
+    }
+  }
 
   if (openContactBtn) {
     openContactBtn.addEventListener('click', () => {
