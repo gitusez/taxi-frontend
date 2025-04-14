@@ -68,15 +68,15 @@ body {
   .logo {
     background-image: url('img/logo.jpg');
   }
+
+  /* Для темной темы */
+  .car-title, .car-detal {
+    color: #ddd; /* Цвет для темной темы (можно оставить как есть) */
+  }
 }
 
 /* Логотип для светлой темы */
 @media (prefers-color-scheme: light) {
-  :root {
-    --bg-color: #ffffff;
-    --text-color: #333333;  /* Сделаем текст темнее */
-    --card-bg: #f9f9f9;
-  }
   .logo {
     background-image: url('img/logo2.jpg');
   }
@@ -90,7 +90,6 @@ body {
     color: #646464;  /* Цвет для деталей авто в светлой теме */
   }
 }
-
 /* Кнопка «Назад» */
 .back-button {
   position: absolute;
