@@ -57,19 +57,28 @@ body {
   height: auto;
   max-width: 1549px; /* Задаем максимальную ширину для логотипа */
   margin: 0 auto; /* Выравниваем логотип по центру */
+  margin-bottom: -3px;
 }
 
 /* Логотип для темной темы */
 @media (prefers-color-scheme: dark) {
+  * {
+    outline: none;  /* Убираем все внешние контуры */
+  }
   .logo {
-    background-image: url('img/logo2.jpg');
+    background-image: url('img/logo.jpg');
   }
 }
 
 /* Логотип для светлой темы */
 @media (prefers-color-scheme: light) {
+  :root {
+    --bg-color: #ffffff;
+    --text-color: #333333;  /* Сделаем текст темнее */
+    --card-bg: #f9f9f9;
+  }
   .logo {
-    background-image: url('img/logo.jpg');
+    background-image: url('img/logo2.jpg');
   }
 }
 
