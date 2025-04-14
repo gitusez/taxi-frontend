@@ -770,7 +770,8 @@ body.lightbox-open {
   justify-content: center;
   align-items: center;
   gap: 12px;
-  margin: 20px auto 100px auto;
+  /* margin: 20px auto 100px auto; */
+  margin: -50px auto 135px auto;
   padding: 0 10px;
   text-align: center;
   /* Если нужно, чтобы не закрывалось футером:
@@ -942,7 +943,8 @@ body.lightbox-open {
   color: var(--text-color);
   border-radius: var(--border-radius);
   padding: 20px;
-  margin: -100px auto 110px auto;
+  /* margin: -100px auto 110px auto; */
+  margin: -130px auto 120px auto;
   text-align: center;
   max-width: 90%;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
