@@ -15,10 +15,6 @@
   --heading-size: 1.1rem;
   --price-size: 1rem;
   --text-size: 0.9rem;
-
-  /* Шрифты для светлой темы */
-  --heading-font: 'Helvetica Neue', sans-serif;
-  --button-font: 'Verdana', sans-serif;
 }
 
 /* Тёмная тема */
@@ -30,9 +26,9 @@
   }
 }
 
-/* Общие стили */
 * {
-  margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
   font-family: var(--font);
 }
@@ -144,17 +140,41 @@ body {
 #sortSelect {
   appearance: none;
   -webkit-appearance: none;
+  background-color: var(--card-bg);
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: var(--border-radius);
+  font-size: var(--text-size);
+  color: var(--text-color);
   background-image: url("data:image/svg+xml,%3Csvg fill='%23aaa' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M0 2l5 5 5-5H0z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 12px;
 }
 
+/* Заголовок раздела */
+.section-heading {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  text-align: center;
+  margin-top: 5%;
+}
+
 /* Сетка PREMIUM */
-.premium-grid, .cars-grid {
+.premium-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 5px; /* Уменьшили до 5px */
+  gap: 5px;
+  padding: 3.5%;
+  margin-bottom: 20px;
+  justify-items: center;
+}
+
+/* Сетка обычных машин */
+.cars-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
   padding: 3.5%;
   margin-bottom: 60px;
   justify-items: center;
@@ -181,7 +201,7 @@ body {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-/* Карточки с изображениями */
+/* Изображения карточек */
 .dish-img, .car-img-wrap {
   width: 100%;
   object-fit: cover;
@@ -344,53 +364,184 @@ body {
   color: var(--white);
 }
 
+/* Убираем стрелки слайдера */
+.swiper-button-next,
+.swiper-button-prev {
+  display: none !important;
+}
+
+/* Лайтбокс с листанием */
+.lightbox {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000;
+  z-index: 9999;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
+}
+
+.lightbox-header {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 25%;
+  left: 3%;
+  font-size: 2rem;
+  color: white;
+  cursor: pointer;
+  z-index: 10000;
+}
+
+.lightbox-counter {
+  color: white;
+  font-size: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.lightbox-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+.lightbox-content img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  cursor: zoom-in;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 3rem;
+  color: white;
+  cursor: pointer;
+  padding: 0 10px;
+  user-select: none;
+}
+
+.lightbox-prev {
+  left: 10px;
+}
+
+.lightbox-next {
+  right: 10px;
+}
+
+body.lightbox-open {
+  overflow: hidden;
+}
+
+#lightboxImage {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  border-radius: 3px;
+}
+
+.fullscreen-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.fullscreen-swiper .swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  cursor: zoom-in;
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
   .card, .car-card, .premium-card {
     width: 105%;
     height: 105%;
   }
+
   .photo-box .swiper-container {
     height: 220px;
   }
 }
 
-/* Уведомление, когда все авто загружены */
-#noMoreCarsNotice {
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  border-radius: var(--border-radius);
-  padding: 20px;
-  margin: -130px auto 120px auto;
-  text-align: center;
-  max-width: 90%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.5s ease;
+@media (max-width: 400px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+
+  .photo-box .swiper-container {
+    height: 180px;
+  }
 }
 
-#noMoreCarsNotice p {
-  font-size: 1rem;
-  margin-bottom: 12px;
-  font-weight: bold;
+@media (max-width: 320px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+
+  .photo-box .swiper-container {
+    height: 220px;
+  }
 }
 
-#noMoreCarsNotice .btn.contact {
-  background-color: var(--yellow);
-  color: var(--black);
-  font-weight: bold;
-  border: none;
-  border-radius: var(--border-radius);
-  padding: 12px 24px;
-  font-size: 15px;
-  transition: 0.3s ease;
-  cursor: pointer;
+@media (max-width: 375px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+
+  .photo-box .swiper-container {
+    height: 220px;
+  }
 }
 
-#noMoreCarsNotice .btn.contact:hover {
-  background-color: #f4c400;
+@media (max-width: 425px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+
+  .photo-box .swiper-container {
+    height: 220px;
+  }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+@media (max-width: 1024px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+
+  .photo-box .swiper-container {
+    height: 220px;
+  }
+}
+
+@media (max-width: 1440px) {
+  .card, .car-card, .premium-card {
+    width: 105%;
+    height: 105%;
+  }
+
+  .photo-box .swiper-container {
+    height: 220px;
+  }
 }
