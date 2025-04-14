@@ -17,10 +17,58 @@
   --text-size: 0.9rem;
 }
 
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-color: #ffffff;
+    --text-color: #000000;  /* Добавьте это для светлой темы */
+    --card-bg: #f9f9f9;
+  }
 
+  .car-title {
+    color: var(--text-color);  /* Цвет для заголовка авто */
+  }
 
+  .car-detal {
+    color: #646464;  /* Цвет для деталей авто в светлой теме */
+  }
+
+  .car-price {
+    color: var(--text-color);  /* Цвет для цены */
+  }
+
+  .logo {
+    background-image: url('img/logo2.jpg');
+  }
+}
 
 @media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #1c1c1c;  /* Цвет фона для темной темы */
+    --text-color: #dcdcdc;  /* Цвет текста для темной темы */
+    --card-bg: #2a2a2a;  /* Цвет фона карточек для темной темы */
+  }
+
+  .car-title {
+    color: var(--text-color);  /* Цвет для заголовка авто в темной теме */
+  }
+
+  .car-detal {
+    color: #646464;  /* Цвет для деталей авто в темной теме */
+  }
+
+  .car-price {
+    color: var(--text-color);  /* Цвет для цены в темной теме */
+  }
+
+  .logo {
+    background-image: url('img/logo.jpg');  /* Логотип для темной темы */
+  }
+}
+
+
+
+
+/* @media (prefers-color-scheme: dark) {
   :root {
     --bg-color: #1c1c1c;
     --text-color: #dcdcdc;
@@ -30,21 +78,19 @@
 
 @media (prefers-color-scheme: light) {
 
-    /* Для светлой темы меняем цвета */
     .car-title {
-      color: #000000;  /* Цвет для заголовка авто в светлой теме */
+      color: #000000; 
     }
   
     .car-detal {
-      color: #646464;  /* Цвет для деталей авто в светлой теме */
+      color: #646464;
     }
   
-    /* Добавлено для цвета car-price в светлой теме */
     .car-price {
-      color: #000000;  /* Цвет для цены в светлой теме */
+      color: #000000;
     }
 
-}
+} */
 
 * {
   margin: 0; padding: 0;
@@ -78,26 +124,24 @@ body {
   margin-bottom: -3px;
 }
 
-/* Логотип для темной темы */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   .logo {
     background-image: url('img/logo.jpg');
   }
 }
 
-/* Логотип для светлой темы */
 @media (prefers-color-scheme: light) {
   /* :root {
     --bg-color: #ffffff;
     --text-color: #333333;
     --card-bg: #f9f9f9;
-  } */
+  } 
   .logo {
     background-image: url('img/logo2.jpg');
   }
 
 }
-
+ */
 
 /* Кнопка «Назад» */
 .back-button {
