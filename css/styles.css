@@ -19,14 +19,32 @@
 
 
 
-/* 
+
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-color: #1c1c1c;
     --text-color: #dcdcdc;
     --card-bg: #2a2a2a;
   }
-} */
+}
+
+@media (prefers-color-scheme: light) {
+
+    /* Для светлой темы меняем цвета */
+    .car-title {
+      color: #000000;  /* Цвет для заголовка авто в светлой теме */
+    }
+  
+    .car-detal {
+      color: #646464;  /* Цвет для деталей авто в светлой теме */
+    }
+  
+    /* Добавлено для цвета car-price в светлой теме */
+    .car-price {
+      color: #000000;  /* Цвет для цены в светлой теме */
+    }
+
+}
 
 * {
   margin: 0; padding: 0;
@@ -62,9 +80,6 @@ body {
 
 /* Логотип для темной темы */
 @media (prefers-color-scheme: dark) {
-  * {
-    outline: none;  /* Убираем все внешние контуры */
-  }
   .logo {
     background-image: url('img/logo.jpg');
   }
@@ -72,28 +87,15 @@ body {
 
 /* Логотип для светлой темы */
 @media (prefers-color-scheme: light) {
-  :root {
+  /* :root {
     --bg-color: #ffffff;
-    --text-color: #333333;  /* Сделаем текст темнее */
+    --text-color: #333333;
     --card-bg: #f9f9f9;
-  }
+  } */
   .logo {
     background-image: url('img/logo2.jpg');
   }
 
-  /* Для светлой темы меняем цвета */
-  .car-title {
-    color: #000000;  /* Цвет для заголовка авто в светлой теме */
-  }
-
-  .car-detal {
-    color: #646464;  /* Цвет для деталей авто в светлой теме */
-  }
-
-  /* Добавлено для цвета car-price в светлой теме */
-  .car-price {
-    color: #000000;  /* Цвет для цены в светлой теме */
-  }
 }
 
 
