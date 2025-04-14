@@ -1,4 +1,3 @@
-
 // import { config } from './config.js';
 
 // document.addEventListener('DOMContentLoaded', () => {
@@ -86,14 +85,17 @@
 //       if (newCars.length === 0) {
 //         allLoaded = true;
 //         loadMoreBtn.disabled = true;
-
-//         setTimeout(() => {
-//           if (feedbackNotice) feedbackNotice.style.display = "block";
-//         }, 0);
+//         feedbackNotice.style.display = "block"; // Показ уведомления сразу
 //         return;
 //       }
 
-//       allCars = allCars.concat(newCars);
+//       // Фильтруем дублирующиеся автомобили
+//       newCars.forEach(car => {
+//         if (!allCars.some(existingCar => existingCar.id === car.id)) {
+//           allCars.push(car); // Добавляем только уникальные машины
+//         }
+//       });
+
 //       offset += itemsCount;
 
 //       sortCars();
@@ -235,6 +237,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const openContactBtn = document.getElementById('openContactBtn');
   const contactModal = document.getElementById('contactModal');
   const closeBtn = document.querySelector('.close-btn');
+
+  // Проверка и смена логотипа в зависимости от темы устройства
+  const logo = document.querySelector('.logo');
+  const prefersDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  logo.src = prefersDarkTheme ? 'img/logo2.jpg' : 'img/logo.jpg'; // логотип для темной или светлой темы
+
+  // Слушаем изменения в настройках темы
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    logo.src = e.matches ? 'img/logo2.jpg' : 'img/logo.jpg'; // Меняем логотип при переключении темы
+  });
 
   if (openContactBtn) {
     openContactBtn.addEventListener('click', () => {

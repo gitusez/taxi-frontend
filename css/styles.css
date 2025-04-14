@@ -54,6 +54,20 @@ body {
   height: auto;
 }
 
+/* Логотип для темной темы */
+@media (prefers-color-scheme: dark) {
+  .logo {
+    content: url('img/logo2.jpg');
+  }
+}
+
+/* Логотип для светлой темы */
+@media (prefers-color-scheme: light) {
+  .logo {
+    content: url('img/logo.jpg');
+  }
+}
+
 /* Кнопка «Назад» */
 .back-button {
   position: absolute;
