@@ -62,14 +62,14 @@ body {
 /* Логотип для темной темы */
 @media (prefers-color-scheme: dark) {
   .logo {
-    content: url('img/logo.jpg');
+    content: url('/public/img/logo2.jpg');
   }
 }
 
 /* Логотип для светлой темы */
 @media (prefers-color-scheme: light) {
   .logo {
-    content: url('img/logo2.jpg');
+    content: url('/public/img/logo.jpg');
   }
 }
 
