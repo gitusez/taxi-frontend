@@ -3,7 +3,7 @@
   --black: #000000;
   --white: #ffffff;
 
-  /* Светлая тема */
+  /* Светлая тема (по умолчанию) */
   --bg-color: #ffffff;
   --text-color: #333333;
   --card-bg: #f9f9f9;
@@ -16,7 +16,6 @@
   --price-size: 1rem;
   --text-size: 0.9rem;
 }
-
 @media (prefers-color-scheme: light) {
   :root {
     --bg-color: #ffffff;
@@ -41,6 +40,7 @@
     background-image: url('img/logo2.jpg');  /* Логотип для светлой темы */
   }
 }
+
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -67,6 +67,7 @@
   }
 }
 
+
 * {
   margin: 0; padding: 0;
   box-sizing: border-box;
@@ -91,7 +92,7 @@ body {
   height: auto;
   max-width: 1549px;
   margin: 0 auto;
-  margin-bottom: -3px;
+  margin-bottom: -5px;
 }
 
 /* Кнопка «Назад» */
