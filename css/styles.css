@@ -20,12 +20,13 @@
 @media (prefers-color-scheme: light) {
   :root {
     --bg-color: #ffffff;
-    --text-color: #000000;  /* Добавьте это для светлой темы */
+    --text-color: #000000;  /* Цвет текста для светлой темы */
     --card-bg: #f9f9f9;
   }
 
+  /* Для светлой темы меняем цвета */
   .car-title {
-    color: var(--text-color);  /* Цвет для заголовка авто */
+    color: var(--text-color);  /* Цвет для заголовка авто в светлой теме */
   }
 
   .car-detal {
@@ -33,11 +34,11 @@
   }
 
   .car-price {
-    color: var(--text-color);  /* Цвет для цены */
+    color: var(--text-color);  /* Цвет для цены в светлой теме */
   }
 
   .logo {
-    background-image: url('img/logo2.jpg');
+    background-image: url('img/logo2.jpg');  /* Логотип для светлой темы */
   }
 }
 
@@ -48,6 +49,7 @@
     --card-bg: #2a2a2a;  /* Цвет фона карточек для темной темы */
   }
 
+  /* Для темной темы меняем цвета */
   .car-title {
     color: var(--text-color);  /* Цвет для заголовка авто в темной теме */
   }
@@ -65,33 +67,6 @@
   }
 }
 
-
-
-
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --bg-color: #1c1c1c;
-    --text-color: #dcdcdc;
-    --card-bg: #2a2a2a;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-
-    .car-title {
-      color: #000000; 
-    }
-  
-    .car-detal {
-      color: #646464;
-    }
-  
-    .car-price {
-      color: #000000;
-    }
-
-} */
-
 * {
   margin: 0; padding: 0;
   box-sizing: border-box;
@@ -108,40 +83,16 @@ body {
 /* Шапка */
 .header-bar {
   position: relative;
-  /* padding: 8px; */
-  background: white;
   text-align: center;
 }
 
 .logo {
-  /* width: 55%;
-  height: auto; */
-
   width: 100%;
   height: auto;
-  max-width: 1549px; /* Задаем максимальную ширину для логотипа */
-  margin: 0 auto; /* Выравниваем логотип по центру */
+  max-width: 1549px;
+  margin: 0 auto;
   margin-bottom: -3px;
 }
-
-/* @media (prefers-color-scheme: dark) {
-  .logo {
-    background-image: url('img/logo.jpg');
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  /* :root {
-    --bg-color: #ffffff;
-    --text-color: #333333;
-    --card-bg: #f9f9f9;
-  } 
-  .logo {
-    background-image: url('img/logo2.jpg');
-  }
-
-}
- */
 
 /* Кнопка «Назад» */
 .back-button {
