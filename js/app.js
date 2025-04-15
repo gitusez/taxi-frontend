@@ -395,7 +395,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadCars(itemsCount, isInitial) {
       try {
-        if (isInitial) loader.style.display = "block";
+        if (isInitial) {
+          loader.style.display = "block";
+        }
         loadMoreBtn.style.display = "none";
         errorBox.style.display = "none";
     
@@ -434,8 +436,10 @@ document.addEventListener('DOMContentLoaded', () => {
       } finally {
         loader.style.display = "none";
         if (!allLoaded) loadMoreBtn.style.display = "block";
+        isInitialLoad = false; // сбросим флаг после первой загрузки
       }
     }
+    
     
     
 
