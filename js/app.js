@@ -307,47 +307,92 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // async function loadCars(itemsCount) {
+    //   try {
+    //     loader && (loader.style.display = "block");
+    //     errorBox && (errorBox.style.display = "none");
+
+    //     const response = await fetch(config.apiUrl, {
+    //       method: "POST",
+    //       headers: { "Content-Type": "application/json" },
+    //       body: JSON.stringify({ items: itemsCount, offset })
+    //     });
+
+    //     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+    //     const result = await response.json();
+    //     if (!result.success) throw new Error(result.error || "Ошибка сервера");
+
+    //     const newCars = Array.isArray(result.cars_list)
+    //       ? result.cars_list
+    //       : Object.values(result.cars_list || {});
+
+    //     if (newCars.length === 0) {
+    //       allLoaded = true;
+    //       loadMoreBtn.disabled = true;
+    //       feedbackNotice && (feedbackNotice.style.display = "block");
+    //       return;
+    //     }
+
+    //     newCars.forEach(car => {
+    //       if (!allCars.some(existingCar => existingCar.id === car.id)) {
+    //         allCars.push(car);
+    //       }
+    //     });
+
+    //     offset += itemsCount;
+    //     sortCars();
+    //     renderCars();
+    //   } catch (error) {
+    //     showError(error.message);
+    //   } finally {
+    //     loader && (loader.style.display = "none");
+    //   }
+    // }
+
     async function loadCars(itemsCount) {
       try {
-        loader && (loader.style.display = "block");
-        errorBox && (errorBox.style.display = "none");
-
+        loadMoreBtn.style.display = "none"; // Скрываем кнопку
+        loader.style.display = "block";
+        errorBox.style.display = "none";
+    
         const response = await fetch(config.apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ items: itemsCount, offset })
         });
-
+    
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
         const result = await response.json();
         if (!result.success) throw new Error(result.error || "Ошибка сервера");
-
+    
         const newCars = Array.isArray(result.cars_list)
           ? result.cars_list
           : Object.values(result.cars_list || {});
-
+    
         if (newCars.length === 0) {
           allLoaded = true;
           loadMoreBtn.disabled = true;
-          feedbackNotice && (feedbackNotice.style.display = "block");
+          feedbackNotice.style.display = "block";
           return;
         }
-
+    
         newCars.forEach(car => {
           if (!allCars.some(existingCar => existingCar.id === car.id)) {
             allCars.push(car);
           }
         });
-
+    
         offset += itemsCount;
         sortCars();
         renderCars();
       } catch (error) {
         showError(error.message);
       } finally {
-        loader && (loader.style.display = "none");
+        loader.style.display = "none";
+        if (!allLoaded) loadMoreBtn.style.display = "block"; // Показываем кнопку
       }
     }
+    
 
     function renderCars() {
       grid.innerHTML = "";
