@@ -171,6 +171,30 @@ document.addEventListener('DOMContentLoaded', () => {
       renderFiltered(filtered);
     }
 
+    // ===== МОДАЛКА "Оставить заявку" =====
+const contactModal = document.getElementById("contactModal");
+const openContactBtn = document.getElementById("openContactBtn");
+const closeContactBtn = document.getElementById("closeContactBtn");
+
+if (openContactBtn && contactModal) {
+  openContactBtn.addEventListener("click", () => {
+    contactModal.style.display = "flex";
+  });
+}
+
+if (closeContactBtn && contactModal) {
+  closeContactBtn.addEventListener("click", () => {
+    contactModal.style.display = "none";
+  });
+}
+
+window.addEventListener("click", (e) => {
+  if (e.target === contactModal) {
+    contactModal.style.display = "none";
+  }
+});
+
+
     function showError(message) {
       if (errorBox) {
         errorBox.textContent = message;
