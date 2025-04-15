@@ -351,8 +351,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadCars(itemsCount) {
       try {
-        loadMoreBtn.style.display = "none"; // Скрываем кнопку
-        loader.style.display = "block";
+        if (!allLoaded) loadMoreBtn.style.display = "none";
+        if (!allLoaded) loader.style.display = "block";
         errorBox.style.display = "none";
     
         const response = await fetch(config.apiUrl, {
