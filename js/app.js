@@ -349,56 +349,10 @@ document.addEventListener('DOMContentLoaded', () => {
     //   }
     // }
 
-    // async function loadCars(itemsCount) {
-    //   try {
-    //     if (!allLoaded) loadMoreBtn.style.display = "none";
-    //     if (!allLoaded) loader.style.display = "block";
-    //     errorBox.style.display = "none";
-    
-    //     const response = await fetch(config.apiUrl, {
-    //       method: "POST",
-    //       headers: { "Content-Type": "application/json" },
-    //       body: JSON.stringify({ items: itemsCount, offset })
-    //     });
-    
-    //     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    //     const result = await response.json();
-    //     if (!result.success) throw new Error(result.error || "Ошибка сервера");
-    
-    //     const newCars = Array.isArray(result.cars_list)
-    //       ? result.cars_list
-    //       : Object.values(result.cars_list || {});
-    
-    //     if (newCars.length === 0) {
-    //       allLoaded = true;
-    //       loadMoreBtn.disabled = true;
-    //       feedbackNotice.style.display = "block";
-    //       return;
-    //     }
-    
-    //     newCars.forEach(car => {
-    //       if (!allCars.some(existingCar => existingCar.id === car.id)) {
-    //         allCars.push(car);
-    //       }
-    //     });
-    
-    //     offset += itemsCount;
-    //     sortCars();
-    //     renderCars();
-    //   } catch (error) {
-    //     showError(error.message);
-    //   } finally {
-    //     loader.style.display = "none";
-    //     if (!allLoaded) loadMoreBtn.style.display = "block"; // Показываем кнопку
-    //   }
-    // }
-
-    async function loadCars(itemsCount, isInitial) {
+    async function loadCars(itemsCount) {
       try {
-        if (isInitial) {
-          loader.style.display = "block";
-        }
-        loadMoreBtn.style.display = "none";
+        if (!allLoaded) loadMoreBtn.style.display = "none";
+        if (!allLoaded) loader.style.display = "block";
         errorBox.style.display = "none";
     
         const response = await fetch(config.apiUrl, {
@@ -435,13 +389,10 @@ document.addEventListener('DOMContentLoaded', () => {
         showError(error.message);
       } finally {
         loader.style.display = "none";
-        if (!allLoaded) loadMoreBtn.style.display = "block";
-        isInitialLoad = false; // сбросим флаг после первой загрузки
+        if (!allLoaded) loadMoreBtn.style.display = "block"; // Показываем кнопку
       }
     }
-    
-    
-    
+
 
     function renderCars() {
       grid.innerHTML = "";
