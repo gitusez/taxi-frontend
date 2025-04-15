@@ -45,13 +45,16 @@
     }
 
     .map-preview {
-      width: 100%;
-      height: auto;
-      display: block;
-      object-fit: cover;
-      border-radius: var(--border-radius);
-      transition: transform 0.2s ease;
-    }
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 45%; /* можно подстроить: top / 30% / 60% и т.д. */
+  transform: scale(1.25); /* приближение */
+  transition: transform 0.3s ease;
+  display: block;
+  border-radius: var(--border-radius);
+}
+
 
     .map-preview:hover {
       transform: scale(1.01);
@@ -78,6 +81,14 @@
     .footer-link:hover {
       color: var(--yellow);
     }
+
+    @media (max-width: 768px) {
+  .map-preview {
+    transform: scale(1.4);
+    object-position: center 50%;
+  }
+}
+
   </style>
 </head>
 <body>
