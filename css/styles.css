@@ -727,6 +727,7 @@ body.lightbox-open {
 }
 
 .btn.contact {
+  margin-top: 10px;
   background-color: #ffcc00;
 }
 
