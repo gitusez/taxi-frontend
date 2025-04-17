@@ -1010,5 +1010,27 @@ body.lightbox-open {
 }
 
 
+.tabs-bar {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.tab-btn {
+  padding: 10px 20px;
+  border: none;
+  background-color: #ddd;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.tab-btn.active {
+  background-color: #ffa500;
+  color: white;
+}
+
+
 
 }

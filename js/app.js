@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (grid && loadMoreContainer && config?.apiUrl) {
     let allCars = [];
+    let currentMode = 'rent'; // 'rent' или 'buyout'
     let offset = 0;
     let allLoaded = false;
     let firstLoad = true;
@@ -40,12 +41,30 @@ document.addEventListener('DOMContentLoaded', () => {
       const searchInput = document.getElementById('searchInput');
       const sortSelect = document.getElementById('sortSelect');
 
+      const rentTab = document.getElementById("rentTab");
+      const buyoutTab = document.getElementById("buyoutTab");
+
+      if (rentTab && buyoutTab) {
+        rentTab.addEventListener("click", () => switchMode("rent"));
+        buyoutTab.addEventListener("click", () => switchMode("buyout"));
+      }
+
       if (searchInput) searchInput.addEventListener('input', debounce(searchCars, 300));
       if (sortSelect) sortSelect.addEventListener('change', () => {
         sortCars();
         renderCars();
       });
     }
+
+    function switchMode(mode) {
+      currentMode = mode;
+    
+      document.getElementById("rentTab").classList.toggle("active", mode === "rent");
+      document.getElementById("buyoutTab").classList.toggle("active", mode === "buyout");
+    
+      renderCars();
+    }
+    
 
     async function loadCars(itemsCount) {
       try {
@@ -108,10 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const model = (car.model || "").toLowerCase();
       let price = "—";
-      if (model.includes("granta")) price = "1700 руб/сутки";
-      else if (model.includes("vesta")) price = "2400 руб/сутки";
-      else if (model.includes("largus")) price = "2600 руб/сутки";
-
+      if (model.includes("granta")) price = currentMode === 'rent' ? "1700 руб/сутки" : "850 000 ₽";
+      else if (model.includes("vesta")) price = currentMode === 'rent' ? "2400 руб/сутки" : "1 050 000 ₽";
+      else if (model.includes("largus")) price = currentMode === 'rent' ? "2600 руб/сутки" : "1 100 000 ₽";
+      
       const fuelType = car.fuel_type || "—";
       const fuelTypeClass = typeof fuelType === 'string' ? fuelType.toLowerCase().replace(/\s/g, '-') : '';
       const image = car.avatar || 'img/granta1.jpg';
