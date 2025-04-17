@@ -1026,6 +1026,10 @@ body.lightbox-open {
   cursor: pointer;
   font-weight: bold;
   border-radius: 5px;
+  color: black; /* добавляем явный цвет текста */
+  -webkit-appearance: none; /* отключаем синий стиль Safari */
+  appearance: none;
+  text-decoration: none;
 }
 
 .tab-btn.active {
