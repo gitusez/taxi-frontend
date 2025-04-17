@@ -331,7 +331,7 @@ body {
   text-decoration: none;
   bottom: 12%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-100%);
   z-index: 9999;
   background: var(--yellow);
   border: none;
@@ -341,8 +341,8 @@ body {
   cursor: pointer;
   font-size: var(--text-size);
   color: var(--black);
-  height: 8%;
-  width: 70%;
+  height: 6.5%;
+  width: 47%;
 
     /* Новые свойства для центрирования */
     display: flex;             /* включаем флексбокс */
@@ -1033,9 +1033,9 @@ body.lightbox-open {
 
 .whatsapp-button-details {
   position: fixed;
-  bottom: 4.5%; /* немного выше, чем кнопка "Позвонить" */
+  bottom: 11%; /* немного выше, чем кнопка "Позвонить" */
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(5%);
   z-index: 9999;
   background: #25D366; /* зелёный цвет WhatsApp */
   border: none;
@@ -1045,7 +1045,8 @@ body.lightbox-open {
   cursor: pointer;
   font-size: var(--text-size);
   color: white;
-  width: 70%;
+  height: 6.5%;
+  width: 45%;
   display: flex;
   align-items: center;
   justify-content: center;
