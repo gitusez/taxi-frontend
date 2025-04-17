@@ -329,7 +329,7 @@ body {
 .call-button-details {
   position: fixed;
   text-decoration: none;
-  bottom: 12%;
+  bottom: 11%;
   left: 50%;
   transform: translateX(-100%);
   z-index: 9999;
