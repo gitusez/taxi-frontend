@@ -194,37 +194,37 @@ window.addEventListener("click", (e) => {
   }
 });
 
-const submitBtn = document.getElementById("submitRequestBtn");
-if (submitBtn) {
-  submitBtn.addEventListener("click", async () => {
-    const name = document.getElementById("userName")?.value.trim();
-    const phone = document.getElementById("userPhone")?.value.trim();
-    const request = document.getElementById("userRequest")?.value.trim();
+// const submitBtn = document.getElementById("submitRequestBtn");
+// if (submitBtn) {
+//   submitBtn.addEventListener("click", async () => {
+//     const name = document.getElementById("userName")?.value.trim();
+//     const phone = document.getElementById("userPhone")?.value.trim();
+//     const request = document.getElementById("userRequest")?.value.trim();
 
-    if (!name || !phone || !request) {
-      alert("Пожалуйста, заполните все поля");
-      return;
-    }
+//     if (!name || !phone || !request) {
+//       alert("Пожалуйста, заполните все поля");
+//       return;
+//     }
 
-    try {
-      const response = await fetch("/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, request })
-      });
+//     try {
+//       const response = await fetch("/api/feedback", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ name, phone, request })
+//       });
 
-      const result = await response.json();
-      if (result.success) {
-        alert("Спасибо! Заявка отправлена.");
-        document.getElementById("contactModal").style.display = "none";
-      } else {
-        alert("Ошибка: " + result.error);
-      }
-    } catch (err) {
-      alert("Ошибка при отправке. Попробуйте позже.");
-    }
-  });
-}
+//       const result = await response.json();
+//       if (result.success) {
+//         alert("Спасибо! Заявка отправлена.");
+//         document.getElementById("contactModal").style.display = "none";
+//       } else {
+//         alert("Ошибка: " + result.error);
+//       }
+//     } catch (err) {
+//       alert("Ошибка при отправке. Попробуйте позже.");
+//     }
+//   });
+// }
 
 
 
