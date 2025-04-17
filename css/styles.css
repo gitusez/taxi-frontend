@@ -213,6 +213,7 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  justify-content: space-between; /* выравнивание */
   cursor: pointer;
   text-align: left;
   transition: transform var(--transition-speed), box-shadow var(--transition-speed);
