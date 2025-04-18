@@ -1,3 +1,4 @@
+// app.js
 import { config } from './config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -213,38 +214,41 @@ window.addEventListener("click", (e) => {
   }
 });
 
-// const submitBtn = document.getElementById("submitRequestBtn");
-// if (submitBtn) {
-//   submitBtn.addEventListener("click", async () => {
-//     const name = document.getElementById("userName")?.value.trim();
-//     const phone = document.getElementById("userPhone")?.value.trim();
-//     const request = document.getElementById("userRequest")?.value.trim();
+// last update 4 pohta
+const submitRequestBtn = document.getElementById("submitRequestBtn");
+if (submitRequestBtn) {
+  submitRequestBtn.addEventListener("click", async () => {
+    const name = document.getElementById("userName").value.trim();
+    const phone = document.getElementById("userPhone").value.trim();
+    const request = document.getElementById("userRequest").value.trim();
 
-//     if (!name || !phone || !request) {
-//       alert("Пожалуйста, заполните все поля");
-//       return;
-//     }
+    if (!name || !phone) {
+      alert("Пожалуйста, заполните имя и телефон");
+      return;
+    }
 
-//     try {
-//       const response = await fetch("/api/feedback", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ name, phone, request })
-//       });
+    try {
+      const response = await fetch("/api/send-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phone, request })
+      });
 
-//       const result = await response.json();
-//       if (result.success) {
-//         alert("Спасибо! Заявка отправлена.");
-//         document.getElementById("contactModal").style.display = "none";
-//       } else {
-//         alert("Ошибка: " + result.error);
-//       }
-//     } catch (err) {
-//       alert("Ошибка при отправке. Попробуйте позже.");
-//     }
-//   });
-// }
-
+      const result = await response.json();
+      if (result.success) {
+        alert("Спасибо! Ваша заявка отправлена.");
+        document.getElementById("userName").value = "";
+        document.getElementById("userPhone").value = "";
+        document.getElementById("userRequest").value = "";
+        contactModal.style.display = "none";
+      } else {
+        alert("Ошибка: " + result.error);
+      }
+    } catch (err) {
+      alert("Не удалось отправить заявку.");
+    }
+  });
+}
 
 
     function showError(message) {

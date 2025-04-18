@@ -1,3 +1,4 @@
+<!-- contact.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -61,18 +62,51 @@
         closeModal();
       }
     }
-    document.getElementById("feedbackForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const name = this.name.value.trim();
-      const phone = this.phone.value.trim();
-      if (name && phone) {
-        alert("Спасибо! Ваша заявка отправлена.");
-        this.reset();
-        closeModal();
-      } else {
-        alert("Пожалуйста, заполните все поля.");
-      }
+
+    // last update pohta
+    document.getElementById("feedbackForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const name = this.name.value.trim();
+  const phone = this.phone.value.trim();
+
+  if (!name || !phone) {
+    alert("Пожалуйста, заполните все поля.");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/send-request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, request: "С формы связи" })
     });
+
+    const result = await response.json();
+    if (result.success) {
+      alert("Спасибо! Ваша заявка отправлена.");
+      this.reset();
+      closeModal();
+    } else {
+      alert("Ошибка: " + result.error);
+    }
+  } catch (err) {
+    alert("Не удалось отправить заявку.");
+  }
+});
+
+
+    // document.getElementById("feedbackForm").addEventListener("submit", function(e) {
+    //   e.preventDefault();
+    //   const name = this.name.value.trim();
+    //   const phone = this.phone.value.trim();
+    //   if (name && phone) {
+    //     alert("Спасибо! Ваша заявка отправлена.");
+    //     this.reset();
+    //     closeModal();
+    //   } else {
+    //     alert("Пожалуйста, заполните все поля.");
+    //   }
+    // });
   </script>
 
 <script type="module" src="js/app.js"></script>
