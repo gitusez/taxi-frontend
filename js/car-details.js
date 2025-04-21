@@ -55,7 +55,7 @@ function renderCarDetails(car) {
     year: car.year,
     color: car.color,
     number: car.number,
-    mileage: car.mileage ? `${car.mileage} км` : null,
+    mileage: car.odometer || "—",
 
     fuel: car.fuel_type,
     transmission: car.transmission,
