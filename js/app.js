@@ -395,6 +395,7 @@ if (savedCars && savedOffset) {
       const value = document.getElementById('sortSelect')?.value;
       if (!value) {
         allCars = [...originalCars]; // Сброс к изначальному порядку
+        renderCars();                // 👉 нужно отрисовать заново!
         return;
       }
     
