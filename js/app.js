@@ -70,7 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadCars(itemsCount) {
       try {
         errorBox.style.display = "none";
-        if (firstLoad) loader.style.display = "block";
+        // if (firstLoad) loader.style.display = "block";
+        loader.style.display = "block";
         loadMoreBtn.style.display = "none";
 
         const response = await fetch(config.apiUrl, {
