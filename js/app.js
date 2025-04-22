@@ -348,6 +348,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const feedbackNotice = document.getElementById('noMoreCarsNotice');
 
   if (grid && loadMoreContainer && config?.apiUrl) {
+
+
+
+    const loadMoreBtn = document.createElement('button');
+    loadMoreBtn.textContent = "Загрузить ещё";
+    loadMoreBtn.className = "btn load-more-btn";
+    loadMoreContainer.appendChild(loadMoreBtn);
+
+    // обработчик должен быть доступен всегда
+    loadMoreBtn.addEventListener('click', () => {
+    if (!allLoaded) loadCars(config.itemsLoadMore);
+
+
+
+});
     let allCars = [];
     let currentMode = 'rent'; // 'rent' или 'buyout'
     let offset = 0;
@@ -359,10 +374,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedOffset = localStorage.getItem('savedOffset');
     const savedScroll = localStorage.getItem('scrollPosition');
 
-    const loadMoreBtn = document.createElement('button');
-    loadMoreBtn.textContent = "Загрузить ещё";
-    loadMoreBtn.className = "btn load-more-btn";
-    loadMoreContainer.appendChild(loadMoreBtn);
+    // const loadMoreBtn = document.createElement('button');
+
+    // loadMoreBtn.textContent = "Загрузить ещё";
+    // loadMoreBtn.className = "btn load-more-btn";
+    // loadMoreContainer.appendChild(loadMoreBtn);
+
+    // if (savedCars && savedOffset) {
+    //   allCars = JSON.parse(savedCars);
+    //   offset = parseInt(savedOffset, 10);
+    //   renderCars();
+    //   localStorage.removeItem('savedCars');
+    //   localStorage.removeItem('savedOffset');
+
+    //   // Восстановление интерфейса
+    //   loadMoreBtn.style.display = "block";
+    //   loadMoreBtn.disabled = false;
+    //   feedbackNotice.style.display = allCars.length < offset ? "none" : "block";
+
+    //   // Восстановление прокрутки
+    //   if (savedScroll !== null) {
+    //     setTimeout(() => {
+    //       window.scrollTo(0, parseInt(savedScroll, 10));
+    //       localStorage.removeItem('scrollPosition');
+    //     }, 100);
+    //   }
+
+    //   return; // не загружаем заново
+    // }
 
     if (savedCars && savedOffset) {
       allCars = JSON.parse(savedCars);
@@ -371,20 +410,33 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('savedCars');
       localStorage.removeItem('savedOffset');
 
-      // Восстановление интерфейса
-      loadMoreBtn.style.display = "block";
-      loadMoreBtn.disabled = false;
-      feedbackNotice.style.display = allCars.length < offset ? "none" : "block";
 
+      if (allCars.length < offset) {
+        // Значит, ещё можно загружать
+        loadMoreBtn.style.display = "block";
+        loadMoreBtn.disabled = false;
+        feedbackNotice.style.display = "none";
+        allLoaded = false;
+      } else {
+        // Всё загружено — показываем финальную форму
+        loadMoreBtn.style.display = "none";
+        feedbackNotice.style.display = "block";
+        allLoaded = true;
+      }
+
+
+      
+    
       // Восстановление прокрутки
+      const savedScroll = localStorage.getItem('scrollPosition');
       if (savedScroll !== null) {
         setTimeout(() => {
           window.scrollTo(0, parseInt(savedScroll, 10));
           localStorage.removeItem('scrollPosition');
         }, 100);
       }
-
-      return; // не загружаем заново
+    
+      return;
     }
 
     // === Инициализация ===
@@ -439,12 +491,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const newCars = Array.isArray(result.cars_list) ? result.cars_list : Object.values(result.cars_list || {});
 
+
+
+        // if (newCars.length === 0) {
+        //   allLoaded = true;
+        //   loadMoreBtn.disabled = true;
+        //   feedbackNotice.style.display = "block";
+        //   return;
+        // }
+
+
         if (newCars.length === 0) {
           allLoaded = true;
           loadMoreBtn.disabled = true;
+          loadMoreBtn.style.display = "none";
           feedbackNotice.style.display = "block";
           return;
-        }
+        } else {
+          feedbackNotice.style.display = "none";
+        }        
+
 
         newCars.forEach(car => {
           if (!allCars.some(existingCar => existingCar.id === car.id)) {
