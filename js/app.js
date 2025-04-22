@@ -66,8 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('savedCars');
       localStorage.removeItem('savedOffset');
 
+      // 👉 ДОБАВЬ ЭТО
+      initEventListeners();
 
-    // Мы не знаем, всё ли загружено — покажем кнопку на всякий случай
+
+      // Мы не знаем, всё ли загружено — покажем кнопку на всякий случай
     loadMoreBtn.style.display = "block";
     loadMoreBtn.disabled = false;
     feedbackNotice.style.display = "none";
