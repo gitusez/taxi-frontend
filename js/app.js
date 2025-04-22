@@ -56,8 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
       allCars = JSON.parse(savedCars);
       offset = parseInt(savedOffset, 10);
 
-      // ✅ ДОБАВЬ ЭТО СЮДА
-      originalCars = [...allCars];
+      // // ✅ ДОБАВЬ ЭТО СЮДА
+      // originalCars = [...allCars];
+
+      if (!savedSort) {
+        originalCars = [...allCars];
+      }
 
       if (savedMode === 'buyout' || savedMode === 'rent') {
         currentMode = savedMode;
@@ -81,17 +85,12 @@ if (savedSort) {
 }
 
 
-
       // Мы не знаем, всё ли загружено — покажем кнопку на всякий случай
     loadMoreBtn.style.display = "block";
     loadMoreBtn.disabled = false;
     feedbackNotice.style.display = "none";
     allLoaded = false;
 
-      
-
-
-      
     
       // Восстановление прокрутки
       const savedScroll = localStorage.getItem('scrollPosition');
