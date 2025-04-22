@@ -648,7 +648,7 @@ body.lightbox-open {
     animation: spin 1s linear infinite;
     z-index: 9999;
   }
-  .loader-inline {
+  /* .loader-inline {
     display: none;
     margin: 20px auto;
     width: 30px;
@@ -657,7 +657,7 @@ body.lightbox-open {
     border-top: 4px solid #ffcc00;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-  }
+  } */
   
   @keyframes spin {
     0% { transform: rotate(0deg); }
