@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
     let allCars = [];
+    let originalCars = [];
     let currentMode = 'rent'; // 'rent' или 'buyout'
     let offset = 0;
     let allLoaded = false;
@@ -117,6 +118,14 @@ document.addEventListener('DOMContentLoaded', () => {
         sortCars();
         renderCars();
       });
+
+      // Клик вне поля поиска убирает фокус
+    document.addEventListener("click", (e) => {
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput && !searchInput.contains(e.target)) {
+    searchInput.blur(); // убираем фокус
+    }
+    });
     }
 
     function switchMode(mode) {
@@ -165,6 +174,13 @@ document.addEventListener('DOMContentLoaded', () => {
           if (!allCars.some(existingCar => existingCar.id === car.id)) {
             allCars.push(car);
           }
+
+
+          if (firstLoad) {
+            originalCars = [...allCars]; // Сохраняем исходный порядок
+          }          
+
+
         });
 
         offset += itemsCount;
@@ -229,17 +245,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // === Сортировка ===
+    // function sortCars() {
+    //   const value = document.getElementById('sortSelect')?.value;
+    //   if (!value) return;
+
+    //   const [field, order] = value.split('_');
+    //   allCars.sort((a, b) => {
+    //     const aVal = String(a[field] || '');
+    //     const bVal = String(b[field] || '');
+    //     return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+    //   });
+    // }
+
     function sortCars() {
       const value = document.getElementById('sortSelect')?.value;
-      if (!value) return;
-
+      // if (!value) return; // Без сортировки
+      if (!value) {
+        allCars = [...originalCars]; // Сброс к изначальному порядку
+        return;
+      }
+    
       const [field, order] = value.split('_');
+    
       allCars.sort((a, b) => {
-        const aVal = String(a[field] || '');
-        const bVal = String(b[field] || '');
-        return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        let aVal, bVal;
+    
+        if (field === 'price') {
+          aVal = parseInt(a.price || 0, 10);
+          bVal = parseInt(b.price || 0, 10);
+        } else if (field === 'mileage') {
+          aVal = parseInt(a.mileage || 0, 10);
+          bVal = parseInt(b.mileage || 0, 10);
+        } else {
+          aVal = String(a[field] || '');
+          bVal = String(b[field] || '');
+          return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        }
+    
+        return order === 'asc' ? aVal - bVal : bVal - aVal;
       });
     }
+    
 
     // === Поиск ===
     function searchCars() {
