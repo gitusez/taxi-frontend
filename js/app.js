@@ -56,6 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
       allCars = JSON.parse(savedCars);
       offset = parseInt(savedOffset, 10);
 
+      // ✅ ДОБАВЬ ЭТО СЮДА
+      originalCars = [...allCars];
+
       if (savedMode === 'buyout' || savedMode === 'rent') {
         currentMode = savedMode;
         document.getElementById("rentTab").classList.toggle("active", currentMode === "rent");
