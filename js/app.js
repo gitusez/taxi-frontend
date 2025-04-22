@@ -143,28 +143,83 @@ if (savedSort) {
       renderCars();
     }
 
-    // === Загрузка данных с сервера ===
+    // // === Загрузка данных с сервера ===
+    // async function loadCars(itemsCount) {
+    //   try {
+    //     errorBox.style.display = "none";
+    //     loadMoreBtn.style.display = "none";
+    //     loader.style.display = "block";
+
+    //     const response = await fetch(config.apiUrl, {
+    //       method: "POST",
+    //       headers: { "Content-Type": "application/json" },
+    //       body: JSON.stringify({ items: itemsCount, offset })
+    //     });
+
+    //     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+    //     const result = await response.json();
+    //     if (!result.success) throw new Error(result.error || "Ошибка сервера");
+
+    //     const newCars = Array.isArray(result.cars_list) ? result.cars_list : Object.values(result.cars_list || {});
+
+
+    //     if (newCars.length < itemsCount) {
+    //       // Сервер вернул меньше машин, чем просили — значит всё, больше нет
+    //       allLoaded = true;
+    //       loadMoreBtn.style.display = "none";
+    //       loadMoreBtn.disabled = true;
+    //       feedbackNotice.style.display = "block";
+    //     } else {
+    //       allLoaded = false;
+    //       loadMoreBtn.style.display = "block";
+    //       loadMoreBtn.disabled = false;
+    //       feedbackNotice.style.display = "none";
+    //     }
+           
+
+
+    //     newCars.forEach(car => {
+    //       if (!allCars.some(existingCar => existingCar.id === car.id)) {
+    //         allCars.push(car);
+    //       }
+    //     });
+        
+    //     if (firstLoad) {
+    //       originalCars = [...allCars]; // Сохраняем исходный порядок
+    //     }
+        
+
+    //     offset += itemsCount;
+    //     sortCars();
+    //     renderCars();
+    //   } catch (error) {
+    //     showError(error.message);
+    //   } finally {
+    //     loader.style.display = "none";
+    //     if (!allLoaded) loadMoreBtn.style.display = "block";
+    //     firstLoad = false;
+    //   }
+    // }
+
     async function loadCars(itemsCount) {
       try {
         errorBox.style.display = "none";
         loadMoreBtn.style.display = "none";
         loader.style.display = "block";
-
+    
         const response = await fetch(config.apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ items: itemsCount, offset })
         });
-
+    
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
         const result = await response.json();
         if (!result.success) throw new Error(result.error || "Ошибка сервера");
-
+    
         const newCars = Array.isArray(result.cars_list) ? result.cars_list : Object.values(result.cars_list || {});
-
-
+    
         if (newCars.length < itemsCount) {
-          // Сервер вернул меньше машин, чем просили — значит всё, больше нет
           allLoaded = true;
           loadMoreBtn.style.display = "none";
           loadMoreBtn.disabled = true;
@@ -175,22 +230,31 @@ if (savedSort) {
           loadMoreBtn.disabled = false;
           feedbackNotice.style.display = "none";
         }
-           
-
-
+    
+        // Добавляем только уникальные
         newCars.forEach(car => {
           if (!allCars.some(existingCar => existingCar.id === car.id)) {
             allCars.push(car);
           }
         });
-        
+    
+        // 🧠 Обновляем originalCars, чтобы "Без сортировки" работал правильно
         if (firstLoad) {
-          originalCars = [...allCars]; // Сохраняем исходный порядок
+          originalCars = [...allCars];
+        } else {
+          const uniqueToOriginal = newCars.filter(car => !originalCars.some(orig => orig.id === car.id));
+          originalCars.push(...uniqueToOriginal);
         }
-        
-
+    
         offset += itemsCount;
-        sortCars();
+    
+        const currentSort = document.getElementById('sortSelect')?.value;
+        if (currentSort) {
+          sortCars(); // если выбрана сортировка
+        } else {
+          allCars = [...originalCars]; // если "Без сортировки" — восстанавливаем порядок
+        }
+    
         renderCars();
       } catch (error) {
         showError(error.message);
@@ -200,6 +264,7 @@ if (savedSort) {
         firstLoad = false;
       }
     }
+    
 
     // === Рендер карточек ===
     function renderCars() {
