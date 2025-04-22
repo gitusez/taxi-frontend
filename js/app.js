@@ -110,7 +110,11 @@ if (savedCars && savedOffset) {
 
   const savedSort = localStorage.getItem('savedSort'); // ⬅️ СНАЧАЛА ОБЪЯВЛЯЕМ
 
-  originalCars = [...allCars];
+  if (!savedSort) {
+    originalCars = JSON.parse(savedCars); // 👈 вот тут правильно сохраняем порядок
+  } else {
+    originalCars = JSON.parse(savedCars); // 👈 всё равно сохраняем, иначе при догрузке будет пусто
+  }
 
   if (savedMode === 'buyout' || savedMode === 'rent') {
     currentMode = savedMode;
