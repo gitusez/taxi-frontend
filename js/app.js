@@ -103,6 +103,16 @@ document.addEventListener('DOMContentLoaded', () => {
         offset += itemsCount;
         sortCars();
         renderCars();
+        //dobavil skrollsave
+        // Восстановление позиции после возврата из карточки
+if (!firstLoad) {
+  const savedScroll = localStorage.getItem('scrollPosition');
+  if (savedScroll !== null) {
+    setTimeout(() => window.scrollTo(0, parseInt(savedScroll, 10)), 100);
+    localStorage.removeItem('scrollPosition');
+  }
+}
+
       } catch (error) {
         showError(error.message);
       } finally {
@@ -147,8 +157,12 @@ document.addEventListener('DOMContentLoaded', () => {
           <p>Тип топлива: <span class="fuel-${fuelTypeClass}">${fuelType}</span></p>
         </div>
       `;
-
-      card.onclick = () => window.location.href = `car-details.html?car=${car.id}`;
+      //dobavil skrollsave
+      // card.onclick = () => window.location.href = `car-details.html?car=${car.id}`;
+      card.onclick = () => {
+        localStorage.setItem('scrollPosition', window.scrollY);
+        window.location.href = `car-details.html?car=${car.id}`;
+      };      
       return card;
     }
 
