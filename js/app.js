@@ -70,6 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
       // 👉 ДОБАВЬ ЭТО
       initEventListeners();
 
+      const savedSort = localStorage.getItem('savedSort');
+if (savedSort) {
+  document.getElementById('sortSelect').value = savedSort;
+  sortCars();
+  localStorage.removeItem('savedSort');
+}
+
+
 
       // Мы не знаем, всё ли загружено — покажем кнопку на всякий случай
     loadMoreBtn.style.display = "block";
@@ -174,14 +182,12 @@ document.addEventListener('DOMContentLoaded', () => {
           if (!allCars.some(existingCar => existingCar.id === car.id)) {
             allCars.push(car);
           }
-
-
-          if (firstLoad) {
-            originalCars = [...allCars]; // Сохраняем исходный порядок
-          }          
-
-
         });
+        
+        if (firstLoad) {
+          originalCars = [...allCars]; // Сохраняем исходный порядок
+        }
+        
 
         offset += itemsCount;
         sortCars();
@@ -238,6 +244,8 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('savedCars', JSON.stringify(allCars));
         localStorage.setItem('savedOffset', offset);
         localStorage.setItem('savedMode', currentMode); // 💾 сохраняем вкладку
+        const sortValue = document.getElementById('sortSelect')?.value || '';
+        localStorage.setItem('savedSort', sortValue); // 💾 сохраняем сортировку
         window.location.href = `car-details.html?car=${car.id}`;
       };
 
@@ -257,9 +265,17 @@ document.addEventListener('DOMContentLoaded', () => {
     //   });
     // }
 
+    function getCarPrice(car) {
+      const model = (car.model || "").toLowerCase();
+      if (model.includes("granta")) return currentMode === 'rent' ? 1700 : 850000;
+      if (model.includes("vesta")) return currentMode === 'rent' ? 2400 : 1050000;
+      if (model.includes("largus")) return currentMode === 'rent' ? 2600 : 1100000;
+      return 0;
+    }
+    
+
     function sortCars() {
       const value = document.getElementById('sortSelect')?.value;
-      // if (!value) return; // Без сортировки
       if (!value) {
         allCars = [...originalCars]; // Сброс к изначальному порядку
         return;
@@ -271,11 +287,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let aVal, bVal;
     
         if (field === 'price') {
-          aVal = parseInt(a.price || 0, 10);
-          bVal = parseInt(b.price || 0, 10);
+          aVal = getCarPrice(a);
+          bVal = getCarPrice(b);
         } else if (field === 'mileage') {
-          aVal = parseInt(a.mileage || 0, 10);
-          bVal = parseInt(b.mileage || 0, 10);
+          aVal = parseInt(a.odometer || 0, 10);
+          bVal = parseInt(b.odometer || 0, 10);
         } else {
           aVal = String(a[field] || '');
           bVal = String(b[field] || '');
@@ -285,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return order === 'asc' ? aVal - bVal : bVal - aVal;
       });
     }
+    
     
 
     // === Поиск ===
