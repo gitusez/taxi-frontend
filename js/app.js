@@ -411,17 +411,11 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('savedOffset');
 
 
-// Показываем кнопку, если offset меньше общего количества, иначе — "Оставить заявку"
-if (offset % config.itemsLoadMore === 0) {
-  loadMoreBtn.style.display = "block";
-  loadMoreBtn.disabled = false;
-  feedbackNotice.style.display = "none";
-  allLoaded = false;
-} else {
-  loadMoreBtn.style.display = "none";
-  feedbackNotice.style.display = "block";
-  allLoaded = true;
-}
+    // Мы не знаем, всё ли загружено — покажем кнопку на всякий случай
+    loadMoreBtn.style.display = "block";
+    loadMoreBtn.disabled = false;
+    feedbackNotice.style.display = "none";
+    allLoaded = false;
 
       
 
@@ -502,15 +496,19 @@ if (offset % config.itemsLoadMore === 0) {
         // }
 
 
-        if (newCars.length === 0) {
+        if (newCars.length < itemsCount) {
+          // Сервер вернул меньше машин, чем просили — значит всё, больше нет
           allLoaded = true;
-          loadMoreBtn.disabled = true;
           loadMoreBtn.style.display = "none";
+          loadMoreBtn.disabled = true;
           feedbackNotice.style.display = "block";
-          return;
         } else {
+          allLoaded = false;
+          loadMoreBtn.style.display = "block";
+          loadMoreBtn.disabled = false;
           feedbackNotice.style.display = "none";
-        }        
+        }
+           
 
 
         newCars.forEach(car => {
