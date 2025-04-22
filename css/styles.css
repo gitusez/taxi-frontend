@@ -648,6 +648,16 @@ body.lightbox-open {
     animation: spin 1s linear infinite;
     z-index: 9999;
   }
+  .loader-inline {
+    display: none;
+    margin: 20px auto;
+    width: 30px;
+    height: 30px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #ffcc00;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
   
   @keyframes spin {
     0% { transform: rotate(0deg); }

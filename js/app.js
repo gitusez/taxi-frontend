@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const loader = document.querySelector('.loader');
   const errorBox = document.querySelector('.error-message');
+  const inlineLoader = document.querySelector('.loader-inline');
   const grid = document.querySelector('.cars-grid');
   const loadMoreContainer = document.querySelector('.pagination-container');
   const feedbackNotice = document.getElementById('noMoreCarsNotice');
@@ -71,7 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         errorBox.style.display = "none";
         // if (firstLoad) loader.style.display = "block";
-        loader.style.display = "block";
+        // loader.style.display = "block";
+        //dobavil
+        if (firstLoad) {
+          loader.style.display = "block";
+        } else {
+          inlineLoader.style.display = "block";
+        }
         loadMoreBtn.style.display = "none";
 
         const response = await fetch(config.apiUrl, {
@@ -107,9 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (error) {
         showError(error.message);
       } finally {
+        //dobavil
         loader.style.display = "none";
+        inlineLoader.style.display = "none";
         if (!allLoaded) loadMoreBtn.style.display = "block";
         firstLoad = false;
+        
       }
     }
 
