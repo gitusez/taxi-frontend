@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         errorBox.style.display = "none";
         // if (firstLoad) loader.style.display = "block";
+        loadMoreBtn.style.display = "none";
         loader.style.display = "block";
         const response = await fetch(config.apiUrl, {
           method: "POST",
