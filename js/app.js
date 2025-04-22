@@ -411,18 +411,19 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('savedOffset');
 
 
-      if (allCars.length < offset) {
-        // Значит, ещё можно загружать
-        loadMoreBtn.style.display = "block";
-        loadMoreBtn.disabled = false;
-        feedbackNotice.style.display = "none";
-        allLoaded = false;
-      } else {
-        // Всё загружено — показываем финальную форму
-        loadMoreBtn.style.display = "none";
-        feedbackNotice.style.display = "block";
-        allLoaded = true;
-      }
+// Показываем кнопку, если offset меньше общего количества, иначе — "Оставить заявку"
+if (offset % config.itemsLoadMore === 0) {
+  loadMoreBtn.style.display = "block";
+  loadMoreBtn.disabled = false;
+  feedbackNotice.style.display = "none";
+  allLoaded = false;
+} else {
+  loadMoreBtn.style.display = "none";
+  feedbackNotice.style.display = "block";
+  allLoaded = true;
+}
+
+      
 
 
       
