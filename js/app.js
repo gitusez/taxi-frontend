@@ -103,16 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
         offset += itemsCount;
         sortCars();
         renderCars();
-        //dobavil skrollsave
-        // Восстановление позиции после возврата из карточки
-if (!firstLoad) {
-  const savedScroll = localStorage.getItem('scrollPosition');
-  if (savedScroll !== null) {
-    setTimeout(() => window.scrollTo(0, parseInt(savedScroll, 10)), 100);
-    localStorage.removeItem('scrollPosition');
-  }
-}
-
       } catch (error) {
         showError(error.message);
       } finally {
@@ -125,6 +115,14 @@ if (!firstLoad) {
     function renderCars() {
       grid.innerHTML = "";
       allCars.forEach(car => grid.appendChild(createCarCard(car)));
+      // ⬇️ ДОБАВЬ ЭТО В КОНЕЦ
+  const savedScroll = localStorage.getItem('scrollPosition');
+  if (savedScroll !== null) {
+    setTimeout(() => {
+      window.scrollTo(0, parseInt(savedScroll, 10));
+      localStorage.removeItem('scrollPosition');
+    }, 100);
+  }
     }
 
     function renderFiltered(filteredCars) {
