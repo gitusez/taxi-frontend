@@ -49,6 +49,13 @@ async function loadCarDetails(carId) {
 }
 
 function renderCarDetails(car) {
+    // Преобразуем тип КПП
+    let transmission = car.transmission;
+    if (typeof transmission === 'string') {
+      const type = transmission.toLowerCase();
+      if (type === 'mt') transmission = 'Механическая коробка';
+      else if (type === 'at') transmission = 'Автомат';
+    }
   const fields = {
     brand: car.brand,
     model: car.model,
@@ -58,7 +65,8 @@ function renderCarDetails(car) {
     mileage: car.odometer || "—",
 
     fuel: car.fuel_type,
-    transmission: car.transmission,
+    // transmission: car.transmission,
+    transmission: transmission,
     equipment: car.equipment
     
     // vin: car.vin,
