@@ -52,57 +52,106 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedMode = localStorage.getItem('savedMode'); //savedMode
 
 
-    if (savedCars && savedOffset) {
-      allCars = JSON.parse(savedCars);
-      offset = parseInt(savedOffset, 10);
+//     if (savedCars && savedOffset) {
+//       allCars = JSON.parse(savedCars);
+//       offset = parseInt(savedOffset, 10);
 
-      // // ✅ ДОБАВЬ ЭТО СЮДА
-      // originalCars = [...allCars];
+//       // // ✅ ДОБАВЬ ЭТО СЮДА
+//       // originalCars = [...allCars];
 
-      if (!savedSort) {
-        originalCars = [...allCars];
-      }
+//       if (!savedSort) {
+//         originalCars = [...allCars];
+//       }
 
-      if (savedMode === 'buyout' || savedMode === 'rent') {
-        currentMode = savedMode;
-        document.getElementById("rentTab").classList.toggle("active", currentMode === "rent");
-        document.getElementById("buyoutTab").classList.toggle("active", currentMode === "buyout");
-        localStorage.removeItem('savedMode');
-      }
+//       if (savedMode === 'buyout' || savedMode === 'rent') {
+//         currentMode = savedMode;
+//         document.getElementById("rentTab").classList.toggle("active", currentMode === "rent");
+//         document.getElementById("buyoutTab").classList.toggle("active", currentMode === "buyout");
+//         localStorage.removeItem('savedMode');
+//       }
       
-      renderCars();
-      localStorage.removeItem('savedCars');
-      localStorage.removeItem('savedOffset');
+//       renderCars();
+//       localStorage.removeItem('savedCars');
+//       localStorage.removeItem('savedOffset');
 
-      // 👉 ДОБАВЬ ЭТО
-      initEventListeners();
+//       // 👉 ДОБАВЬ ЭТО
+//       initEventListeners();
 
-      const savedSort = localStorage.getItem('savedSort');
-if (savedSort) {
-  document.getElementById('sortSelect').value = savedSort;
-  sortCars();
-  localStorage.removeItem('savedSort');
+//       const savedSort = localStorage.getItem('savedSort');
+// if (savedSort) {
+//   document.getElementById('sortSelect').value = savedSort;
+//   sortCars();
+//   localStorage.removeItem('savedSort');
+// }
+
+
+//       // Мы не знаем, всё ли загружено — покажем кнопку на всякий случай
+//     loadMoreBtn.style.display = "block";
+//     loadMoreBtn.disabled = false;
+//     feedbackNotice.style.display = "none";
+//     allLoaded = false;
+
+    
+//       // Восстановление прокрутки
+//       const savedScroll = localStorage.getItem('scrollPosition');
+//       if (savedScroll !== null) {
+//         setTimeout(() => {
+//           window.scrollTo(0, parseInt(savedScroll, 10));
+//           localStorage.removeItem('scrollPosition');
+//         }, 100);
+//       }
+    
+//       return;
+//     }
+
+if (savedCars && savedOffset) {
+  allCars = JSON.parse(savedCars);
+  offset = parseInt(savedOffset, 10);
+
+  const savedSort = localStorage.getItem('savedSort'); // ⬅️ СНАЧАЛА ОБЪЯВЛЯЕМ
+
+  // Если сортировка не выбрана — сохранить порядок
+  if (!savedSort) {
+    originalCars = [...allCars];
+  }
+
+  if (savedMode === 'buyout' || savedMode === 'rent') {
+    currentMode = savedMode;
+    document.getElementById("rentTab").classList.toggle("active", currentMode === "rent");
+    document.getElementById("buyoutTab").classList.toggle("active", currentMode === "buyout");
+    localStorage.removeItem('savedMode');
+  }
+
+  if (savedSort) {
+    document.getElementById('sortSelect').value = savedSort;
+    sortCars();
+    localStorage.removeItem('savedSort');
+  }
+
+  renderCars();
+  localStorage.removeItem('savedCars');
+  localStorage.removeItem('savedOffset');
+
+  // Восстановление прокрутки
+  const savedScroll = localStorage.getItem('scrollPosition');
+  if (savedScroll !== null) {
+    setTimeout(() => {
+      window.scrollTo(0, parseInt(savedScroll, 10));
+      localStorage.removeItem('scrollPosition');
+    }, 100);
+  }
+
+  // Инициализация событий после восстановления
+  initEventListeners();
+
+  loadMoreBtn.style.display = "block";
+  loadMoreBtn.disabled = false;
+  feedbackNotice.style.display = "none";
+  allLoaded = false;
+
+  return;
 }
 
-
-      // Мы не знаем, всё ли загружено — покажем кнопку на всякий случай
-    loadMoreBtn.style.display = "block";
-    loadMoreBtn.disabled = false;
-    feedbackNotice.style.display = "none";
-    allLoaded = false;
-
-    
-      // Восстановление прокрутки
-      const savedScroll = localStorage.getItem('scrollPosition');
-      if (savedScroll !== null) {
-        setTimeout(() => {
-          window.scrollTo(0, parseInt(savedScroll, 10));
-          localStorage.removeItem('scrollPosition');
-        }, 100);
-      }
-    
-      return;
-    }
 
     // === Инициализация ===
     initEventListeners();
