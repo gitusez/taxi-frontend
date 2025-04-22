@@ -110,12 +110,9 @@ if (savedCars && savedOffset) {
 
   const savedSort = localStorage.getItem('savedSort'); // ⬅️ СНАЧАЛА ОБЪЯВЛЯЕМ
 
-  if (!savedSort) {
-    originalCars = JSON.parse(savedCars); // 👈 вот тут правильно сохраняем порядок
-  } else {
-    originalCars = JSON.parse(savedCars); // 👈 всё равно сохраняем, иначе при догрузке будет пусто
-  }
-
+  const savedOriginal = localStorage.getItem('originalCars');
+  originalCars = savedOriginal ? JSON.parse(savedOriginal) : [...allCars];
+  
   if (savedMode === 'buyout' || savedMode === 'rent') {
     currentMode = savedMode;
     document.getElementById("rentTab").classList.toggle("active", currentMode === "rent");
@@ -359,6 +356,7 @@ if (savedCars && savedOffset) {
       card.onclick = () => {
         localStorage.setItem('scrollPosition', window.scrollY);
         localStorage.setItem('savedCars', JSON.stringify(allCars));
+        localStorage.setItem('originalCars', JSON.stringify(originalCars)); // 💾 сохраняем оригинальный порядок
         localStorage.setItem('savedOffset', offset);
         localStorage.setItem('savedMode', currentMode); // 💾 сохраняем вкладку
         const sortValue = document.getElementById('sortSelect')?.value || '';
@@ -395,6 +393,7 @@ if (savedCars && savedOffset) {
       const value = document.getElementById('sortSelect')?.value;
       if (!value) {
         allCars = [...originalCars]; // Сброс к изначальному порядку
+        document.getElementById('sortSelect').selectedIndex = 0; // 👈 сброс селекта
         renderCars();                // 👉 нужно отрисовать заново!
         return;
       }
