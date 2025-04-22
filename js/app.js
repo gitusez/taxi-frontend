@@ -25,6 +25,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let offset = 0;
     let allLoaded = false;
     let firstLoad = true;
+// scroll test
+    const savedCars = localStorage.getItem('savedCars');
+   const savedOffset = localStorage.getItem('savedOffset');
+if (savedCars && savedOffset) {
+  allCars = JSON.parse(savedCars);
+  offset = parseInt(savedOffset, 10);
+  renderCars();
+  localStorage.removeItem('savedCars');
+  localStorage.removeItem('savedOffset');
+
+  // восстановим scroll после отрисовки
+  const savedScroll = localStorage.getItem('scrollPosition');
+  if (savedScroll !== null) {
+    setTimeout(() => {
+      window.scrollTo(0, parseInt(savedScroll, 10));
+      localStorage.removeItem('scrollPosition');
+    }, 100);
+  }
+  return; // не грузим заново с сервера
+}
 
     const loadMoreBtn = document.createElement('button');
     loadMoreBtn.textContent = "Загрузить ещё";
@@ -115,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCars() {
       grid.innerHTML = "";
       allCars.forEach(car => grid.appendChild(createCarCard(car)));
+      // scroll test
       // ⬇️ ДОБАВЬ ЭТО В КОНЕЦ
   const savedScroll = localStorage.getItem('scrollPosition');
   if (savedScroll !== null) {
@@ -155,12 +176,21 @@ document.addEventListener('DOMContentLoaded', () => {
           <p>Тип топлива: <span class="fuel-${fuelTypeClass}">${fuelType}</span></p>
         </div>
       `;
-      //dobavil skrollsave
+      //dflt back
       // card.onclick = () => window.location.href = `car-details.html?car=${car.id}`;
+
+      //dobavil skrollsave2
+      // card.onclick = () => {
+      //   localStorage.setItem('scrollPosition', window.scrollY);
+      //   window.location.href = `car-details.html?car=${car.id}`;
+      // };
+      
       card.onclick = () => {
         localStorage.setItem('scrollPosition', window.scrollY);
+        localStorage.setItem('savedCars', JSON.stringify(allCars));
+        localStorage.setItem('savedOffset', offset);
         window.location.href = `car-details.html?car=${car.id}`;
-      };      
+      };
       return card;
     }
 
