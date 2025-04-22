@@ -110,10 +110,7 @@ if (savedCars && savedOffset) {
 
   const savedSort = localStorage.getItem('savedSort'); // ⬅️ СНАЧАЛА ОБЪЯВЛЯЕМ
 
-  // Если сортировка не выбрана — сохранить порядок
-  if (!savedSort) {
-    originalCars = [...allCars];
-  }
+  originalCars = [...allCars];
 
   if (savedMode === 'buyout' || savedMode === 'rent') {
     currentMode = savedMode;
