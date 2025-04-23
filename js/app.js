@@ -347,11 +347,12 @@ if (savedCars && savedOffset) {
         <div class="car-detal">
           <p>Год: ${car.year || '—'}</p>
           <p>Цвет: ${car.color || '—'}</p>
-          <p>Номер: ${car.number || '—'}</p>
-          <p>Тип топлива: <span class="fuel-${fuelTypeClass}">${fuelType}</span></p>
+          <p>Гос.Номер: ${car.number || '—'}</p>
+          <p>Пробег: ${car.odometer_display || '—'}</p>
         </div>
       `;
 
+//<p>Тип топлива: <span class="fuel-${fuelTypeClass}">${fuelType}</span></p>
 
       card.onclick = () => {
         localStorage.setItem('scrollPosition', window.scrollY);
