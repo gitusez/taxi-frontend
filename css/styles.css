@@ -1177,9 +1177,9 @@ body.lightbox-open {
 } */
 
 .feature-line {
-  line-height: 1.4;
+  /* line-height: 1.4; */
   margin-bottom: 4px;
-  padding: 2px 0;
+  /* padding: 2px 0; */
   border-radius: 4px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
