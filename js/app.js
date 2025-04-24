@@ -51,59 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedScroll = localStorage.getItem('scrollPosition');
     const savedMode = localStorage.getItem('savedMode'); //savedMode
 
-
-//     if (savedCars && savedOffset) {
-//       allCars = JSON.parse(savedCars);
-//       offset = parseInt(savedOffset, 10);
-
-//       // // ✅ ДОБАВЬ ЭТО СЮДА
-//       // originalCars = [...allCars];
-
-//       if (!savedSort) {
-//         originalCars = [...allCars];
-//       }
-
-//       if (savedMode === 'buyout' || savedMode === 'rent') {
-//         currentMode = savedMode;
-//         document.getElementById("rentTab").classList.toggle("active", currentMode === "rent");
-//         document.getElementById("buyoutTab").classList.toggle("active", currentMode === "buyout");
-//         localStorage.removeItem('savedMode');
-//       }
-      
-//       renderCars();
-//       localStorage.removeItem('savedCars');
-//       localStorage.removeItem('savedOffset');
-
-//       // 👉 ДОБАВЬ ЭТО
-//       initEventListeners();
-
-//       const savedSort = localStorage.getItem('savedSort');
-// if (savedSort) {
-//   document.getElementById('sortSelect').value = savedSort;
-//   sortCars();
-//   localStorage.removeItem('savedSort');
-// }
-
-
-//       // Мы не знаем, всё ли загружено — покажем кнопку на всякий случай
-//     loadMoreBtn.style.display = "block";
-//     loadMoreBtn.disabled = false;
-//     feedbackNotice.style.display = "none";
-//     allLoaded = false;
-
-    
-//       // Восстановление прокрутки
-//       const savedScroll = localStorage.getItem('scrollPosition');
-//       if (savedScroll !== null) {
-//         setTimeout(() => {
-//           window.scrollTo(0, parseInt(savedScroll, 10));
-//           localStorage.removeItem('scrollPosition');
-//         }, 100);
-//       }
-    
-//       return;
-//     }
-
 if (savedCars && savedOffset) {
   allCars = JSON.parse(savedCars);
   offset = parseInt(savedOffset, 10);
@@ -193,63 +140,6 @@ if (savedCars && savedOffset) {
     }
 
     // // === Загрузка данных с сервера ===
-    // async function loadCars(itemsCount) {
-    //   try {
-    //     errorBox.style.display = "none";
-    //     loadMoreBtn.style.display = "none";
-    //     loader.style.display = "block";
-
-    //     const response = await fetch(config.apiUrl, {
-    //       method: "POST",
-    //       headers: { "Content-Type": "application/json" },
-    //       body: JSON.stringify({ items: itemsCount, offset })
-    //     });
-
-    //     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    //     const result = await response.json();
-    //     if (!result.success) throw new Error(result.error || "Ошибка сервера");
-
-    //     const newCars = Array.isArray(result.cars_list) ? result.cars_list : Object.values(result.cars_list || {});
-
-
-    //     if (newCars.length < itemsCount) {
-    //       // Сервер вернул меньше машин, чем просили — значит всё, больше нет
-    //       allLoaded = true;
-    //       loadMoreBtn.style.display = "none";
-    //       loadMoreBtn.disabled = true;
-    //       feedbackNotice.style.display = "block";
-    //     } else {
-    //       allLoaded = false;
-    //       loadMoreBtn.style.display = "block";
-    //       loadMoreBtn.disabled = false;
-    //       feedbackNotice.style.display = "none";
-    //     }
-           
-
-
-    //     newCars.forEach(car => {
-    //       if (!allCars.some(existingCar => existingCar.id === car.id)) {
-    //         allCars.push(car);
-    //       }
-    //     });
-        
-    //     if (firstLoad) {
-    //       originalCars = [...allCars]; // Сохраняем исходный порядок
-    //     }
-        
-
-    //     offset += itemsCount;
-    //     sortCars();
-    //     renderCars();
-    //   } catch (error) {
-    //     showError(error.message);
-    //   } finally {
-    //     loader.style.display = "none";
-    //     if (!allLoaded) loadMoreBtn.style.display = "block";
-    //     firstLoad = false;
-    //   }
-    // }
-
     async function loadCars(itemsCount) {
       try {
         errorBox.style.display = "none";
@@ -368,18 +258,7 @@ if (savedCars && savedOffset) {
       return card;
     }
 
-    // === Сортировка ===
-    // function sortCars() {
-    //   const value = document.getElementById('sortSelect')?.value;
-    //   if (!value) return;
-
-    //   const [field, order] = value.split('_');
-    //   allCars.sort((a, b) => {
-    //     const aVal = String(a[field] || '');
-    //     const bVal = String(b[field] || '');
-    //     return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-    //   });
-    // }
+  
 
     function getCarPrice(car) {
       const model = (car.model || "").toLowerCase();
@@ -389,6 +268,7 @@ if (savedCars && savedOffset) {
       return 0;
     }
     
+      // === Сортировка ===
 
     function sortCars() {
       const value = document.getElementById('sortSelect')?.value;

@@ -1,3 +1,4 @@
+//car-details.js
 import { config } from './config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -65,19 +66,49 @@ function renderCarDetails(car) {
     mileage: car.odometer || "—",
 
     fuel: car.fuel_type,
-    // transmission: car.transmission,
     transmission: transmission,
     equipment: car.equipment
-    
+
+
+    // transmission: car.transmission,
     // vin: car.vin,
     // status: car.status
 
   };
 
+  // 👇 Разделим equipment на комплектацию (список) и описание (абзац)
+let features = [];
+let description = "";
+
+if (typeof car.equipment === 'string') {
+  const lines = car.equipment.split('\n').map(line => line.trim()).filter(Boolean);
+  const descStart = lines.findIndex(line => line.toLowerCase().startsWith('описание'));
+  if (descStart !== -1) {
+    features = lines.slice(0, descStart);
+    description = lines.slice(descStart + 1).join('\n');
+  } else {
+    features = lines;
+  }
+}
+
+
   Object.entries(fields).forEach(([key, value]) => {
     const el = document.querySelector(`.detail-${key}`);
     if (el) el.textContent = value ?? "—";
   });
+
+  // 👉 Показываем комплектацию как список
+const equipEl = document.querySelector(".detail-equipment");
+if (equipEl) {
+  equipEl.innerHTML = `<ul>${features.map(item => `<li>${item}</li>`).join('')}</ul>`;
+}
+
+// 👉 Показываем описание
+const descEl = document.querySelector(".detail-description");
+if (descEl) {
+  descEl.textContent = description || "Описание отсутствует";
+}
+
 
   const swiperWrapper = document.querySelector('.swiper-wrapper');
   swiperWrapper.innerHTML = car.avatar
