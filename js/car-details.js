@@ -73,7 +73,7 @@ function renderCarDetails(car) {
 
     // transmission: car.transmission,
     // vin: car.vin,
-    // status: car.status
+    status: car.status
 
   };
 
