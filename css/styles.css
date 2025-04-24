@@ -1073,6 +1073,30 @@ body.lightbox-open {
   background: #20b858;
 }
 
+.detail-description {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-top: 10px;
+  white-space: pre-wrap;
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-theme .detail-description {
+  background-color: #2b2b2b;
+  color: #f1f1f1;
+  border: 1px solid #444;
+}
+
+.light-theme .detail-description {
+  background-color: #f7f7f7;
+  color: #222;
+  border: 1px solid #ccc;
+}
+
+
+
 
 
 }

@@ -67,7 +67,7 @@ function renderCarDetails(car) {
 
     fuel: car.fuel_type,
     transmission: transmission,
-    equipment: car.equipment
+    // equipment: car.equipment
 
 
     // transmission: car.transmission,
@@ -105,6 +105,7 @@ if (equipEl) {
 
 // 👉 Показываем описание
 const descEl = document.querySelector(".detail-description");
+console.log("🟡 Описание:", description); // ← временно
 if (descEl) {
   descEl.textContent = description || "Описание отсутствует";
 }
