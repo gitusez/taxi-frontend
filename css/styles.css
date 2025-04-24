@@ -1148,9 +1148,7 @@ body.lightbox-open {
   transition: background-color 0.3s ease, color 0.3s ease;
 } */
 
-
-
-.detail-equipment {
+/* .detail-equipment {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -1176,7 +1174,28 @@ body.lightbox-open {
   background-color: #f1f1f1;
   color: #222;
   border: 1px solid #ccc;
+} */
+
+.feature-line {
+  line-height: 1.4;
+  margin-bottom: 4px;
+  padding: 2px 0;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Светлая тема */
+.light-theme .feature-line {
+  color: #222;
+  background-color: transparent; /* или #f9f9f9 для лёгкого выделения */
+}
+
+/* Тёмная тема */
+.dark-theme .feature-line {
+  color: #f1f1f1;
+  background-color: transparent; /* или #2b2b2b если нужно легкое затемнение */
+}
+
 
 
 }
