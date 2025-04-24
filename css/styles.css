@@ -1119,17 +1119,34 @@ body.lightbox-open {
   border: 1px solid #ccc;
 }
 
-.detail-equipment ul {
-  list-style: none;       /* убираем точки */
-  padding-left: 0;        /* убираем отступ слева */
+/* .detail-equipment ul {
+  list-style: none;
+  padding-left: 0;
   margin: 0;
 }
 
 .detail-equipment li {
   margin-bottom: 4px;
+} */
+
+.detail-equipment ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-
+.detail-equipment li {
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.2;
+  display: inline-block;
+  white-space: nowrap;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 
 
 }
