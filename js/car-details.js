@@ -73,7 +73,7 @@ function renderCarDetails(car) {
 
     // transmission: car.transmission,
     // vin: car.vin,
-    status: car.status
+    // status: car.status
 
   };
 
@@ -116,15 +116,40 @@ if (descEl) {
 }
 
 
-  const swiperWrapper = document.querySelector('.swiper-wrapper');
-  swiperWrapper.innerHTML = car.avatar
-    ? `<div class="swiper-slide"><img src="${car.avatar}" alt="Фото авто" onclick="openLightbox(['${car.avatar}'], 0)"></div>`
-    : '<div class="swiper-slide">Нет фото</div>';
+  // const swiperWrapper = document.querySelector('.swiper-wrapper');
+  // swiperWrapper.innerHTML = car.avatar
+  //   ? `<div class="swiper-slide"><img src="${car.avatar}" alt="Фото авто" onclick="openLightbox(['${car.avatar}'], 0)"></div>`
+  //   : '<div class="swiper-slide">Нет фото</div>';
 
-  new Swiper('.swiper-container', {
-    slidesPerView: 1,
-    spaceBetween: 0
-  });
+  // new Swiper('.swiper-container', {
+  //   slidesPerView: 1,
+  //   spaceBetween: 0
+  // });
+
+  // 📸 Автозагрузка всех фото из папки по номеру
+const swiperWrapper = document.querySelector('.swiper-wrapper');
+const carNumber = (car.number || "").replace(/\s/g, "").toUpperCase();
+const basePath = `/photos/${carNumber}`;
+const images = [];
+
+for (let i = 1; i <= 20; i++) {
+  images.push(`${basePath}/${carNumber}_${i}.jpeg`);
+}
+
+// Вставка слайдов
+swiperWrapper.innerHTML = images.map((src, index) => `
+  <div class="swiper-slide">
+    <img src="${src}" alt="Фото авто" onclick="openLightbox(${JSON.stringify(images)}, ${index})">
+  </div>
+`).join("");
+
+// Инициализация свайпера
+new Swiper('.swiper-container', {
+  slidesPerView: 1,
+  spaceBetween: 0
+});
+
+  
 }
 
 let fullscreenSwiper;
