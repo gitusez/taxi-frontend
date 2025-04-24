@@ -57,6 +57,9 @@ body.dark-theme .logo {
   background-image: url('img/logo.jpg');
 }
 
+.car-detal p {
+  margin-bottom: 4px;
+}
 
 
 * {
@@ -1117,7 +1120,8 @@ body.lightbox-open {
 }
 
 .detail-equipment ul {
-  padding-left: 18px;
+  list-style: none;       /* убираем точки */
+  padding-left: 0;        /* убираем отступ слева */
   margin: 0;
 }
 
