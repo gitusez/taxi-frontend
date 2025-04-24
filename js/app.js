@@ -178,21 +178,34 @@ if (savedCars && savedOffset) {
         });
     
         // 🧠 Обновляем originalCars, чтобы "Без сортировки" работал правильно
+        // if (firstLoad) {
+        //   originalCars = [...allCars];
+        // } else {
+        //   const uniqueToOriginal = newCars.filter(car => !originalCars.some(orig => orig.id === car.id));
+        //   originalCars.push(...uniqueToOriginal);
+        // }
+
         if (firstLoad) {
-          originalCars = [...allCars];
+          originalCars = [...allCars];        // сохраняем исходный порядок
+          firstLoad = false;                  // сбрасываем, чтобы больше не перезаписывать
+          const currentSort = document.getElementById('sortSelect')?.value;
+          if (currentSort) {
+            sortCars();                       // сортируем после сохранения original
+          }
         } else {
           const uniqueToOriginal = newCars.filter(car => !originalCars.some(orig => orig.id === car.id));
           originalCars.push(...uniqueToOriginal);
         }
+        
     
         offset += itemsCount;
     
-        const currentSort = document.getElementById('sortSelect')?.value;
-        if (currentSort) {
-          sortCars(); // если выбрана сортировка
-        } else {
-          allCars = [...originalCars]; // если "Без сортировки" — восстанавливаем порядок
-        }
+        // const currentSort = document.getElementById('sortSelect')?.value;
+        // if (currentSort) {
+        //   sortCars(); // если выбрана сортировка
+        // } else {
+        //   allCars = [...originalCars]; // если "Без сортировки" — восстанавливаем порядок
+        // }
     
         renderCars();
       } catch (error) {
@@ -267,7 +280,7 @@ if (savedCars && savedOffset) {
       if (model.includes("largus")) return currentMode === 'rent' ? 2600 : 1100000;
       return 0;
     }
-    
+
       // === Сортировка ===
 
     function sortCars() {
