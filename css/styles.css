@@ -90,7 +90,7 @@ body {
 }
 
 /* Кнопка «Назад» */
-.back-button {
+/* .back-button {
   position: absolute;
   left: 10px;
   top: 15%;
@@ -99,7 +99,44 @@ body {
   text-decoration: none;
   font-size: 1.2rem;
   font-weight: bold;
+} */
+
+/* Кнопка «Назад» — закреплённая сверху */
+.back-button {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  padding: 6px 12px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  backdrop-filter: blur(4px);
 }
+
+/* Темная тема */
+.dark-theme .back-button {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #ffcc00;
+}
+
+/* Светлая тема */
+.light-theme .back-button {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #222;
+  border: 1px solid #ddd;
+}
+
+.back-button:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.light-theme .back-button:hover {
+  background-color: rgba(255, 255, 255, 1);
+}
+
 
 /* Подвал */
 .footer-bar {
