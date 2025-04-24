@@ -1116,6 +1116,14 @@ body.lightbox-open {
   border: 1px solid #ccc;
 }
 
+.detail-equipment ul {
+  padding-left: 18px;
+  margin: 0;
+}
+
+.detail-equipment li {
+  margin-bottom: 4px;
+}
 
 
 

@@ -63,7 +63,8 @@ function renderCarDetails(car) {
     year: car.year,
     color: car.color,
     number: car.number,
-    mileage: car.odometer || "—",
+    // mileage: car.odometer || "—",
+    mileage: car.odometer ? `${car.odometer.toLocaleString('ru-RU')} км.` : "—",
 
     fuel: car.fuel_type,
     transmission: transmission,
