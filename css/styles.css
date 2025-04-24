@@ -675,11 +675,32 @@ body.lightbox-open {
     font-weight: bold;
   }
   
-  .error-message {
+  /* .error-message {
     color: #ff4444;
     text-align: center;
     padding: 20px;
     font-size: 1.1rem;
+  } */
+
+  .error-message {
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-top: 10px;
+    white-space: pre-wrap;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .dark-theme .error-message {
+    background-color: #3b0c0c;
+    color: #ffbcbc;
+    border: 1px solid #8a2c2c;
+  }
+  
+  .light-theme .error-message {
+    background-color: #ffeaea;
+    color: #a60000;
+    border: 1px solid #ffc4c4;
   }
 
   /* Стили для страницы "Связь" */

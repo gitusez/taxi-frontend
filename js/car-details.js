@@ -157,11 +157,21 @@ window.closeLightbox = function() {
   document.body.classList.remove('lightbox-open');
 };
 
+// function showError(msg) {
+//   const el = document.querySelector('.detail-description');
+//   if (el) {
+//     el.textContent = msg;
+//     el.style.color = 'red';
+//   }
+//   console.error(msg);
+// }
+
 function showError(msg) {
-  const el = document.querySelector('.detail-description');
-  if (el) {
-    el.textContent = msg;
-    el.style.color = 'red';
-  }
   console.error(msg);
+
+  const errorBox = document.querySelector('.error-message');
+  if (errorBox) {
+    errorBox.textContent = msg;
+    errorBox.style.display = 'block';
+  }
 }
