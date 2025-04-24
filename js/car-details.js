@@ -101,7 +101,9 @@ if (typeof car.equipment === 'string') {
   // 👉 Показываем комплектацию как список
 const equipEl = document.querySelector(".detail-equipment");
 if (equipEl) {
-  equipEl.innerHTML = `<ul>${features.map(item => `<li>${item}</li>`).join('')}</ul>`;
+  // equipEl.innerHTML = `<ul>${features.map(item => `<li>${item}</li>`).join('')}</ul>`;
+  equipEl.innerHTML = features.map(item => `<span class="feature-tag">${item}</span>`).join('');
+
 }
 
 // 👉 Показываем описание

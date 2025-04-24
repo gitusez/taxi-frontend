@@ -1129,7 +1129,7 @@ body.lightbox-open {
   margin-bottom: 4px;
 } */
 
-.detail-equipment ul {
+/* .detail-equipment ul {
   list-style: none;
   padding-left: 0;
   margin: 0;
@@ -1146,6 +1146,36 @@ body.lightbox-open {
   display: inline-block;
   white-space: nowrap;
   transition: background-color 0.3s ease, color 0.3s ease;
+} */
+
+
+
+.detail-equipment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.feature-tag {
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-theme .feature-tag {
+  background-color: #2e2e2e;
+  color: #f1f1f1;
+  border: 1px solid #444;
+}
+
+.light-theme .feature-tag {
+  background-color: #f1f1f1;
+  color: #222;
+  border: 1px solid #ccc;
 }
 
 
