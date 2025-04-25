@@ -144,8 +144,10 @@ if (descEl) {
   // 📸 Автозагрузка всех фото из папки по номеру
 
 
-const swiperWrapper = document.querySelector('.swiper-wrapper');
+// const swiperWrapper = document.querySelector('.swiper-wrapper');
 // const carNumber = (car.number || "").replace(/\s/g, "").toUpperCase();
+const swiperWrapper = document.querySelector('.photo-box .swiper-wrapper');
+
 
 const rawNumber = car.number || "";
 const carNumber = toLatinNumber(rawNumber.toUpperCase());
@@ -202,11 +204,11 @@ function checkDone() {
 }
 
 
-// Инициализация свайпера
-new Swiper('.swiper-container', {
-  slidesPerView: 1,
-  spaceBetween: 0
-});
+// // Инициализация свайпера
+// new Swiper('.swiper-container', {
+//   slidesPerView: 1,
+//   spaceBetween: 0
+// });
 
   
 }

@@ -1252,5 +1252,10 @@ body.lightbox-open {
   color: #666;
 }
 
+.fullscreen-swiper,
+.fullscreen-swiper .swiper-wrapper,
+.fullscreen-swiper .swiper-slide {
+  height: 100%;
+}
 
 }
