@@ -43,7 +43,7 @@ body.light-theme .car-detal {
   color: #646464;
 }
 body.light-theme .logo {
-  background-image: url('img/logo2.jpg');
+  background-image: url('../img/logo.jpg');
 }
 
 body.dark-theme .car-title,
@@ -54,7 +54,7 @@ body.dark-theme .car-detal {
   color: #646464;
 }
 body.dark-theme .logo {
-  background-image: url('img/logo.jpg');
+  background-image: url('../img/logo2.jpg');
 }
 
 .car-detal p {
