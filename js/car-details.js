@@ -213,22 +213,61 @@ images.forEach((src, index) => {
 //   }
 // }
 
+// function checkDone() {
+//   checkCount++;
+//   if (checkCount === checkLimit) {
+//     if (validImages.length > 0) {
+//       swiperWrapper.innerHTML = loadedSlides.join("");
+    
+//       // 👇 Инициализация Swiper после рендера DOM
+//       requestAnimationFrame(() => {
+//         new Swiper('.car-swiper.swiper-container', {
+//           slidesPerView: 1,
+//           spaceBetween: 0,
+//           direction: 'horizontal',
+//           loop: false,
+//           observer: true,
+//           observeParents: true
+//         });
+//       });
+//     }
+//   }
+// }
+
 function checkDone() {
   checkCount++;
+
   if (checkCount === checkLimit) {
     if (validImages.length > 0) {
-      swiperWrapper.innerHTML = loadedSlides.join("");
-      new Swiper('.car-swiper', {
-        slidesPerView: 1,
-        spaceBetween: 0
+      // Вставляем слайды с data-index
+      swiperWrapper.innerHTML = validImages.map((src, index) => `
+        <div class="swiper-slide">
+          <img src="${src}" alt="Фото авто" data-index="${index}" class="car-photo">
+        </div>
+      `).join("");
+
+      // Привязываем события клика после вставки DOM
+      document.querySelectorAll('.car-photo').forEach((img, i) => {
+        img.addEventListener('click', () => openLightbox(validImages, i));
+      });
+
+      // Инициализация swiper
+      requestAnimationFrame(() => {
+        new Swiper('.car-swiper.swiper-container', {
+          slidesPerView: 1,
+          spaceBetween: 0,
+          direction: 'horizontal',
+          loop: false,
+          observer: true,
+          observeParents: true
+        });
       });
     } else {
+      // Нет валидных фото
       swiperWrapper.innerHTML = `<div class="swiper-slide"><div class="no-photo">Фото отсутствует</div></div>`;
     }
   }
 }
-
-
 
 // // Инициализация свайпера
 // new Swiper('.swiper-container', {
@@ -236,13 +275,46 @@ function checkDone() {
 //   spaceBetween: 0
 // });
 
-  
 }
 
+// let fullscreenSwiper;
+// window.openLightbox = function(images, startIndex) {
+//   const wrapper = document.getElementById('lightboxSwiperWrapper');
+//   wrapper.innerHTML = '';
+//   images.forEach(src => {
+//     const slide = document.createElement('div');
+//     slide.className = 'swiper-slide';
+//     slide.innerHTML = `<div class="swiper-zoom-container"><img src="${src}" alt="Фото"></div>`;
+//     wrapper.appendChild(slide);
+//   });
+
+//   if (fullscreenSwiper) fullscreenSwiper.destroy(true, true);
+//   fullscreenSwiper = new Swiper('.fullscreen-swiper', {
+//     initialSlide: startIndex,
+//     slidesPerView: 1,
+//     loop: false,
+//     zoom: { maxRatio: 3, toggle: true },
+//     observer: true,
+//     observeParents: true,
+//     pagination: {
+//       el: '.fullscreen-pagination',
+//       type: 'fraction',
+//       renderFraction: (currentClass, totalClass) =>
+//         `<span class="${currentClass}"></span>/<span class="${totalClass}"></span>`
+//     }
+//   });
+  
+
+//   document.getElementById('lightbox').style.display = 'flex';
+//   document.body.classList.add('lightbox-open');
+// };
+
 let fullscreenSwiper;
-window.openLightbox = function(images, startIndex) {
+
+window.openLightbox = function(images, startIndex = 0) {
   const wrapper = document.getElementById('lightboxSwiperWrapper');
   wrapper.innerHTML = '';
+
   images.forEach(src => {
     const slide = document.createElement('div');
     slide.className = 'swiper-slide';
@@ -251,11 +323,14 @@ window.openLightbox = function(images, startIndex) {
   });
 
   if (fullscreenSwiper) fullscreenSwiper.destroy(true, true);
+
   fullscreenSwiper = new Swiper('.fullscreen-swiper', {
     initialSlide: startIndex,
     slidesPerView: 1,
     loop: false,
     zoom: { maxRatio: 3, toggle: true },
+    observer: true,
+    observeParents: true,
     pagination: {
       el: '.fullscreen-pagination',
       type: 'fraction',
@@ -267,6 +342,7 @@ window.openLightbox = function(images, startIndex) {
   document.getElementById('lightbox').style.display = 'flex';
   document.body.classList.add('lightbox-open');
 };
+
 
 window.closeLightbox = function() {
   document.getElementById('lightbox').style.display = 'none';

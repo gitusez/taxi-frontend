@@ -425,6 +425,7 @@ body {
   cursor: pointer;
 }
 
+
 /* .fullscreen-pagination {
   position: absolute;
   top: 10px;
@@ -667,12 +668,15 @@ body.lightbox-open {
     width: 105%;
     height: 105%;
   }
+}
   /* .dish-img, .car-img-wrap {
     height: 100px;
   } */
   .photo-box .swiper-container {
     height: 220px;
   }
+
+
 
   .loader {
     display: none;
@@ -1258,4 +1262,16 @@ body.lightbox-open {
   height: 100%;
 }
 
+/* 💡 ОБЯЗАТЕЛЬНЫЕ стили для горизонтального Swiper */
+.photo-box .swiper-wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  transition-property: transform;
+  box-sizing: content-box;
+}
+
+.photo-box .swiper-slide {
+  width: 100% !important;
+  flex-shrink: 0;
+  height: 100%;
 }
