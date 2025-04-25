@@ -124,7 +124,7 @@ if (equipEl) {
 
 // 👉 Показываем описание
 const descEl = document.querySelector(".detail-description");
-console.log("🟡 Описание:", description); // ← временно
+// console.log("🟡 Описание:", description); // ← временно
 if (descEl) {
   descEl.textContent = description || "Описание отсутствует";
 }
