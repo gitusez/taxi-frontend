@@ -115,10 +115,7 @@ if (typeof car.equipment === 'string') {
   // 👉 Показываем комплектацию как список
 const equipEl = document.querySelector(".detail-equipment");
 if (equipEl) {
-  // equipEl.innerHTML = `<ul>${features.map(item => `<li>${item}</li>`).join('')}</ul>`;
-  // equipEl.innerHTML = features.map(item => `<span class="feature-tag">${item}</span>`).join('');
   equipEl.innerHTML = features.map(item => `<div class="feature-line">${item}</div>`).join('');
-
 
 }
 
@@ -129,25 +126,9 @@ if (descEl) {
   descEl.textContent = description || "Описание отсутствует";
 }
 
+// 📸 Автозагрузка всех фото из папки по номеру
 
-  // const swiperWrapper = document.querySelector('.swiper-wrapper');
-  // swiperWrapper.innerHTML = car.avatar
-  //   ? `<div class="swiper-slide"><img src="${car.avatar}" alt="Фото авто" onclick="openLightbox(['${car.avatar}'], 0)"></div>`
-  //   : '<div class="swiper-slide">Нет фото</div>';
-
-  // new Swiper('.swiper-container', {
-  //   slidesPerView: 1,
-  //   spaceBetween: 0
-  // });
-
-
-  // 📸 Автозагрузка всех фото из папки по номеру
-
-
-// const swiperWrapper = document.querySelector('.swiper-wrapper');
-// const carNumber = (car.number || "").replace(/\s/g, "").toUpperCase();
 const swiperWrapper = document.querySelector('.photo-box .swiper-wrapper');
-
 
 const rawNumber = car.number || "";
 const carNumber = toLatinNumber(rawNumber.toUpperCase());
@@ -159,13 +140,6 @@ for (let i = 1; i <= 20; i++) {
   images.push(`${basePath}/${carNumber}_${i}.jpeg`);
 }
 
-// Вставка слайдов
-// swiperWrapper.innerHTML = images.map((src, index) => `
-//   <div class="swiper-slide">
-//     <img src="${src}" alt="Фото авто" onclick="openLightbox(${JSON.stringify(images)}, ${index})">
-//   </div>
-// `).join("");
-
 // Проверка, существует ли хотя бы одно фото
 let atLeastOneExists = false;
 let loadedSlides = [];
@@ -176,15 +150,6 @@ const validImages = []; // ← обязательно объявляем!
 images.forEach((src, index) => {
   const img = new Image();
   img.src = src;
-  // img.onload = () => {
-  //   atLeastOneExists = true;
-  //   loadedSlides.push(`
-  //     <div class="swiper-slide">
-  //       <img src="${src}" alt="Фото авто" onclick="openLightbox(${JSON.stringify(images)}, ${index})">
-  //     </div>
-  //   `);
-  //   checkDone();
-  // };
   img.onload = () => {
     validImages.push(src);
     loadedSlides.push(`
@@ -197,42 +162,6 @@ images.forEach((src, index) => {
   
   img.onerror = () => checkDone();
 });
-
-// function checkDone() {
-//   checkCount++;
-//   if (checkCount === checkLimit) {
-//     if (atLeastOneExists) {
-//       swiperWrapper.innerHTML = loadedSlides.join("");
-//       new Swiper('.car-swiper', {
-//         slidesPerView: 1,
-//         spaceBetween: 0
-//       });
-//     } else {
-//       swiperWrapper.innerHTML = `<div class="swiper-slide"><div class="no-photo">Фото отсутствует</div></div>`;
-//     }
-//   }
-// }
-
-// function checkDone() {
-//   checkCount++;
-//   if (checkCount === checkLimit) {
-//     if (validImages.length > 0) {
-//       swiperWrapper.innerHTML = loadedSlides.join("");
-    
-//       // 👇 Инициализация Swiper после рендера DOM
-//       requestAnimationFrame(() => {
-//         new Swiper('.car-swiper.swiper-container', {
-//           slidesPerView: 1,
-//           spaceBetween: 0,
-//           direction: 'horizontal',
-//           loop: false,
-//           observer: true,
-//           observeParents: true
-//         });
-//       });
-//     }
-//   }
-// }
 
 function checkDone() {
   checkCount++;
@@ -269,45 +198,7 @@ function checkDone() {
   }
 }
 
-// // Инициализация свайпера
-// new Swiper('.swiper-container', {
-//   slidesPerView: 1,
-//   spaceBetween: 0
-// });
-
 }
-
-// let fullscreenSwiper;
-// window.openLightbox = function(images, startIndex) {
-//   const wrapper = document.getElementById('lightboxSwiperWrapper');
-//   wrapper.innerHTML = '';
-//   images.forEach(src => {
-//     const slide = document.createElement('div');
-//     slide.className = 'swiper-slide';
-//     slide.innerHTML = `<div class="swiper-zoom-container"><img src="${src}" alt="Фото"></div>`;
-//     wrapper.appendChild(slide);
-//   });
-
-//   if (fullscreenSwiper) fullscreenSwiper.destroy(true, true);
-//   fullscreenSwiper = new Swiper('.fullscreen-swiper', {
-//     initialSlide: startIndex,
-//     slidesPerView: 1,
-//     loop: false,
-//     zoom: { maxRatio: 3, toggle: true },
-//     observer: true,
-//     observeParents: true,
-//     pagination: {
-//       el: '.fullscreen-pagination',
-//       type: 'fraction',
-//       renderFraction: (currentClass, totalClass) =>
-//         `<span class="${currentClass}"></span>/<span class="${totalClass}"></span>`
-//     }
-//   });
-  
-
-//   document.getElementById('lightbox').style.display = 'flex';
-//   document.body.classList.add('lightbox-open');
-// };
 
 let fullscreenSwiper;
 
@@ -349,15 +240,6 @@ window.closeLightbox = function() {
   if (fullscreenSwiper) fullscreenSwiper.destroy(true, true);
   document.body.classList.remove('lightbox-open');
 };
-
-// function showError(msg) {
-//   const el = document.querySelector('.detail-description');
-//   if (el) {
-//     el.textContent = msg;
-//     el.style.color = 'red';
-//   }
-//   console.error(msg);
-// }
 
 function showError(msg) {
   console.error(msg);

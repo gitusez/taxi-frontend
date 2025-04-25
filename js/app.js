@@ -190,14 +190,6 @@ if (savedCars && savedOffset) {
           }
         });
     
-        // 🧠 Обновляем originalCars, чтобы "Без сортировки" работал правильно
-        // if (firstLoad) {
-        //   originalCars = [...allCars];
-        // } else {
-        //   const uniqueToOriginal = newCars.filter(car => !originalCars.some(orig => orig.id === car.id));
-        //   originalCars.push(...uniqueToOriginal);
-        // }
-
         if (firstLoad) {
           originalCars = [...allCars];        // сохраняем исходный порядок
           firstLoad = false;                  // сбрасываем, чтобы больше не перезаписывать
@@ -210,16 +202,8 @@ if (savedCars && savedOffset) {
           originalCars.push(...uniqueToOriginal);
         }
         
-    
-        offset += itemsCount;
-    
-        // const currentSort = document.getElementById('sortSelect')?.value;
-        // if (currentSort) {
-        //   sortCars(); // если выбрана сортировка
-        // } else {
-        //   allCars = [...originalCars]; // если "Без сортировки" — восстанавливаем порядок
-        // }
-    
+        offset += itemsCount;    
+
         renderCars();
       } catch (error) {
         showError(error.message);
@@ -272,8 +256,6 @@ if (savedCars && savedOffset) {
           <p>Пробег: ${car.odometer_display || '—'}</p>
         </div>
       `;
-
-//<p>Тип топлива: <span class="fuel-${fuelTypeClass}">${fuelType}</span></p>
 
       card.onclick = () => {
         localStorage.setItem('scrollPosition', window.scrollY);
