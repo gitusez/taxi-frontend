@@ -1,6 +1,20 @@
 //car-details.js
 import { config } from './config.js';
 
+function toLatinNumber(plate) {
+  const map = {
+    'А': 'A', 'В': 'B', 'Е': 'E', 'К': 'K',
+    'М': 'M', 'Н': 'H', 'О': 'O', 'Р': 'P',
+    'С': 'C', 'Т': 'T', 'У': 'Y', 'Х': 'X',
+    // нижний регистр (на всякий случай)
+    'а': 'A', 'в': 'B', 'е': 'E', 'к': 'K',
+    'м': 'M', 'н': 'H', 'о': 'O', 'р': 'P',
+    'с': 'C', 'т': 'T', 'у': 'Y', 'х': 'X'
+  };
+  return plate.replace(/\s/g, '').split('').map(c => map[c] || c).join('');
+}
+
+
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const carId = params.get('car');
@@ -126,9 +140,16 @@ if (descEl) {
   //   spaceBetween: 0
   // });
 
+
   // 📸 Автозагрузка всех фото из папки по номеру
+
+
 const swiperWrapper = document.querySelector('.swiper-wrapper');
-const carNumber = (car.number || "").replace(/\s/g, "").toUpperCase();
+// const carNumber = (car.number || "").replace(/\s/g, "").toUpperCase();
+
+const rawNumber = car.number || "";
+const carNumber = toLatinNumber(rawNumber.toUpperCase());
+
 const basePath = `/photos/${carNumber}`;
 const images = [];
 
@@ -137,11 +158,49 @@ for (let i = 1; i <= 20; i++) {
 }
 
 // Вставка слайдов
-swiperWrapper.innerHTML = images.map((src, index) => `
-  <div class="swiper-slide">
-    <img src="${src}" alt="Фото авто" onclick="openLightbox(${JSON.stringify(images)}, ${index})">
-  </div>
-`).join("");
+// swiperWrapper.innerHTML = images.map((src, index) => `
+//   <div class="swiper-slide">
+//     <img src="${src}" alt="Фото авто" onclick="openLightbox(${JSON.stringify(images)}, ${index})">
+//   </div>
+// `).join("");
+
+// Проверка, существует ли хотя бы одно фото
+let atLeastOneExists = false;
+let loadedSlides = [];
+
+let checkCount = 0;
+const checkLimit = images.length;
+
+images.forEach((src, index) => {
+  const img = new Image();
+  img.src = src;
+  img.onload = () => {
+    atLeastOneExists = true;
+    loadedSlides.push(`
+      <div class="swiper-slide">
+        <img src="${src}" alt="Фото авто" onclick="openLightbox(${JSON.stringify(images)}, ${index})">
+      </div>
+    `);
+    checkDone();
+  };
+  img.onerror = () => checkDone();
+});
+
+function checkDone() {
+  checkCount++;
+  if (checkCount === checkLimit) {
+    if (atLeastOneExists) {
+      swiperWrapper.innerHTML = loadedSlides.join("");
+      new Swiper('.swiper-container', {
+        slidesPerView: 1,
+        spaceBetween: 0
+      });
+    } else {
+      swiperWrapper.innerHTML = `<div class="swiper-slide"><div class="no-photo">Фото отсутствует</div></div>`;
+    }
+  }
+}
+
 
 // Инициализация свайпера
 new Swiper('.swiper-container', {

@@ -2,6 +2,19 @@
 // app.js
 import { config } from './config.js';
 
+function toLatinNumber(plate) {
+  const map = {
+    'А': 'A', 'В': 'B', 'Е': 'E', 'К': 'K',
+    'М': 'M', 'Н': 'H', 'О': 'O', 'Р': 'P',
+    'С': 'C', 'Т': 'T', 'У': 'Y', 'Х': 'X',
+    'а': 'A', 'в': 'B', 'е': 'E', 'к': 'K',
+    'м': 'M', 'н': 'H', 'о': 'O', 'р': 'P',
+    'с': 'C', 'т': 'T', 'у': 'Y', 'х': 'X'
+  };
+  return plate.replace(/\s/g, '').split('').map(c => map[c] || c).join('');
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
   // === Тема оформления ===
   const prefersDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -241,7 +254,12 @@ if (savedCars && savedOffset) {
 
       const fuelType = car.fuel_type || "—";
       const fuelTypeClass = typeof fuelType === 'string' ? fuelType.toLowerCase().replace(/\s/g, '-') : '';
-      const image = car.avatar || 'img/granta1.jpg';
+      // const image = car.avatar || 'img/granta1.jpg';
+      const rawNumber = car.number || "";
+      const carNumber = toLatinNumber(rawNumber.toUpperCase());
+      const imagePath = `/photos/${carNumber}/${carNumber}_1.jpeg`;
+      const image = car.avatar || imagePath;
+
 
       card.innerHTML = `
         <img src="${image}" alt="Фото авто" class="car-img">
