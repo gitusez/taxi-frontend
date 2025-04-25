@@ -172,28 +172,53 @@ let loadedSlides = [];
 
 let checkCount = 0;
 const checkLimit = images.length;
-
+const validImages = []; // ← обязательно объявляем!
 images.forEach((src, index) => {
   const img = new Image();
   img.src = src;
+  // img.onload = () => {
+  //   atLeastOneExists = true;
+  //   loadedSlides.push(`
+  //     <div class="swiper-slide">
+  //       <img src="${src}" alt="Фото авто" onclick="openLightbox(${JSON.stringify(images)}, ${index})">
+  //     </div>
+  //   `);
+  //   checkDone();
+  // };
   img.onload = () => {
-    atLeastOneExists = true;
+    validImages.push(src);
     loadedSlides.push(`
       <div class="swiper-slide">
-        <img src="${src}" alt="Фото авто" onclick="openLightbox(${JSON.stringify(images)}, ${index})">
+        <img src="${src}" alt="Фото авто" onclick="openLightbox(${JSON.stringify(validImages)}, ${validImages.length - 1})">
       </div>
     `);
     checkDone();
   };
+  
   img.onerror = () => checkDone();
 });
+
+// function checkDone() {
+//   checkCount++;
+//   if (checkCount === checkLimit) {
+//     if (atLeastOneExists) {
+//       swiperWrapper.innerHTML = loadedSlides.join("");
+//       new Swiper('.car-swiper', {
+//         slidesPerView: 1,
+//         spaceBetween: 0
+//       });
+//     } else {
+//       swiperWrapper.innerHTML = `<div class="swiper-slide"><div class="no-photo">Фото отсутствует</div></div>`;
+//     }
+//   }
+// }
 
 function checkDone() {
   checkCount++;
   if (checkCount === checkLimit) {
-    if (atLeastOneExists) {
+    if (validImages.length > 0) {
       swiperWrapper.innerHTML = loadedSlides.join("");
-      new Swiper('.swiper-container', {
+      new Swiper('.car-swiper', {
         slidesPerView: 1,
         spaceBetween: 0
       });
@@ -202,6 +227,7 @@ function checkDone() {
     }
   }
 }
+
 
 
 // // Инициализация свайпера
