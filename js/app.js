@@ -37,26 +37,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (grid && loadMoreContainer && config?.apiUrl) {
 
-
-
     const loadMoreBtn = document.createElement('button');
     loadMoreBtn.textContent = "Загрузить ещё";
     loadMoreBtn.className = "btn load-more-btn";
     loadMoreContainer.appendChild(loadMoreBtn);
 
-    // обработчик должен быть доступен всегда
-    loadMoreBtn.addEventListener('click', () => {
-    if (!allLoaded) loadCars(config.itemsLoadMore);
-
-
-
-});
     let allCars = [];
     let originalCars = [];
     let currentMode = 'rent'; // 'rent' или 'buyout'
     let offset = 0;
     let allLoaded = false;
     let firstLoad = true;
+
+
+        // ==== КЭШ и автообновление ====
+        const CACHE_KEY = 'cars_cache_v1';
+        const CACHE_TTL_MS = 60000; // 60 секунд
+    
+        const cachedData = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+        const now = Date.now();
+    
+        if (cachedData.time && now - cachedData.time < CACHE_TTL_MS && Array.isArray(cachedData.cars)) {
+          allCars = cachedData.cars;
+          originalCars = [...allCars];
+          offset = allCars.length;
+          firstLoad = false;
+          renderCars();
+          loadMoreBtn.style.display = "block";
+          loadMoreBtn.disabled = false;
+          feedbackNotice.style.display = "none";
+        } else {
+          loadCars(config.itemsInitial);
+        }
+    
+        // автообновление данных каждые 60 секунд
+        setInterval(() => {
+          console.log('[INFO] Автообновление...');
+          offset = 0;
+          allCars = [];
+          originalCars = [];
+          firstLoad = true;
+          loadCars(config.itemsInitial);
+        }, CACHE_TTL_MS);
+    
+
+    // обработчик должен быть доступен всегда
+    loadMoreBtn.addEventListener('click', () => {
+      if (!allLoaded) loadCars(config.itemsLoadMore);
+
+
+
+});
 
     // === Восстановление состояния после возврата из карточки ===
     const savedCars = localStorage.getItem('savedCars');
@@ -202,7 +233,12 @@ if (savedCars && savedOffset) {
           originalCars.push(...uniqueToOriginal);
         }
         
-        offset += itemsCount;    
+        offset += itemsCount;
+
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+          time: Date.now(),
+          cars: allCars
+        }));        
 
         renderCars();
       } catch (error) {
