@@ -14,7 +14,6 @@ function toLatinNumber(plate) {
   return plate.replace(/\s/g, '').split('').map(c => map[c] || c).join('');
 }
 
-let updateNotice;
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -69,10 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadMoreContainer = document.querySelector('.pagination-container');
   const feedbackNotice = document.getElementById('noMoreCarsNotice');
 
-//   updateNotice = document.createElement('div');
-//   updateNotice.className = 'update-notice';  
-// updateNotice.textContent = 'Данные обновлены';
-// document.body.appendChild(updateNotice);
 
   if (grid && loadMoreContainer && config?.apiUrl) {
 
@@ -455,6 +450,11 @@ if (savedCars && savedOffset) {
 
     async function loadCars(itemsCount, isRefresh = false) {
       try {
+        
+        if (feedbackNotice) {
+          feedbackNotice.style.display = "none";
+        }
+        
         errorBox.style.display = "none";
         loadMoreBtn.style.display = "none";
         loader.style.display = "block";
@@ -494,16 +494,16 @@ if (savedCars && savedOffset) {
         saveCache(allCars);
         renderCars();
     
-        if (total <= 100) {
+        if (total <= 100 || offset >= total) {
           allLoaded = true;
           loadMoreBtn.style.display = "none";
           loadMoreBtn.disabled = true;
-          feedbackNotice.style.display = "none";
-        } else if (offset >= total) {
-          allLoaded = true;
-          loadMoreBtn.style.display = "none";
-          loadMoreBtn.disabled = true;
-          feedbackNotice.style.display = "block";
+    
+          setTimeout(() => {
+            // Показываем уведомление только если total <= 100
+            feedbackNotice.style.display = total <= 100 ? "block" : "none";
+          }, 300);
+
         } else {
           allLoaded = false;
           loadMoreBtn.style.display = "block";
