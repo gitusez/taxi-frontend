@@ -14,8 +14,42 @@ function toLatinNumber(plate) {
   return plate.replace(/\s/g, '').split('').map(c => map[c] || c).join('');
 }
 
+let updateNotice;
 
 document.addEventListener('DOMContentLoaded', () => {
+
+  const CACHE_KEY = 'cars_cache_v1';
+  const CACHE_TTL_MS = 60000; // 60 секунд
+  
+  function loadCache() {
+    try {
+      const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+      const now = Date.now();
+      if (cached.time && now - cached.time < CACHE_TTL_MS && Array.isArray(cached.cars)) {
+        return cached.cars;
+      }
+    } catch (e) {
+      console.warn('[CACHE] Ошибка чтения кэша:', e);
+    }
+    return null;
+  }
+  
+  function saveCache(cars) {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        time: Date.now(),
+        cars
+      }));
+    } catch (e) {
+      console.warn('[CACHE] Ошибка записи кэша:', e);
+    }
+  }
+  
+  function clearCache() {
+    localStorage.removeItem(CACHE_KEY);
+  }
+  
+  
   // === Тема оформления ===
   const prefersDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
   toggleTheme(prefersDarkTheme);
@@ -35,6 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadMoreContainer = document.querySelector('.pagination-container');
   const feedbackNotice = document.getElementById('noMoreCarsNotice');
 
+  updateNotice = document.createElement('div');
+  updateNotice.className = 'update-notice';  
+updateNotice.textContent = 'Данные обновлены';
+document.body.appendChild(updateNotice);
+
   if (grid && loadMoreContainer && config?.apiUrl) {
 
     const loadMoreBtn = document.createElement('button');
@@ -51,14 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         // ==== КЭШ и автообновление ====
-        const CACHE_KEY = 'cars_cache_v1';
-        const CACHE_TTL_MS = 60000; // 60 секунд
     
-        const cachedData = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
-        const now = Date.now();
-    
-        if (cachedData.time && now - cachedData.time < CACHE_TTL_MS && Array.isArray(cachedData.cars)) {
-          allCars = cachedData.cars;
+        const cachedCars = loadCache();
+
+        if (cachedCars) {
+          allCars = cachedCars;
           originalCars = [...allCars];
           offset = allCars.length;
           firstLoad = false;
@@ -69,16 +105,69 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           loadCars(config.itemsInitial);
         }
+        
     
         // автообновление данных каждые 60 секунд
+        // setInterval(() => {
+        //   console.log('[INFO] Автообновление...');
+        //   localStorage.removeItem(CACHE_KEY);
+        //   offset = 0;
+        //   allCars = [];
+        //   originalCars = [];
+        //   firstLoad = true;
+        //   loadCars(config.itemsInitial);
+        // }, CACHE_TTL_MS);
+
+        // setInterval(() => {
+        //   console.log('[INFO] Автообновление...');
+        //   loadCars(config.itemsInitial, true); // передаём флаг обновления
+        // }, CACHE_TTL_MS);
+
+
+
         setInterval(() => {
           console.log('[INFO] Автообновление...');
-          offset = 0;
-          allCars = [];
-          originalCars = [];
-          firstLoad = true;
-          loadCars(config.itemsInitial);
+        
+          const savedScroll = window.scrollY;
+          const savedSort = document.getElementById('sortSelect')?.value || '';
+          const savedQuery = document.getElementById('searchInput')?.value || '';
+          const savedMode = currentMode;
+        
+          loadCars(config.itemsInitial, true).then(() => {
+            // безопасная установка вкладок
+            const rentTab = document.getElementById("rentTab");
+            const buyoutTab = document.getElementById("buyoutTab");
+            if (rentTab && buyoutTab) {
+              rentTab.classList.toggle("active", savedMode === "rent");
+              buyoutTab.classList.toggle("active", savedMode === "buyout");
+            }
+            currentMode = savedMode;
+        
+            const sortSelect = document.getElementById('sortSelect');
+            if (sortSelect && savedSort) {
+              sortSelect.value = savedSort;
+              sortCars();
+            }
+        
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput && savedQuery) {
+              searchInput.value = savedQuery;
+              searchCars();
+            } else {
+              renderCars();
+            }
+        
+            if (!document.hidden) {
+              window.scrollTo(0, savedScroll);
+            }
+        
+            updateNotice.style.display = 'block';
+            setTimeout(() => updateNotice.style.display = 'none', 3000);
+          });
         }, CACHE_TTL_MS);
+        
+
+        
     
 
     // обработчик должен быть доступен всегда
@@ -92,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // === Восстановление состояния после возврата из карточки ===
     const savedCars = localStorage.getItem('savedCars');
     const savedOffset = localStorage.getItem('savedOffset');
-    const savedScroll = localStorage.getItem('scrollPosition');
     const savedMode = localStorage.getItem('savedMode'); //savedMode
 
 if (savedCars && savedOffset) {
@@ -146,10 +234,6 @@ if (savedCars && savedOffset) {
     initEventListeners();
     loadCars(config.itemsInitial);
 
-    loadMoreBtn.addEventListener('click', () => {
-      if (!allLoaded) loadCars(config.itemsLoadMore);
-    });
-
     function initEventListeners() {
       const searchInput = document.getElementById('searchInput');
       const sortSelect = document.getElementById('sortSelect');
@@ -183,26 +267,119 @@ if (savedCars && savedOffset) {
       renderCars();
     }
 
-    // // === Загрузка данных с сервера ===
-    async function loadCars(itemsCount) {
+    // // // === Загрузка данных с сервера ===
+    // async function loadCars(itemsCount) {
+    //   try {
+    //     errorBox.style.display = "none";
+    //     loadMoreBtn.style.display = "none";
+    //     loader.style.display = "block";
+    
+    //     const response = await fetch(config.apiUrl, {
+    //       method: "POST",
+    //       headers: { "Content-Type": "application/json" },
+    //       body: JSON.stringify({ items: itemsCount, offset })
+    //     });
+    
+    //     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+    //     const result = await response.json();
+    //     if (!result.success) throw new Error(result.error || "Ошибка сервера");
+    
+    //     const newCars = Array.isArray(result.cars_list) ? result.cars_list : Object.values(result.cars_list || {});
+    
+    //     if (newCars.length < itemsCount) {
+    //       allLoaded = true;
+    //       loadMoreBtn.style.display = "none";
+    //       loadMoreBtn.disabled = true;
+    //       feedbackNotice.style.display = "block";
+    //     } else {
+    //       allLoaded = false;
+    //       loadMoreBtn.style.display = "block";
+    //       loadMoreBtn.disabled = false;
+    //       feedbackNotice.style.display = "none";
+    //     }
+    
+    //     // Добавляем только уникальные
+    //     newCars.forEach(car => {
+    //       if (!allCars.some(existingCar => existingCar.id === car.id)) {
+    //         allCars.push(car);
+    //       }
+    //     });
+    
+    //     if (firstLoad) {
+    //       originalCars = [...allCars];        // сохраняем исходный порядок
+    //       firstLoad = false;                  // сбрасываем, чтобы больше не перезаписывать
+    //       const currentSort = document.getElementById('sortSelect')?.value;
+    //       if (currentSort) {
+    //         sortCars();                       // сортируем после сохранения original
+    //       }
+    //     } else {
+    //       const uniqueToOriginal = newCars.filter(car => !originalCars.some(orig => orig.id === car.id));
+    //       originalCars.push(...uniqueToOriginal);
+    //     }
+        
+    //     offset += itemsCount;
+
+    //     localStorage.setItem(CACHE_KEY, JSON.stringify({
+    //       time: Date.now(),
+    //       cars: allCars
+    //     }));        
+
+    //     renderCars();
+    //   } catch (error) {
+    //     showError(error.message);
+    //   } finally {
+    //     loader.style.display = "none";
+    //     if (!allLoaded) loadMoreBtn.style.display = "block";
+    //     firstLoad = false;
+    //   }
+    // }
+
+
+
+
+
+    async function loadCars(itemsCount, isRefresh = false) {
       try {
         errorBox.style.display = "none";
         loadMoreBtn.style.display = "none";
         loader.style.display = "block";
     
+        if (isRefresh) clearCache();
+    
         const response = await fetch(config.apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items: itemsCount, offset })
+          body: JSON.stringify({ items: itemsCount, offset: isRefresh ? 0 : offset })
         });
     
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
         const result = await response.json();
         if (!result.success) throw new Error(result.error || "Ошибка сервера");
     
-        const newCars = Array.isArray(result.cars_list) ? result.cars_list : Object.values(result.cars_list || {});
+        const newCars = Array.isArray(result.cars_list)
+          ? result.cars_list
+          : Object.values(result.cars_list || {});
+        const total = result.total || 0;
     
-        if (newCars.length < itemsCount) {
+        const newIds = new Set(newCars.map(car => car.id));
+        allCars = isRefresh
+          ? [...newCars]
+          : [...allCars.filter(car => !newIds.has(car.id)), ...newCars];
+    
+        if (isRefresh) {
+          originalCars = [...newCars];
+          offset = newCars.length;
+        } else {
+          const existingIds = new Set(originalCars.map(car => car.id));
+          const uniqueNew = newCars.filter(car => !existingIds.has(car.id));
+          originalCars.push(...uniqueNew);
+          offset += itemsCount;
+        }
+    
+        saveCache(allCars);
+        renderCars();
+    
+        if (offset >= total) {
           allLoaded = true;
           loadMoreBtn.style.display = "none";
           loadMoreBtn.disabled = true;
@@ -214,33 +391,6 @@ if (savedCars && savedOffset) {
           feedbackNotice.style.display = "none";
         }
     
-        // Добавляем только уникальные
-        newCars.forEach(car => {
-          if (!allCars.some(existingCar => existingCar.id === car.id)) {
-            allCars.push(car);
-          }
-        });
-    
-        if (firstLoad) {
-          originalCars = [...allCars];        // сохраняем исходный порядок
-          firstLoad = false;                  // сбрасываем, чтобы больше не перезаписывать
-          const currentSort = document.getElementById('sortSelect')?.value;
-          if (currentSort) {
-            sortCars();                       // сортируем после сохранения original
-          }
-        } else {
-          const uniqueToOriginal = newCars.filter(car => !originalCars.some(orig => orig.id === car.id));
-          originalCars.push(...uniqueToOriginal);
-        }
-        
-        offset += itemsCount;
-
-        localStorage.setItem(CACHE_KEY, JSON.stringify({
-          time: Date.now(),
-          cars: allCars
-        }));        
-
-        renderCars();
       } catch (error) {
         showError(error.message);
       } finally {
@@ -250,17 +400,36 @@ if (savedCars && savedOffset) {
       }
     }
     
+    
+    
+    
+    
 
     // === Рендер карточек ===
-    function renderCars() {
-      grid.innerHTML = "";
-      allCars.forEach(car => grid.appendChild(createCarCard(car)));
-    }
+    // function renderCars() {
+    //   grid.innerHTML = "";
+    //   allCars.forEach(car => grid.appendChild(createCarCard(car)));
+    // }
 
-    function renderFiltered(filteredCars) {
+    // function renderFiltered(filteredCars) {
+    //   grid.innerHTML = "";
+    //   filteredCars.forEach(car => grid.appendChild(createCarCard(car)));
+    // }
+
+    function renderCars() {
+      const fragment = document.createDocumentFragment();
+      allCars.forEach(car => fragment.appendChild(createCarCard(car)));
       grid.innerHTML = "";
-      filteredCars.forEach(car => grid.appendChild(createCarCard(car)));
+      grid.appendChild(fragment);
     }
+    
+    function renderFiltered(filteredCars) {
+      const fragment = document.createDocumentFragment();
+      filteredCars.forEach(car => fragment.appendChild(createCarCard(car)));
+      grid.innerHTML = "";
+      grid.appendChild(fragment);
+    }
+    
 
     // function createCarCard(car) {
     //   const card = document.createElement('div');
@@ -312,21 +481,34 @@ if (savedCars && savedOffset) {
       card.className = 'car-card';
     
       const model = (car.model || "").toLowerCase();
-      let price = "—";
-      if (model.includes("granta")) price = currentMode === 'rent' ? "1700 руб/сутки" : "850 000 ₽";
-      else if (model.includes("vesta")) price = currentMode === 'rent' ? "2400 руб/сутки" : "1 050 000 ₽";
-      else if (model.includes("largus")) price = currentMode === 'rent' ? "2600 руб/сутки" : "1 100 000 ₽";
+      // let price = "—";
+      // if (model.includes("granta")) price = currentMode === 'rent' ? "1700 руб/сутки" : "850 000 ₽";
+      // else if (model.includes("vesta")) price = currentMode === 'rent' ? "2400 руб/сутки" : "1 050 000 ₽";
+      // else if (model.includes("largus")) price = currentMode === 'rent' ? "2600 руб/сутки" : "1 100 000 ₽";
     
-      const rawNumber = car.number || "";
-      const carNumber = toLatinNumber(rawNumber.toUpperCase());
-      const imagePath = `/photos/${carNumber}/${carNumber}_1.jpeg`;
-      const fallback = 'img/granta1.jpg'; // 🔧 заглушка (должна быть в public/img)
+      // const rawNumber = car.number || "";
+      // const carNumber = toLatinNumber(rawNumber.toUpperCase());
+      // const imagePath = `/photos/${carNumber}/${carNumber}_1.jpeg`;
+      // const fallback = 'img/granta1.jpg'; // 🔧 заглушка (должна быть в public/img)
+
+      let price = "—";
+if (model.includes("granta")) price = currentMode === 'rent' ? "1700 руб/сутки" : "850 000 ₽";
+else if (model.includes("vesta")) price = currentMode === 'rent' ? "2400 руб/сутки" : "1 050 000 ₽";
+else if (model.includes("largus")) price = currentMode === 'rent' ? "2600 руб/сутки" : "1 100 000 ₽";
+
+const rawNumber = car.number || "";
+const carNumber = toLatinNumber(rawNumber.toUpperCase());
+const imagePath = `/photos/${carNumber}/${carNumber}_1.jpeg`;
+
+let fallback = 'img/granta1.jpg'; // default
+if (model.includes("vesta")) fallback = 'img/vesta1.jpg';
+else if (model.includes("largus")) fallback = 'img/largus1.jpg';
     
       const fuelType = car.fuel_type || "—";
       const fuelTypeClass = typeof fuelType === 'string' ? fuelType.toLowerCase().replace(/\s/g, '-') : '';
     
       card.innerHTML = `
-        <img src="${imagePath}" alt="Фото авто" class="car-img" onerror="this.onerror=null; this.src='${fallback}'">
+        <img src="${imagePath}" alt="Фото авто" loading="lazy" class="car-img" onerror="this.onerror=null; this.src='${fallback}'">
         <h3 class="car-price">Цена: ${price}</h3>
         <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
         <div class="car-detal">
@@ -364,13 +546,42 @@ if (savedCars && savedOffset) {
 
       // === Сортировка ===
 
+    // function sortCars() {
+    //   const value = document.getElementById('sortSelect')?.value;
+    //   if (!value) {
+    //     allCars = [...originalCars]; // Сброс к изначальному порядку
+    //     document.getElementById('sortSelect').selectedIndex = 0; // 👈 сброс селекта
+    //     renderCars();                // 👉 нужно отрисовать заново!
+    //     return;
+    //   }
+    
+    //   const [field, order] = value.split('_');
+    
+    //   allCars.sort((a, b) => {
+    //     let aVal, bVal;
+    
+    //     if (field === 'price') {
+    //       aVal = getCarPrice(a);
+    //       bVal = getCarPrice(b);
+    //     } else if (field === 'mileage') {
+    //       aVal = parseInt(a.odometer || 0, 10);
+    //       bVal = parseInt(b.odometer || 0, 10);
+    //     } else {
+    //       aVal = String(a[field] || '');
+    //       bVal = String(b[field] || '');
+    //       return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+    //     }
+    
+    //     return order === 'asc' ? aVal - bVal : bVal - aVal;
+    //   });
+    // }
+
     function sortCars() {
       const value = document.getElementById('sortSelect')?.value;
       if (!value) {
-        allCars = [...originalCars]; // Сброс к изначальному порядку
-        document.getElementById('sortSelect').selectedIndex = 0; // 👈 сброс селекта
-        renderCars();                // 👉 нужно отрисовать заново!
-        return;
+        allCars = [...originalCars]; // сброс к изначальному порядку
+        document.getElementById('sortSelect').selectedIndex = 0;
+        return; // ⛔️ renderCars здесь больше не нужен
       }
     
       const [field, order] = value.split('_');
@@ -393,6 +604,7 @@ if (savedCars && savedOffset) {
         return order === 'asc' ? aVal - bVal : bVal - aVal;
       });
     }
+    
     
     
 

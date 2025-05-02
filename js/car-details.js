@@ -126,77 +126,164 @@ if (descEl) {
   descEl.textContent = description || "Описание отсутствует";
 }
 
-// 📸 Автозагрузка всех фото из папки по номеру
+// // 📸 Автозагрузка всех фото из папки по номеру
 
+// const swiperWrapper = document.querySelector('.photo-box .swiper-wrapper');
+
+// const rawNumber = car.number || "";
+// const carNumber = toLatinNumber(rawNumber.toUpperCase());
+
+// const basePath = `/photos/${carNumber}`;
+// const images = [];
+
+// for (let i = 1; i <= 20; i++) {
+//   images.push(`${basePath}/${carNumber}_${i}.jpeg`);
+// }
+
+// // Проверка, существует ли хотя бы одно фото
+// let atLeastOneExists = false;
+// let loadedSlides = [];
+
+// let checkCount = 0;
+// const checkLimit = images.length;
+// const validImages = []; // ← обязательно объявляем!
+// images.forEach((src, index) => {
+//   const img = new Image();
+//   img.src = src;
+//   img.onload = () => {
+//     validImages.push(src);
+//     loadedSlides.push(`
+//       <div class="swiper-slide">
+//         <img src="${src}" alt="Фото авто" onclick="openLightbox(${JSON.stringify(validImages)}, ${validImages.length - 1})">
+//       </div>
+//     `);
+//     checkDone();
+//   };
+  
+//   img.onerror = () => checkDone();
+// });
+
+// function checkDone() {
+//   checkCount++;
+
+//   if (checkCount === checkLimit) {
+//     if (validImages.length > 0) {
+//       // Вставляем слайды с data-index
+//       swiperWrapper.innerHTML = validImages.map((src, index) => `
+//         <div class="swiper-slide">
+//           <img src="${src}" alt="Фото авто" data-index="${index}" class="car-photo">
+//         </div>
+//       `).join("");
+
+//       // Привязываем события клика после вставки DOM
+//       document.querySelectorAll('.car-photo').forEach((img, i) => {
+//         img.addEventListener('click', () => openLightbox(validImages, i));
+//       });
+
+//       // Инициализация swiper
+//       requestAnimationFrame(() => {
+//         new Swiper('.car-swiper.swiper-container', {
+//           slidesPerView: 1,
+//           spaceBetween: 0,
+//           direction: 'horizontal',
+//           loop: false,
+//           observer: true,
+//           observeParents: true
+//         });
+//       });
+//     } else {
+//       // Нет валидных фото
+//       swiperWrapper.innerHTML = `<div class="swiper-slide"><div class="no-photo">Фото отсутствует</div></div>`;
+//     }
+//   }
+// }
+
+
+// 📸 Автозагрузка всех фото из папки по номеру
 const swiperWrapper = document.querySelector('.photo-box .swiper-wrapper');
 
 const rawNumber = car.number || "";
 const carNumber = toLatinNumber(rawNumber.toUpperCase());
-
 const basePath = `/photos/${carNumber}`;
-const images = [];
+const extensions = ['jpeg', 'jpg', 'png'];
+const maxPhotos = 20;
 
-for (let i = 1; i <= 20; i++) {
-  images.push(`${basePath}/${carNumber}_${i}.jpeg`);
-}
-
-// Проверка, существует ли хотя бы одно фото
-let atLeastOneExists = false;
-let loadedSlides = [];
-
-let checkCount = 0;
-const checkLimit = images.length;
-const validImages = []; // ← обязательно объявляем!
-images.forEach((src, index) => {
-  const img = new Image();
-  img.src = src;
-  img.onload = () => {
-    validImages.push(src);
-    loadedSlides.push(`
-      <div class="swiper-slide">
-        <img src="${src}" alt="Фото авто" onclick="openLightbox(${JSON.stringify(validImages)}, ${validImages.length - 1})">
-      </div>
-    `);
-    checkDone();
-  };
-  
-  img.onerror = () => checkDone();
-});
-
-function checkDone() {
-  checkCount++;
-
-  if (checkCount === checkLimit) {
-    if (validImages.length > 0) {
-      // Вставляем слайды с data-index
-      swiperWrapper.innerHTML = validImages.map((src, index) => `
-        <div class="swiper-slide">
-          <img src="${src}" alt="Фото авто" data-index="${index}" class="car-photo">
-        </div>
-      `).join("");
-
-      // Привязываем события клика после вставки DOM
-      document.querySelectorAll('.car-photo').forEach((img, i) => {
-        img.addEventListener('click', () => openLightbox(validImages, i));
-      });
-
-      // Инициализация swiper
-      requestAnimationFrame(() => {
-        new Swiper('.car-swiper.swiper-container', {
-          slidesPerView: 1,
-          spaceBetween: 0,
-          direction: 'horizontal',
-          loop: false,
-          observer: true,
-          observeParents: true
-        });
-      });
-    } else {
-      // Нет валидных фото
-      swiperWrapper.innerHTML = `<div class="swiper-slide"><div class="no-photo">Фото отсутствует</div></div>`;
-    }
+// Генерация всех возможных путей
+const imagePaths = [];
+for (let i = 1; i <= maxPhotos; i++) {
+  for (let ext of extensions) {
+    imagePaths.push(`${basePath}/${carNumber}_${i}.${ext}`);
   }
 }
+
+// Проверка существования файлов
+const checkImages = imagePaths.map(src => {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(src);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+});
+
+// Загружаем и отображаем
+Promise.all(checkImages).then(results => {
+  const validImages = results.filter(Boolean);
+
+  // if (validImages.length === 0) {
+  //   swiperWrapper.innerHTML = `<div class="swiper-slide"><div class="no-photo">Фото отсутствует</div></div>`;
+  //   return;
+  // }
+
+  if (validImages.length === 0) {
+    const model = (car.model || "").toLowerCase();
+    let fallback = '/img/granta1.jpg'; // по умолчанию
+  
+    if (model.includes("vesta")) fallback = "/img/vesta1.jpg";
+    else if (model.includes("largus")) fallback = "/img/largus1.jpg";
+  
+    swiperWrapper.innerHTML = `
+      <div class="swiper-slide">
+        <img src="${fallback}" alt="Фото авто" class="car-photo">
+      </div>
+    `;
+  
+    // Поддержим полноэкранный просмотр даже с fallback
+    document.querySelectorAll('.car-photo').forEach((img, i) => {
+      img.addEventListener('click', () => openLightbox([fallback], 0));
+    });
+  
+    return;
+  }
+  
+
+  // Сохраняем правильный порядок и делаем HTML
+  swiperWrapper.innerHTML = validImages.map((src, index) => `
+    <div class="swiper-slide">
+      <img src="${src}" alt="Фото авто" loading="lazy" data-index="${index}" class="car-photo">
+    </div>
+  `).join('');
+
+  // Привязываем клики
+  document.querySelectorAll('.car-photo').forEach((img, i) => {
+    img.addEventListener('click', () => openLightbox(validImages, i));
+  });
+
+  // Инициализация Swiper
+  requestAnimationFrame(() => {
+    new Swiper('.car-swiper.swiper-container', {
+      slidesPerView: 1,
+      spaceBetween: 0,
+      direction: 'horizontal',
+      loop: false,
+      observer: true,
+      observeParents: true,
+      preloadImages: false,
+      lazy: true
+    });
+  });
+});
+
 
 }
 
@@ -209,7 +296,8 @@ window.openLightbox = function(images, startIndex = 0) {
   images.forEach(src => {
     const slide = document.createElement('div');
     slide.className = 'swiper-slide';
-    slide.innerHTML = `<div class="swiper-zoom-container"><img src="${src}" alt="Фото"></div>`;
+    // slide.innerHTML = `<div class="swiper-zoom-container"><img src="${src}" alt="Фото"></div>`;
+    slide.innerHTML = `<div class="swiper-zoom-container"><img src="${src}" alt="Фото" loading="lazy"></div>`;
     wrapper.appendChild(slide);
   });
 
