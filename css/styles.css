@@ -1185,8 +1185,11 @@ body.lightbox-open {
 }
 
 .total-count {
-  font-size: 16px;
-  font-weight: 500;
-  margin-bottom: 10px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+  margin: 12px 0;
+  color: var(--text-color);
 }
+
 

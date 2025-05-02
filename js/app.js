@@ -228,49 +228,100 @@ if (rentTab && buyoutTab) {
     const savedMode = localStorage.getItem('savedMode'); //savedMode
 
 if (savedCars && savedOffset) {
-  allCars = JSON.parse(savedCars);
-  offset = parseInt(savedOffset, 10);
+  // allCars = JSON.parse(savedCars);
 
-  const savedSort = localStorage.getItem('savedSort'); // ⬅️ СНАЧАЛА ОБЪЯВЛЯЕМ
+  // offset = parseInt(savedOffset, 10);
 
-  const savedOriginal = localStorage.getItem('originalCars');
-  originalCars = savedOriginal ? JSON.parse(savedOriginal) : [...allCars];
+  // const savedSort = localStorage.getItem('savedSort'); // ⬅️ СНАЧАЛА ОБЪЯВЛЯЕМ
+
+  // const savedOriginal = localStorage.getItem('originalCars');
+  // originalCars = savedOriginal ? JSON.parse(savedOriginal) : [...allCars];
   
-  if (savedMode === 'buyout' || savedMode === 'rent') {
-    currentMode = savedMode;
-    document.getElementById("rentTab").classList.toggle("active", currentMode === "rent");
-    document.getElementById("buyoutTab").classList.toggle("active", currentMode === "buyout");
-    localStorage.removeItem('savedMode');
-  }
+  // if (savedMode === 'buyout' || savedMode === 'rent') {
+  //   currentMode = savedMode;
+  //   document.getElementById("rentTab").classList.toggle("active", currentMode === "rent");
+  //   document.getElementById("buyoutTab").classList.toggle("active", currentMode === "buyout");
+  //   localStorage.removeItem('savedMode');
+  // }
 
-  if (savedSort) {
-    document.getElementById('sortSelect').value = savedSort;
-    sortCars();
-    localStorage.removeItem('savedSort');
-  }
+  // if (savedSort) {
+  //   document.getElementById('sortSelect').value = savedSort;
+  //   sortCars();
+  //   localStorage.removeItem('savedSort');
+  // }
 
-  renderCars();
-  localStorage.removeItem('savedCars');
-  localStorage.removeItem('savedOffset');
+  // renderCars();
+  // localStorage.removeItem('savedCars');
+  // localStorage.removeItem('savedOffset');
 
-  // Восстановление прокрутки
-  const savedScroll = localStorage.getItem('scrollPosition');
-  if (savedScroll !== null) {
-    setTimeout(() => {
-      window.scrollTo(0, parseInt(savedScroll, 10));
-      localStorage.removeItem('scrollPosition');
-    }, 100);
-  }
+  // // Восстановление прокрутки
+  // const savedScroll = localStorage.getItem('scrollPosition');
+  // if (savedScroll !== null) {
+  //   setTimeout(() => {
+  //     window.scrollTo(0, parseInt(savedScroll, 10));
+  //     localStorage.removeItem('scrollPosition');
+  //   }, 100);
+  // }
 
-  // Инициализация событий после восстановления
-  initEventListeners();
+  // // Инициализация событий после восстановления
+  // initEventListeners();
 
+  // loadMoreBtn.style.display = "block";
+  // loadMoreBtn.disabled = false;
+  // feedbackNotice.style.display = "none";
+  // allLoaded = false;
+
+  // return;
+
+
+  allCars = JSON.parse(savedCars);
+offset = parseInt(savedOffset, 10);
+const savedTotal = parseInt(localStorage.getItem('carsTotal') || '1000', 10);
+
+const savedSort = localStorage.getItem('savedSort');
+const savedOriginal = localStorage.getItem('originalCars');
+originalCars = savedOriginal ? JSON.parse(savedOriginal) : [...allCars];
+
+if (savedMode === 'buyout' || savedMode === 'rent') {
+  currentMode = savedMode;
+  document.getElementById("rentTab").classList.toggle("active", currentMode === "rent");
+  document.getElementById("buyoutTab").classList.toggle("active", currentMode === "buyout");
+  localStorage.removeItem('savedMode');
+}
+
+if (savedSort) {
+  document.getElementById('sortSelect').value = savedSort;
+  sortCars();
+  localStorage.removeItem('savedSort');
+}
+
+allLoaded = offset >= savedTotal;
+renderCars();
+
+localStorage.removeItem('savedCars');
+localStorage.removeItem('savedOffset');
+
+if (!allLoaded) {
   loadMoreBtn.style.display = "block";
   loadMoreBtn.disabled = false;
   feedbackNotice.style.display = "none";
-  allLoaded = false;
+} else {
+  loadMoreBtn.style.display = "none";
+  feedbackNotice.style.display = "block";
+}
 
-  return;
+// Восстановление прокрутки
+const savedScroll = localStorage.getItem('scrollPosition');
+if (savedScroll !== null) {
+  setTimeout(() => {
+    window.scrollTo(0, parseInt(savedScroll, 10));
+    localStorage.removeItem('scrollPosition');
+  }, 100);
+}
+
+initEventListeners();
+return;
+
 }
 
 
