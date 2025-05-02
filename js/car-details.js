@@ -198,8 +198,96 @@ if (descEl) {
 //   }
 // }
 
+//v2
 
 // 📸 Автозагрузка всех фото из папки по номеру
+// const swiperWrapper = document.querySelector('.photo-box .swiper-wrapper');
+
+// const rawNumber = car.number || "";
+// const carNumber = toLatinNumber(rawNumber.toUpperCase());
+// const basePath = `/photos/${carNumber}`;
+// const extensions = ['jpeg', 'jpg', 'png'];
+// const maxPhotos = 20;
+
+// // Генерация всех возможных путей
+// const imagePaths = [];
+// for (let i = 1; i <= maxPhotos; i++) {
+//   for (let ext of extensions) {
+//     imagePaths.push(`${basePath}/${carNumber}_${i}.${ext}`);
+//   }
+// }
+
+// // Проверка существования файлов
+// const checkImages = imagePaths.map(src => {
+//   return new Promise(resolve => {
+//     const img = new Image();
+//     img.onload = () => resolve(src);
+//     img.onerror = () => resolve(null);
+//     img.src = src;
+//   });
+// });
+
+// // Загружаем и отображаем
+// Promise.all(checkImages).then(results => {
+//   const validImages = results.filter(Boolean);
+
+//   // if (validImages.length === 0) {
+//   //   swiperWrapper.innerHTML = `<div class="swiper-slide"><div class="no-photo">Фото отсутствует</div></div>`;
+//   //   return;
+//   // }
+
+//   if (validImages.length === 0) {
+//     const model = (car.model || "").toLowerCase();
+//     let fallback = '/img/granta1.jpg'; // по умолчанию
+  
+//     if (model.includes("vesta")) fallback = "/img/vesta1.jpg";
+//     else if (model.includes("largus")) fallback = "/img/largus1.jpg";
+  
+//     swiperWrapper.innerHTML = `
+//       <div class="swiper-slide">
+//         <img src="${fallback}" alt="Фото авто" class="car-photo">
+//       </div>
+//     `;
+  
+//     // Поддержим полноэкранный просмотр даже с fallback
+//     document.querySelectorAll('.car-photo').forEach((img, i) => {
+//       img.addEventListener('click', () => openLightbox([fallback], 0));
+//     });
+  
+//     return;
+//   }
+  
+
+//   // Сохраняем правильный порядок и делаем HTML
+//   swiperWrapper.innerHTML = validImages.map((src, index) => `
+//     <div class="swiper-slide">
+//       <img src="${src}" alt="Фото авто" loading="lazy" data-index="${index}" class="car-photo">
+//     </div>
+//   `).join('');
+
+//   // Привязываем клики
+//   document.querySelectorAll('.car-photo').forEach((img, i) => {
+//     img.addEventListener('click', () => openLightbox(validImages, i));
+//   });
+
+//   // Инициализация Swiper
+//   requestAnimationFrame(() => {
+//     new Swiper('.car-swiper.swiper-container', {
+//       slidesPerView: 1,
+//       spaceBetween: 0,
+//       direction: 'horizontal',
+//       loop: false,
+//       observer: true,
+//       observeParents: true,
+//       preloadImages: false,
+//       lazy: true
+//     });
+//   });
+// });
+
+
+
+
 const swiperWrapper = document.querySelector('.photo-box .swiper-wrapper');
 
 const rawNumber = car.number || "";
@@ -208,7 +296,7 @@ const basePath = `/photos/${carNumber}`;
 const extensions = ['jpeg', 'jpg', 'png'];
 const maxPhotos = 20;
 
-// Генерация всех возможных путей
+// Генерируем пути и проверяем
 const imagePaths = [];
 for (let i = 1; i <= maxPhotos; i++) {
   for (let ext of extensions) {
@@ -216,7 +304,6 @@ for (let i = 1; i <= maxPhotos; i++) {
   }
 }
 
-// Проверка существования файлов
 const checkImages = imagePaths.map(src => {
   return new Promise(resolve => {
     const img = new Image();
@@ -226,50 +313,38 @@ const checkImages = imagePaths.map(src => {
   });
 });
 
-// Загружаем и отображаем
 Promise.all(checkImages).then(results => {
   const validImages = results.filter(Boolean);
 
-  // if (validImages.length === 0) {
-  //   swiperWrapper.innerHTML = `<div class="swiper-slide"><div class="no-photo">Фото отсутствует</div></div>`;
-  //   return;
-  // }
-
   if (validImages.length === 0) {
     const model = (car.model || "").toLowerCase();
-    let fallback = '/img/granta1.jpg'; // по умолчанию
-  
+    let fallback = '/img/granta1.jpg';
     if (model.includes("vesta")) fallback = "/img/vesta1.jpg";
     else if (model.includes("largus")) fallback = "/img/largus1.jpg";
-  
+
     swiperWrapper.innerHTML = `
       <div class="swiper-slide">
-        <img src="${fallback}" alt="Фото авто" class="car-photo">
+        <img src="${fallback}" alt="Фото авто" class="car-photo" loading="lazy">
       </div>
     `;
-  
-    // Поддержим полноэкранный просмотр даже с fallback
+
     document.querySelectorAll('.car-photo').forEach((img, i) => {
       img.addEventListener('click', () => openLightbox([fallback], 0));
     });
-  
+
     return;
   }
-  
 
-  // Сохраняем правильный порядок и делаем HTML
   swiperWrapper.innerHTML = validImages.map((src, index) => `
     <div class="swiper-slide">
       <img src="${src}" alt="Фото авто" loading="lazy" data-index="${index}" class="car-photo">
     </div>
-  `).join('');
+  `).join("");
 
-  // Привязываем клики
   document.querySelectorAll('.car-photo').forEach((img, i) => {
     img.addEventListener('click', () => openLightbox(validImages, i));
   });
 
-  // Инициализация Swiper
   requestAnimationFrame(() => {
     new Swiper('.car-swiper.swiper-container', {
       slidesPerView: 1,
@@ -283,7 +358,6 @@ Promise.all(checkImages).then(results => {
     });
   });
 });
-
 
 }
 

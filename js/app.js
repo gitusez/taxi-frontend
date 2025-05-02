@@ -171,8 +171,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedMode = currentMode;
   
     loadCars(100, true).then(() => {
-      document.getElementById("rentTab")?.classList.toggle("active", savedMode === "rent");
-      document.getElementById("buyoutTab")?.classList.toggle("active", savedMode === "buyout");
+      // document.getElementById("rentTab")?.classList.toggle("active", savedMode === "rent");
+      // document.getElementById("buyoutTab")?.classList.toggle("active", savedMode === "buyout");
+
+      const rentTab = document.getElementById("rentTab");
+const buyoutTab = document.getElementById("buyoutTab");
+
+if (rentTab && buyoutTab) {
+  if (savedMode === "rent") {
+    rentTab.classList.add("active");
+    buyoutTab.classList.remove("active");
+  } else {
+    rentTab.classList.remove("active");
+    buyoutTab.classList.add("active");
+  }
+}
+
       currentMode = savedMode;
   
       const sortSelect = document.getElementById('sortSelect');
@@ -450,7 +464,7 @@ if (savedCars && savedOffset) {
 
     async function loadCars(itemsCount, isRefresh = false) {
       try {
-        
+
         if (feedbackNotice) {
           feedbackNotice.style.display = "none";
         }
@@ -475,6 +489,8 @@ if (savedCars && savedOffset) {
           ? result.cars_list
           : Object.values(result.cars_list || {});
         const total = result.total || 0;
+        localStorage.setItem('carsTotal', total);
+
     
         const newIds = new Set(newCars.map(car => car.id));
         allCars = isRefresh
@@ -515,25 +531,38 @@ if (savedCars && savedOffset) {
         showError(error.message);
       } finally {
         loader.style.display = "none";
-        if (!allLoaded) loadMoreBtn.style.display = "block";
+        // if (!allLoaded) loadMoreBtn.style.display = "block";
         firstLoad = false;
       }
     }
     
 
     function renderCars() {
+      if (!grid) return;
+    
+      // 👇 Обновляем отображение общего количества
+      const totalEl = document.getElementById("totalCount");
+      if (totalEl) {
+        const total = localStorage.getItem('carsTotal');
+        totalEl.textContent = total ? `Всего автомобилей: ${total}` : '';
+      }
+    
+      // 👇 Отрисовка карточек
       const fragment = document.createDocumentFragment();
       allCars.forEach(car => fragment.appendChild(createCarCard(car)));
       grid.innerHTML = "";
       grid.appendChild(fragment);
     }
     
+    
     function renderFiltered(filteredCars) {
+      if (!grid) return;
       const fragment = document.createDocumentFragment();
       filteredCars.forEach(car => fragment.appendChild(createCarCard(car)));
       grid.innerHTML = "";
       grid.appendChild(fragment);
     }
+    
     
 
     // function createCarCard(car) {
@@ -581,65 +610,123 @@ if (savedCars && savedOffset) {
     //   return card;
     // }
 
-    function createCarCard(car) {
-      const card = document.createElement('div');
-      card.className = 'car-card';
+//     function createCarCard(car) {
+//       const card = document.createElement('div');
+//       card.className = 'car-card';
     
-      const model = (car.model || "").toLowerCase();
-      // let price = "—";
-      // if (model.includes("granta")) price = currentMode === 'rent' ? "1700 руб/сутки" : "850 000 ₽";
-      // else if (model.includes("vesta")) price = currentMode === 'rent' ? "2400 руб/сутки" : "1 050 000 ₽";
-      // else if (model.includes("largus")) price = currentMode === 'rent' ? "2600 руб/сутки" : "1 100 000 ₽";
+//       const model = (car.model || "").toLowerCase();
+//       // let price = "—";
+//       // if (model.includes("granta")) price = currentMode === 'rent' ? "1700 руб/сутки" : "850 000 ₽";
+//       // else if (model.includes("vesta")) price = currentMode === 'rent' ? "2400 руб/сутки" : "1 050 000 ₽";
+//       // else if (model.includes("largus")) price = currentMode === 'rent' ? "2600 руб/сутки" : "1 100 000 ₽";
     
-      // const rawNumber = car.number || "";
-      // const carNumber = toLatinNumber(rawNumber.toUpperCase());
-      // const imagePath = `/photos/${carNumber}/${carNumber}_1.jpeg`;
-      // const fallback = 'img/granta1.jpg'; // 🔧 заглушка (должна быть в public/img)
+//       // const rawNumber = car.number || "";
+//       // const carNumber = toLatinNumber(rawNumber.toUpperCase());
+//       // const imagePath = `/photos/${carNumber}/${carNumber}_1.jpeg`;
+//       // const fallback = 'img/granta1.jpg'; // 🔧 заглушка (должна быть в public/img)
 
-      let price = "—";
-if (model.includes("granta")) price = currentMode === 'rent' ? "1700 руб/сутки" : "850 000 ₽";
-else if (model.includes("vesta")) price = currentMode === 'rent' ? "2400 руб/сутки" : "1 050 000 ₽";
-else if (model.includes("largus")) price = currentMode === 'rent' ? "2600 руб/сутки" : "1 100 000 ₽";
+//       let price = "—";
+// if (model.includes("granta")) price = currentMode === 'rent' ? "1700 руб/сутки" : "850 000 ₽";
+// else if (model.includes("vesta")) price = currentMode === 'rent' ? "2400 руб/сутки" : "1 050 000 ₽";
+// else if (model.includes("largus")) price = currentMode === 'rent' ? "2600 руб/сутки" : "1 100 000 ₽";
 
-const rawNumber = car.number || "";
-const carNumber = toLatinNumber(rawNumber.toUpperCase());
-const imagePath = `/photos/${carNumber}/${carNumber}_1.jpeg`;
+// const rawNumber = car.number || "";
+// const carNumber = toLatinNumber(rawNumber.toUpperCase());
+// const imagePath = `/photos/${carNumber}/${carNumber}_1.jpeg`;
 
-let fallback = 'img/granta1.jpg'; // default
-if (model.includes("vesta")) fallback = 'img/vesta1.jpg';
-else if (model.includes("largus")) fallback = 'img/largus1.jpg';
+// let fallback = 'img/granta1.jpg'; // default
+// if (model.includes("vesta")) fallback = 'img/vesta1.jpg';
+// else if (model.includes("largus")) fallback = 'img/largus1.jpg';
     
-      const fuelType = car.fuel_type || "—";
-      const fuelTypeClass = typeof fuelType === 'string' ? fuelType.toLowerCase().replace(/\s/g, '-') : '';
+//       const fuelType = car.fuel_type || "—";
+//       const fuelTypeClass = typeof fuelType === 'string' ? fuelType.toLowerCase().replace(/\s/g, '-') : '';
     
-      card.innerHTML = `
-        <img src="${imagePath}" alt="Фото авто" loading="lazy" class="car-img" onerror="this.onerror=null; this.src='${fallback}'">
-        <h3 class="car-price">Цена: ${price}</h3>
-        <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
-        <div class="car-detal">
-          <p>Год: ${car.year || '—'}</p>
-          <p>Цвет: ${car.color || '—'}</p>
-          <p>Гос.Номер: ${car.number || '—'}</p>
-          <p>Пробег: ${car.odometer_display || '—'}</p>
-        </div>
-      `;
+//       card.innerHTML = `
+//         <img src="${imagePath}" alt="Фото авто" loading="lazy" class="car-img" onerror="this.onerror=null; this.src='${fallback}'">
+//         <h3 class="car-price">Цена: ${price}</h3>
+//         <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
+//         <div class="car-detal">
+//           <p>Год: ${car.year || '—'}</p>
+//           <p>Цвет: ${car.color || '—'}</p>
+//           <p>Гос.Номер: ${car.number || '—'}</p>
+//           <p>Пробег: ${car.odometer_display || '—'}</p>
+//         </div>
+//       `;
     
-      card.onclick = () => {
-        localStorage.setItem('scrollPosition', window.scrollY);
-        localStorage.setItem('savedCars', JSON.stringify(allCars));
-        localStorage.setItem('originalCars', JSON.stringify(originalCars));
-        localStorage.setItem('savedOffset', offset);
-        localStorage.setItem('savedMode', currentMode);
-        const sortValue = document.getElementById('sortSelect')?.value || '';
-        localStorage.setItem('savedSort', sortValue);
-        window.location.href = `car-details.html?car=${car.id}`;
-      };
+//       card.onclick = () => {
+//         localStorage.setItem('scrollPosition', window.scrollY);
+//         localStorage.setItem('savedCars', JSON.stringify(allCars));
+//         localStorage.setItem('originalCars', JSON.stringify(originalCars));
+//         localStorage.setItem('savedOffset', offset);
+//         localStorage.setItem('savedMode', currentMode);
+//         const sortValue = document.getElementById('sortSelect')?.value || '';
+//         localStorage.setItem('savedSort', sortValue);
+//         window.location.href = `car-details.html?car=${car.id}`;
+//       };
     
-      return card;
-    }
+//       return card;
+//     }
     
 
-  
+  function createCarCard(car) {
+  const card = document.createElement('div');
+  card.className = 'car-card';
+
+  const model = (car.model || "").toLowerCase();
+
+  let price = "—";
+  if (model.includes("granta")) price = currentMode === 'rent' ? "1700 руб/сутки" : "850 000 ₽";
+  else if (model.includes("vesta")) price = currentMode === 'rent' ? "2400 руб/сутки" : "1 050 000 ₽";
+  else if (model.includes("largus")) price = currentMode === 'rent' ? "2600 руб/сутки" : "1 100 000 ₽";
+
+  const rawNumber = car.number || "";
+  const carNumber = toLatinNumber(rawNumber.toUpperCase());
+  const imagePath = `/photos/${carNumber}/${carNumber}_1.jpeg`;
+
+  let fallback = 'img/granta1.jpg';
+  if (model.includes("vesta")) fallback = 'img/vesta1.jpg';
+  else if (model.includes("largus")) fallback = 'img/largus1.jpg';
+
+  const img = document.createElement("img");
+  img.src = imagePath;
+  img.alt = "Фото авто";
+  img.loading = "lazy";
+  img.className = "car-img";
+  img.onerror = () => {
+    img.onerror = null;
+    img.src = fallback;
+  };
+
+  const fuelType = car.fuel_type || "—";
+
+  const details = `
+    <h3 class="car-price">Цена: ${price}</h3>
+    <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
+    <div class="car-detal">
+      <p>Год: ${car.year || '—'}</p>
+      <p>Цвет: ${car.color || '—'}</p>
+      <p>Гос.Номер: ${car.number || '—'}</p>
+      <p>Пробег: ${car.odometer_display || '—'}</p>
+    </div>
+  `;
+
+  card.appendChild(img);
+  card.insertAdjacentHTML("beforeend", details);
+
+  card.onclick = () => {
+    localStorage.setItem('scrollPosition', window.scrollY);
+    localStorage.setItem('savedCars', JSON.stringify(allCars));
+    localStorage.setItem('originalCars', JSON.stringify(originalCars));
+    localStorage.setItem('savedOffset', offset);
+    localStorage.setItem('savedMode', currentMode);
+    const sortValue = document.getElementById('sortSelect')?.value || '';
+    localStorage.setItem('savedSort', sortValue);
+    window.location.href = `car-details.html?car=${car.id}`;
+  };
+
+  return card;
+}
+
 
     function getCarPrice(car) {
       const model = (car.model || "").toLowerCase();
