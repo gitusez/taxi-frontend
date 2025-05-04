@@ -635,7 +635,8 @@ body.lightbox-open {
     height: 100px;
   } */
   .photo-box .swiper-container {
-    height: 220px;
+    /* height: 220px; */
+    height: 300px;
   }
 
 
