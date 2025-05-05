@@ -622,9 +622,9 @@ function getCarPrice(car) {
   const model = (car.model || "").toLowerCase();
   const number = toLatinNumber((car.number || "").toUpperCase());
 
-  if (number === 'М505КУ126') return currentMode === 'rent' ? 5000 : 1400000;
-  if (number === 'Н505МР126') return currentMode === 'rent' ? 5000 : 1600000;
-  if (number === 'Н300СТ126') return currentMode === 'rent' ? 5000 : 3000000;
+  if (number === 'M505KY126') return currentMode === 'rent' ? 5000 : 1400000;
+  if (number === 'H505MP126') return currentMode === 'rent' ? 5000 : 1600000;
+  if (number === 'H300CT126') return currentMode === 'rent' ? 5000 : 3000000;
 
   if (model.includes("granta")) return currentMode === 'rent' ? 1700 : 850000;
   if (model.includes("vesta")) return currentMode === 'rent' ? 2400 : 1050000;
@@ -632,6 +632,7 @@ function getCarPrice(car) {
 
   return 0;
 }
+
 
       // === Сортировка ===
 
