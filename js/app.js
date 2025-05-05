@@ -534,60 +534,129 @@ async function renderCars() {
     
     
     
-  async function createCarCard(car) {
+//   async function createCarCard(car) {
+//   const card = document.createElement('div');
+//   card.className = 'car-card';
+
+//   const model = (car.model || "").toLowerCase();
+
+//   let price = "—";
+//   if (model.includes("granta")) price = currentMode === 'rent' ? "1700 руб/сутки" : "850 000 ₽";
+//   else if (model.includes("vesta")) price = currentMode === 'rent' ? "2400 руб/сутки" : "1 050 000 ₽";
+//   else if (model.includes("largus")) price = currentMode === 'rent' ? "2600 руб/сутки" : "1 100 000 ₽";
+
+//   const rawNumber = car.number || "";
+//   const carNumber = toLatinNumber(rawNumber.toUpperCase());
+//   // const imagePath = `/photos/${carNumber}/${carNumber}_1.jpeg`;
+
+//   // let fallback = 'img/granta1.jpg';
+//   // if (model.includes("vesta")) fallback = 'img/vesta1.jpg';
+//   // else if (model.includes("largus")) fallback = 'img/largus1.jpg';
+
+//   // const img = document.createElement("img");
+//   // img.src = imagePath;
+//   // img.alt = "Фото авто";
+//   // img.loading = "lazy";
+//   // img.className = "car-img";
+//   // img.onerror = () => {
+//   //   img.onerror = null;
+//   //   img.src = fallback;
+//   // };
+
+//   const img = document.createElement("img");
+// img.alt = "Фото авто";
+// img.loading = "lazy";
+// img.className = "car-img";
+
+// const fallback = model.includes("vesta")
+//   ? 'img/vesta1.jpg'
+//   : model.includes("largus")
+//     ? 'img/largus1.jpg'
+//     : 'img/granta1.jpg';
+
+// try {
+//   const res = await fetch(`/api/photos/${carNumber}`);
+//   const result = await res.json();
+//   if (result.success && result.photos.length > 0) {
+//     img.src = result.photos[0];
+//   } else {
+//     img.src = fallback;
+//   }
+// } catch (e) {
+//   img.src = fallback;
+// }
+
+
+//   const fuelType = car.fuel_type || "—";
+
+//   const details = `
+//     <h3 class="car-price">Цена: ${price}</h3>
+//     <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
+//     <div class="car-detal">
+//       <p>Год: ${car.year || '—'}</p>
+//       <p>Цвет: ${car.color || '—'}</p>
+//       <p>Гос.Номер: ${car.number || '—'}</p>
+//       <p>Пробег: ${car.odometer_display || '—'}</p>
+//     </div>
+//   `;
+
+//   card.appendChild(img);
+//   card.insertAdjacentHTML("beforeend", details);
+
+//   card.onclick = () => {
+//     localStorage.setItem('scrollPosition', window.scrollY);
+//     localStorage.setItem('savedCars', JSON.stringify(allCars));
+//     localStorage.setItem('originalCars', JSON.stringify(originalCars));
+//     localStorage.setItem('savedOffset', offset);
+//     localStorage.setItem('savedMode', currentMode);
+//     const sortValue = document.getElementById('sortSelect')?.value || '';
+//     localStorage.setItem('savedSort', sortValue);
+//     window.location.href = `car-details.html?car=${car.id}`;
+//   };
+
+//   return card;
+// }
+
+
+async function createCarCard(car) {
   const card = document.createElement('div');
   card.className = 'car-card';
 
   const model = (car.model || "").toLowerCase();
-
-  let price = "—";
-  if (model.includes("granta")) price = currentMode === 'rent' ? "1700 руб/сутки" : "850 000 ₽";
-  else if (model.includes("vesta")) price = currentMode === 'rent' ? "2400 руб/сутки" : "1 050 000 ₽";
-  else if (model.includes("largus")) price = currentMode === 'rent' ? "2600 руб/сутки" : "1 100 000 ₽";
-
   const rawNumber = car.number || "";
   const carNumber = toLatinNumber(rawNumber.toUpperCase());
-  // const imagePath = `/photos/${carNumber}/${carNumber}_1.jpeg`;
 
-  // let fallback = 'img/granta1.jpg';
-  // if (model.includes("vesta")) fallback = 'img/vesta1.jpg';
-  // else if (model.includes("largus")) fallback = 'img/largus1.jpg';
+  // 🔧 Получаем цену через getCarPrice()
+  const priceValue = getCarPrice({ ...car, number: carNumber }, currentMode);
+  const price = priceValue > 0
+    ? (currentMode === 'rent'
+        ? `${priceValue} руб/сутки`
+        : `${priceValue.toLocaleString('ru-RU')} ₽`)
+    : "—";
 
-  // const img = document.createElement("img");
-  // img.src = imagePath;
-  // img.alt = "Фото авто";
-  // img.loading = "lazy";
-  // img.className = "car-img";
-  // img.onerror = () => {
-  //   img.onerror = null;
-  //   img.src = fallback;
-  // };
-
+  // 🖼 Загрузка фото
   const img = document.createElement("img");
-img.alt = "Фото авто";
-img.loading = "lazy";
-img.className = "car-img";
+  img.alt = "Фото авто";
+  img.loading = "lazy";
+  img.className = "car-img";
 
-const fallback = model.includes("vesta")
-  ? 'img/vesta1.jpg'
-  : model.includes("largus")
-    ? 'img/largus1.jpg'
-    : 'img/granta1.jpg';
+  const fallback = model.includes("vesta")
+    ? 'img/vesta1.jpg'
+    : model.includes("largus")
+      ? 'img/largus1.jpg'
+      : 'img/granta1.jpg';
 
-try {
-  const res = await fetch(`/api/photos/${carNumber}`);
-  const result = await res.json();
-  if (result.success && result.photos.length > 0) {
-    img.src = result.photos[0];
-  } else {
+  try {
+    const res = await fetch(`/api/photos/${carNumber}`);
+    const result = await res.json();
+    if (result.success && result.photos.length > 0) {
+      img.src = result.photos[0];
+    } else {
+      img.src = fallback;
+    }
+  } catch (e) {
     img.src = fallback;
   }
-} catch (e) {
-  img.src = fallback;
-}
-
-
-  const fuelType = car.fuel_type || "—";
 
   const details = `
     <h3 class="car-price">Цена: ${price}</h3>
@@ -618,20 +687,21 @@ try {
 }
 
 
-function getCarPrice(car) {
+function getCarPrice(car, mode) {
   const model = (car.model || "").toLowerCase();
   const number = toLatinNumber((car.number || "").toUpperCase());
 
-  if (number === 'M505KY126') return currentMode === 'rent' ? 5000 : 1400000;
-  if (number === 'H505MP126') return currentMode === 'rent' ? 5000 : 1600000;
-  if (number === 'H300CT126') return currentMode === 'rent' ? 5000 : 3000000;
+  if (number === 'M505KY126') return mode === 'rent' ? 5000 : 1400000;
+  if (number === 'H505MP126') return mode === 'rent' ? 5000 : 1600000;
+  if (number === 'H300CT126') return mode === 'rent' ? 5000 : 3000000;
 
-  if (model.includes("granta")) return currentMode === 'rent' ? 1700 : 850000;
-  if (model.includes("vesta")) return currentMode === 'rent' ? 2400 : 1050000;
-  if (model.includes("largus")) return currentMode === 'rent' ? 2600 : 1100000;
+  if (model.includes("granta")) return mode === 'rent' ? 1700 : 850000;
+  if (model.includes("vesta")) return mode === 'rent' ? 2400 : 1050000;
+  if (model.includes("largus")) return mode === 'rent' ? 2600 : 1100000;
 
   return 0;
 }
+
 
 
       // === Сортировка ===
