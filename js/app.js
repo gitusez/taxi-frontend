@@ -201,14 +201,24 @@ renderCars();
 localStorage.removeItem('savedCars');
 localStorage.removeItem('savedOffset');
 
+// if (!allLoaded) {
+//   loadMoreBtn.style.display = "block";
+//   loadMoreBtn.disabled = false;
+//   feedbackNotice.style.display = "none";
+// } else {
+//   loadMoreBtn.style.display = "none";
+//   feedbackNotice.style.display = "block";
+// }
+
 if (!allLoaded) {
   loadMoreBtn.style.display = "block";
   loadMoreBtn.disabled = false;
-  feedbackNotice.style.display = "none";
+  feedbackNotice.style.display = currentMode === 'prokat' ? "none" : "none";
 } else {
   loadMoreBtn.style.display = "none";
-  feedbackNotice.style.display = "block";
+  feedbackNotice.style.display = currentMode === 'prokat' ? "none" : "block";
 }
+
 
 // Восстановление прокрутки
 const savedScroll = localStorage.getItem('scrollPosition');
@@ -349,7 +359,8 @@ return;
     
           setTimeout(() => {
             // Показываем уведомление только если total <= 100
-            feedbackNotice.style.display = total <= 100 ? "block" : "none";
+            // feedbackNotice.style.display = total <= 100 ? "block" : "none";
+            feedbackNotice.style.display = (total <= 100 && currentMode !== 'prokat') ? "block" : "none";
           }, 300);
 
         } else {
@@ -492,8 +503,9 @@ async function renderCars() {
     feedbackNotice.style.display = "none";
   } else {
     loadMoreBtn.style.display = "none";
-    feedbackNotice.style.display = currentMode === 'prokat' ? "none" : "block";
+    feedbackNotice.style.display = "block"; // ← это нормально, тк currentMode !== 'prokat'
   }
+  
 }
 
 
