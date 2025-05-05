@@ -176,10 +176,11 @@ const savedSort = localStorage.getItem('savedSort');
 const savedOriginal = localStorage.getItem('originalCars');
 originalCars = savedOriginal ? JSON.parse(savedOriginal) : [...allCars];
 
-if (savedMode === 'buyout' || savedMode === 'rent') {
+if (savedMode === 'buyout' || savedMode === 'rent'|| savedMode === 'prokat') {
   currentMode = savedMode;
   document.getElementById("rentTab").classList.toggle("active", currentMode === "rent");
   document.getElementById("buyoutTab").classList.toggle("active", currentMode === "buyout");
+  document.getElementById("prokatTab").classList.toggle("active", currentMode === "prokat");
   localStorage.removeItem('savedMode');
 }
 
@@ -228,10 +229,12 @@ return;
       const sortSelect = document.getElementById('sortSelect');
       const rentTab = document.getElementById("rentTab");
       const buyoutTab = document.getElementById("buyoutTab");
+      const prokatTab = document.getElementById("prokatTab");
 
-      if (rentTab && buyoutTab) {
+      if (rentTab && buyoutTab && prokatTab) {
         rentTab.addEventListener("click", () => switchMode("rent"));
         buyoutTab.addEventListener("click", () => switchMode("buyout"));
+        prokatTab.addEventListener("click", () => switchMode("prokat"));
       }
 
       if (searchInput) searchInput.addEventListener('input', debounce(searchCars, 300));
@@ -249,16 +252,44 @@ return;
     });
     }
 
+    // function switchMode(mode) {
+    //   currentMode = mode;
+    //   document.getElementById("rentTab").classList.toggle("active", mode === "rent");
+    //   document.getElementById("buyoutTab").classList.toggle("active", mode === "buyout");
+    //   renderCars();
+    // }
+
     function switchMode(mode) {
       currentMode = mode;
-      document.getElementById("rentTab").classList.toggle("active", mode === "rent");
-      document.getElementById("buyoutTab").classList.toggle("active", mode === "buyout");
+    
+      const modes = ["rent", "buyout", "prokat"];
+      modes.forEach(id => {
+        const tab = document.getElementById(`${id}Tab`);
+        if (tab) tab.classList.toggle("active", id === mode);
+      });
+
+        // 👉 Сброс сортировки и поиска при переходе в Прокат
+  if (mode === 'prokat') {
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    if (searchInput) searchInput.value = '';
+    if (sortSelect) sortSelect.selectedIndex = 0;
+  }
+    
       renderCars();
     }
+    
 
     // // // === Загрузка данных с сервера ===
 
     async function loadCars(itemsCount, isRefresh = false) {
+
+      if (currentMode === 'prokat') {
+        renderCars(); // только рендерим (из кэша)
+        loader.style.display = "none";
+        return;
+      }
+      
       try {
 
         if (feedbackNotice) {
@@ -360,12 +391,31 @@ return;
       }
     
       const fragment = document.createDocumentFragment();
-      const cardPromises = allCars.map(car => createCarCard(car));
+      // const cardPromises = allCars.map(car => createCarCard(car));
+
+      let filteredCars = [...allCars];
+
+if (currentMode === 'prokat') {
+  const prokatNumbers = ['М505КУ126', 'Н300СТ126', 'Н505МР126'].map(toLatinNumber);
+  filteredCars = allCars.filter(car => prokatNumbers.includes(toLatinNumber(car.number || '')));
+}
+
+const cardPromises = filteredCars.map(car => createCarCard(car));
+
+
       const cards = await Promise.all(cardPromises);
       cards.forEach(card => fragment.appendChild(card));
     
       grid.innerHTML = "";
       grid.appendChild(fragment);
+
+      if (currentMode === 'prokat') {
+        loadMoreContainer.style.display = "none";
+        feedbackNotice.style.display = "none";
+      } else {
+        loadMoreContainer.style.display = "block";
+      }
+      
     }
     
     
