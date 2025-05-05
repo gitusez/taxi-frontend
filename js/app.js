@@ -626,15 +626,13 @@ async function createCarCard(car) {
   const rawNumber = car.number || "";
   const carNumber = toLatinNumber(rawNumber.toUpperCase());
 
-  // 🔧 Получаем цену через getCarPrice()
+  // 💰 Получаем цену
   const priceValue = getCarPrice({ ...car, number: carNumber }, currentMode);
-  const price = priceValue > 0
-    ? (currentMode === 'rent'
-        ? `${priceValue} руб/сутки`
-        : `${priceValue.toLocaleString('ru-RU')} ₽`)
-    : "—";
+  const price = (currentMode === 'rent' || currentMode === 'prokat')
+    ? `${priceValue} руб/сутки`
+    : `${priceValue.toLocaleString('ru-RU')} ₽`;
 
-  // 🖼 Загрузка фото
+  // 🖼 Загрузка изображения
   const img = document.createElement("img");
   img.alt = "Фото авто";
   img.loading = "lazy";
@@ -649,15 +647,12 @@ async function createCarCard(car) {
   try {
     const res = await fetch(`/api/photos/${carNumber}`);
     const result = await res.json();
-    if (result.success && result.photos.length > 0) {
-      img.src = result.photos[0];
-    } else {
-      img.src = fallback;
-    }
+    img.src = (result.success && result.photos.length > 0) ? result.photos[0] : fallback;
   } catch (e) {
     img.src = fallback;
   }
 
+  // 📋 Детали карточки
   const details = `
     <h3 class="car-price">Цена: ${price}</h3>
     <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
@@ -687,22 +682,36 @@ async function createCarCard(car) {
 }
 
 
+
 function getCarPrice(car, mode) {
   const model = (car.model || "").toLowerCase();
   const number = toLatinNumber((car.number || "").toUpperCase());
 
-  // 👉 Специальные машины "прокат" — только аренда
-  const prokatOnly = ['M505KY126', 'H505MP126', 'H300CT126'];
-  if (prokatOnly.includes(number)) {
-    return mode === 'rent' || mode === 'prokat' ? 5000 : 0;
+  // 🚗 Специальные цены для проката
+  const prokatCars = {
+    'M505KY126': 5000,
+    'H505MP126': 5000,
+    'H300CT126': 5000
+  };
+
+  // Если это "Прокат" — возвращаем цену только за сутки
+  if (mode === 'prokat' && prokatCars[number]) {
+    return prokatCars[number];
   }
 
+  // В остальных режимах исключаем прокатные машины
+  if (['rent', 'buyout'].includes(mode) && prokatCars[number]) {
+    return 0;
+  }
+
+  // 🧠 Стандартные модели
   if (model.includes("granta")) return mode === 'rent' ? 1700 : 850000;
   if (model.includes("vesta")) return mode === 'rent' ? 2400 : 1050000;
   if (model.includes("largus")) return mode === 'rent' ? 2600 : 1100000;
 
   return 0;
 }
+
 
 
 
