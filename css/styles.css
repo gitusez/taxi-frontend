@@ -73,6 +73,7 @@ body {
   color: var(--text-color);
   line-height: 1;
   overflow-x: hidden;
+  padding-bottom: 80px;
 }
 
 /* Шапка */
@@ -1042,7 +1043,7 @@ body.lightbox-open {
 }
 
 .tab-btn {
-  padding: 10px 50px;
+  padding: 10px 40px;
   border: none;
   background-color: #ddd;
   cursor: pointer;

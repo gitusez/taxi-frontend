@@ -384,21 +384,40 @@ return;
     async function renderCars() {
       if (!grid) return;
     
+      // const totalEl = document.getElementById("totalCount");
+      // if (totalEl) {
+      //   const total = localStorage.getItem('carsTotal');
+      //   totalEl.textContent = total ? `Всего автомобилей: ${total}` : '';
+      // }
+
       const totalEl = document.getElementById("totalCount");
-      if (totalEl) {
-        const total = localStorage.getItem('carsTotal');
-        totalEl.textContent = total ? `Всего автомобилей: ${total}` : '';
-      }
+if (totalEl) {
+  if (currentMode === 'prokat') {
+    totalEl.style.display = "none";
+  } else {
+    const total = localStorage.getItem('carsTotal');
+    totalEl.textContent = total ? `Всего автомобилей: ${total}` : '';
+    totalEl.style.display = "block";
+  }
+}
+
     
       const fragment = document.createDocumentFragment();
       // const cardPromises = allCars.map(car => createCarCard(car));
 
       let filteredCars = [...allCars];
-
-if (currentMode === 'prokat') {
-  const prokatNumbers = ['М505КУ126', 'Н300СТ126', 'Н505МР126'].map(toLatinNumber);
-  filteredCars = allCars.filter(car => prokatNumbers.includes(toLatinNumber(car.number || '')));
-}
+      const prokatNumbers = ['М505КУ126', 'Н300СТ126', 'Н505МР126'].map(toLatinNumber);
+      
+      if (currentMode === 'prokat') {
+        filteredCars = allCars.filter(car =>
+          prokatNumbers.includes(toLatinNumber(car.number || ''))
+        );
+      } else {
+        filteredCars = allCars.filter(car =>
+          !prokatNumbers.includes(toLatinNumber(car.number || ''))
+        );
+      }
+      
 
 const cardPromises = filteredCars.map(car => createCarCard(car));
 
@@ -414,7 +433,9 @@ const cardPromises = filteredCars.map(car => createCarCard(car));
         feedbackNotice.style.display = "none";
       } else {
         loadMoreContainer.style.display = "block";
+        feedbackNotice.style.display = "block";
       }
+      
       
     }
     
