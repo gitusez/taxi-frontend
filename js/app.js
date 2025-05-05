@@ -114,18 +114,23 @@ async function initApp() {
     const savedMode = currentMode;
   
     loadCars(100, true).then(() => {
-const rentTab = document.getElementById("rentTab");
-const buyoutTab = document.getElementById("buyoutTab");
+// const rentTab = document.getElementById("rentTab");
+// const buyoutTab = document.getElementById("buyoutTab");
 
-if (rentTab && buyoutTab) {
-  if (savedMode === "rent") {
-    rentTab.classList.add("active");
-    buyoutTab.classList.remove("active");
-  } else {
-    rentTab.classList.remove("active");
-    buyoutTab.classList.add("active");
-  }
+// if (rentTab && buyoutTab) {
+//   if (savedMode === "rent") {
+//     rentTab.classList.add("active");
+//     buyoutTab.classList.remove("active");
+//   } else {
+//     rentTab.classList.remove("active");
+//     buyoutTab.classList.add("active");
+//   }
+// }
+
+if (["rent", "buyout", "prokat"].includes(savedMode)) {
+  switchMode(savedMode);
 }
+
 
       currentMode = savedMode;
   
@@ -447,7 +452,7 @@ async function renderCars() {
   const fragment = document.createDocumentFragment();
   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
 
-  // 👇 Фильтруем машины по вкладке
+  // 👇 Фильтрация по текущей вкладке
   let filteredCars = [...allCars];
   if (currentMode === 'prokat') {
     filteredCars = allCars.filter(car =>
@@ -459,7 +464,7 @@ async function renderCars() {
     );
   }
 
-  // 👇 Обновляем счётчик
+  // 👇 Обновление счётчика
   if (totalEl) {
     if (currentMode === 'prokat') {
       totalEl.style.display = "none";
@@ -469,7 +474,7 @@ async function renderCars() {
     }
   }
 
-  // 👇 Рендерим карточки
+  // 👇 Отрисовка карточек
   const cardPromises = filteredCars.map(car => createCarCard(car));
   const cards = await Promise.all(cardPromises);
   cards.forEach(card => fragment.appendChild(card));
@@ -477,15 +482,7 @@ async function renderCars() {
   grid.innerHTML = "";
   grid.appendChild(fragment);
 
-  // 👇 Управление видимостью кнопки и уведомления
-  // if (currentMode === 'prokat') {
-  //   loadMoreContainer.style.display = "none";
-  //   feedbackNotice.style.display = "none";
-  // } else {
-  //   loadMoreContainer.style.display = "block";
-  //   feedbackNotice.style.display = "block";
-  // }
-
+  // 👇 Управление кнопкой "Загрузить ещё" и блоком "Не нашли авто мечты…"
   if (currentMode === 'prokat') {
     loadMoreBtn.style.display = "none";
     feedbackNotice.style.display = "none";
@@ -495,10 +492,10 @@ async function renderCars() {
     feedbackNotice.style.display = "none";
   } else {
     loadMoreBtn.style.display = "none";
-    feedbackNotice.style.display = "block";
+    feedbackNotice.style.display = currentMode === 'prokat' ? "none" : "block";
   }
-  
 }
+
 
     
     
@@ -609,18 +606,20 @@ try {
 }
 
 
-    function getCarPrice(car) {
-      const model = (car.model || "").toLowerCase();
+function getCarPrice(car) {
+  const model = (car.model || "").toLowerCase();
+  const number = toLatinNumber((car.number || "").toUpperCase());
 
-      if (number === 'М505КУ126') return currentMode === 'rent' ? 5000 : 1400000;
-      if (number === 'Н505МР126') return currentMode === 'rent' ? 5000 : 1600000;
-      if (number === 'Н300СТ126') return currentMode === 'rent' ? 5000 : 3000000;
+  if (number === 'М505КУ126') return currentMode === 'rent' ? 5000 : 1400000;
+  if (number === 'Н505МР126') return currentMode === 'rent' ? 5000 : 1600000;
+  if (number === 'Н300СТ126') return currentMode === 'rent' ? 5000 : 3000000;
 
-      if (model.includes("granta")) return currentMode === 'rent' ? 1700 : 850000;
-      if (model.includes("vesta")) return currentMode === 'rent' ? 2400 : 1050000;
-      if (model.includes("largus")) return currentMode === 'rent' ? 2600 : 1100000;
-      return 0;
-    }
+  if (model.includes("granta")) return currentMode === 'rent' ? 1700 : 850000;
+  if (model.includes("vesta")) return currentMode === 'rent' ? 2400 : 1050000;
+  if (model.includes("largus")) return currentMode === 'rent' ? 2600 : 1100000;
+
+  return 0;
+}
 
       // === Сортировка ===
 
