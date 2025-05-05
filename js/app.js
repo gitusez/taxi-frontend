@@ -691,9 +691,11 @@ function getCarPrice(car, mode) {
   const model = (car.model || "").toLowerCase();
   const number = toLatinNumber((car.number || "").toUpperCase());
 
-  if (number === 'M505KY126') return mode === 'rent' ? 5000 : 1400000;
-  if (number === 'H505MP126') return mode === 'rent' ? 5000 : 1600000;
-  if (number === 'H300CT126') return mode === 'rent' ? 5000 : 3000000;
+  // 👉 Специальные машины "прокат" — только аренда
+  const prokatOnly = ['M505KY126', 'H505MP126', 'H300CT126'];
+  if (prokatOnly.includes(number)) {
+    return mode === 'rent' || mode === 'prokat' ? 5000 : 0;
+  }
 
   if (model.includes("granta")) return mode === 'rent' ? 1700 : 850000;
   if (model.includes("vesta")) return mode === 'rent' ? 2400 : 1050000;
@@ -701,6 +703,7 @@ function getCarPrice(car, mode) {
 
   return 0;
 }
+
 
 
 
