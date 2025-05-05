@@ -381,63 +381,125 @@ return;
     //   grid.appendChild(fragment);
     // }
 
-    async function renderCars() {
-      if (!grid) return;
+//     async function renderCars() {
+//       if (!grid) return;
     
-      // const totalEl = document.getElementById("totalCount");
-      // if (totalEl) {
-      //   const total = localStorage.getItem('carsTotal');
-      //   totalEl.textContent = total ? `Всего автомобилей: ${total}` : '';
-      // }
+//       // const totalEl = document.getElementById("totalCount");
+//       // if (totalEl) {
+//       //   const total = localStorage.getItem('carsTotal');
+//       //   totalEl.textContent = total ? `Всего автомобилей: ${total}` : '';
+//       // }
 
-      const totalEl = document.getElementById("totalCount");
-if (totalEl) {
+//       const totalEl = document.getElementById("totalCount");
+// if (totalEl) {
+//   if (currentMode === 'prokat') {
+//     totalEl.style.display = "none";
+//   } else {
+//     const total = localStorage.getItem('carsTotal');
+//     totalEl.textContent = total ? `Всего автомобилей: ${total}` : '';
+//     totalEl.style.display = "block";
+//   }
+// }
+
+    
+//       const fragment = document.createDocumentFragment();
+//       // const cardPromises = allCars.map(car => createCarCard(car));
+
+//       let filteredCars = [...allCars];
+//       const prokatNumbers = ['М505КУ126', 'Н300СТ126', 'Н505МР126'].map(toLatinNumber);
+      
+//       if (currentMode === 'prokat') {
+//         filteredCars = allCars.filter(car =>
+//           prokatNumbers.includes(toLatinNumber(car.number || ''))
+//         );
+//       } else {
+//         filteredCars = allCars.filter(car =>
+//           !prokatNumbers.includes(toLatinNumber(car.number || ''))
+//         );
+//       }
+      
+
+// const cardPromises = filteredCars.map(car => createCarCard(car));
+
+
+//       const cards = await Promise.all(cardPromises);
+//       cards.forEach(card => fragment.appendChild(card));
+    
+//       grid.innerHTML = "";
+//       grid.appendChild(fragment);
+
+//       if (currentMode === 'prokat') {
+//         loadMoreContainer.style.display = "none";
+//         feedbackNotice.style.display = "none";
+//       } else {
+//         loadMoreContainer.style.display = "block";
+//         feedbackNotice.style.display = "block";
+//       }
+      
+      
+//     }
+
+
+async function renderCars() {
+  if (!grid) return;
+
+  const totalEl = document.getElementById("totalCount");
+  const fragment = document.createDocumentFragment();
+  const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+
+  // 👇 Фильтруем машины по вкладке
+  let filteredCars = [...allCars];
   if (currentMode === 'prokat') {
-    totalEl.style.display = "none";
+    filteredCars = allCars.filter(car =>
+      prokatNumbers.includes(toLatinNumber(car.number || ''))
+    );
   } else {
-    const total = localStorage.getItem('carsTotal');
-    totalEl.textContent = total ? `Всего автомобилей: ${total}` : '';
-    totalEl.style.display = "block";
+    filteredCars = allCars.filter(car =>
+      !prokatNumbers.includes(toLatinNumber(car.number || ''))
+    );
   }
+
+  // 👇 Обновляем счётчик
+  if (totalEl) {
+    if (currentMode === 'prokat') {
+      totalEl.style.display = "none";
+    } else {
+      totalEl.textContent = `Всего автомобилей: ${filteredCars.length}`;
+      totalEl.style.display = "block";
+    }
+  }
+
+  // 👇 Рендерим карточки
+  const cardPromises = filteredCars.map(car => createCarCard(car));
+  const cards = await Promise.all(cardPromises);
+  cards.forEach(card => fragment.appendChild(card));
+
+  grid.innerHTML = "";
+  grid.appendChild(fragment);
+
+  // 👇 Управление видимостью кнопки и уведомления
+  // if (currentMode === 'prokat') {
+  //   loadMoreContainer.style.display = "none";
+  //   feedbackNotice.style.display = "none";
+  // } else {
+  //   loadMoreContainer.style.display = "block";
+  //   feedbackNotice.style.display = "block";
+  // }
+
+  if (currentMode === 'prokat') {
+    loadMoreBtn.style.display = "none";
+    feedbackNotice.style.display = "none";
+  } else if (!allLoaded) {
+    loadMoreBtn.style.display = "block";
+    loadMoreBtn.disabled = false;
+    feedbackNotice.style.display = "none";
+  } else {
+    loadMoreBtn.style.display = "none";
+    feedbackNotice.style.display = "block";
+  }
+  
 }
 
-    
-      const fragment = document.createDocumentFragment();
-      // const cardPromises = allCars.map(car => createCarCard(car));
-
-      let filteredCars = [...allCars];
-      const prokatNumbers = ['М505КУ126', 'Н300СТ126', 'Н505МР126'].map(toLatinNumber);
-      
-      if (currentMode === 'prokat') {
-        filteredCars = allCars.filter(car =>
-          prokatNumbers.includes(toLatinNumber(car.number || ''))
-        );
-      } else {
-        filteredCars = allCars.filter(car =>
-          !prokatNumbers.includes(toLatinNumber(car.number || ''))
-        );
-      }
-      
-
-const cardPromises = filteredCars.map(car => createCarCard(car));
-
-
-      const cards = await Promise.all(cardPromises);
-      cards.forEach(card => fragment.appendChild(card));
-    
-      grid.innerHTML = "";
-      grid.appendChild(fragment);
-
-      if (currentMode === 'prokat') {
-        loadMoreContainer.style.display = "none";
-        feedbackNotice.style.display = "none";
-      } else {
-        loadMoreContainer.style.display = "block";
-        feedbackNotice.style.display = "block";
-      }
-      
-      
-    }
     
     
     
@@ -549,6 +611,11 @@ try {
 
     function getCarPrice(car) {
       const model = (car.model || "").toLowerCase();
+
+      if (number === 'М505КУ126') return currentMode === 'rent' ? 5000 : 1400000;
+      if (number === 'Н505МР126') return currentMode === 'rent' ? 5000 : 1600000;
+      if (number === 'Н300СТ126') return currentMode === 'rent' ? 5000 : 3000000;
+
       if (model.includes("granta")) return currentMode === 'rent' ? 1700 : 850000;
       if (model.includes("vesta")) return currentMode === 'rent' ? 2400 : 1050000;
       if (model.includes("largus")) return currentMode === 'rent' ? 2600 : 1100000;
@@ -557,17 +624,63 @@ try {
 
       // === Сортировка ===
 
+    // function sortCars() {
+    //   const value = document.getElementById('sortSelect')?.value;
+    //   if (!value) {
+    //     allCars = [...originalCars]; // сброс к изначальному порядку
+    //     document.getElementById('sortSelect').selectedIndex = 0;
+    //     return; // ⛔️ renderCars здесь больше не нужен
+    //   }
+    
+    //   const [field, order] = value.split('_');
+    
+    //   allCars.sort((a, b) => {
+    //     let aVal, bVal;
+    
+    //     if (field === 'price') {
+    //       aVal = getCarPrice(a);
+    //       bVal = getCarPrice(b);
+    //     } else if (field === 'mileage') {
+    //       aVal = parseInt(a.odometer || 0, 10);
+    //       bVal = parseInt(b.odometer || 0, 10);
+    //     } else {
+    //       aVal = String(a[field] || '');
+    //       bVal = String(b[field] || '');
+    //       return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+    //     }
+    
+    //     return order === 'asc' ? aVal - bVal : bVal - aVal;
+    //   });
+    // }
+
     function sortCars() {
       const value = document.getElementById('sortSelect')?.value;
       if (!value) {
         allCars = [...originalCars]; // сброс к изначальному порядку
         document.getElementById('sortSelect').selectedIndex = 0;
-        return; // ⛔️ renderCars здесь больше не нужен
+        renderCars(); // ⬅️ обязательно рендер после сброса
+        return;
       }
     
       const [field, order] = value.split('_');
     
-      allCars.sort((a, b) => {
+      // Преобразуем номера для фильтрации "Проката"
+      const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+    
+      // Фильтруем нужные машины в зависимости от режима
+      let filtered = [...allCars];
+      if (currentMode === 'prokat') {
+        filtered = filtered.filter(car =>
+          prokatNumbers.includes(toLatinNumber(car.number || ''))
+        );
+      } else {
+        filtered = filtered.filter(car =>
+          !prokatNumbers.includes(toLatinNumber(car.number || ''))
+        );
+      }
+    
+      // Сортируем отфильтрованные
+      filtered.sort((a, b) => {
         let aVal, bVal;
     
         if (field === 'price') {
@@ -584,7 +697,11 @@ try {
     
         return order === 'asc' ? aVal - bVal : bVal - aVal;
       });
+    
+      // Обновляем отображение с учётом сортировки
+      renderFiltered(filtered);
     }
+    
     
     
     
@@ -609,10 +726,47 @@ try {
     //   renderFiltered(filtered);
     // }
 
+    // function searchCars() {
+    //   const searchInput = document.getElementById('searchInput');
+    //   const totalEl = document.getElementById('totalCount');
+    //   const query = searchInput?.value.toLowerCase() || '';
+    
+    //   const translitMap = {
+    //     а: 'a', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z',
+    //     и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p',
+    //     р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch',
+    //     ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya'
+    //   };
+    
+    //   const translit = str =>
+    //     str.split('').map(c => translitMap[c] || translitMap[c.toLowerCase()] || c).join('');
+    
+    //   const normalizedQuery = query.normalize("NFD").replace(/[̀-ͯ]/g, "");
+    //   const altQuery = translit(normalizedQuery);
+    
+    //   if (!query) {
+    //     if (totalEl) totalEl.style.display = "block";
+    //     renderCars();
+    //     return;
+    //   }
+    
+    //   if (totalEl) totalEl.style.display = "none";
+    
+    //   const filtered = allCars.filter(car => {
+    //     const name = ((car.brand || '') + ' ' + (car.model || '')).toLowerCase();
+    //     const normName = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
+    //     return normName.includes(normalizedQuery) || normName.includes(altQuery);
+    //   });
+    
+    //   renderFiltered(filtered);
+    // }
+    
     function searchCars() {
       const searchInput = document.getElementById('searchInput');
       const totalEl = document.getElementById('totalCount');
       const query = searchInput?.value.toLowerCase() || '';
+    
+      const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
     
       const translitMap = {
         а: 'a', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z',
@@ -627,24 +781,38 @@ try {
       const normalizedQuery = query.normalize("NFD").replace(/[̀-ͯ]/g, "");
       const altQuery = translit(normalizedQuery);
     
+      let filtered = [...allCars];
+    
+      // 💡 Фильтрация по текущей вкладке
+      if (currentMode === 'prokat') {
+        filtered = filtered.filter(car =>
+          prokatNumbers.includes(toLatinNumber(car.number || ''))
+        );
+      } else {
+        filtered = filtered.filter(car =>
+          !prokatNumbers.includes(toLatinNumber(car.number || ''))
+        );
+      }
+    
       if (!query) {
         if (totalEl) totalEl.style.display = "block";
-        renderCars();
+        renderFiltered(filtered);
         return;
       }
     
       if (totalEl) totalEl.style.display = "none";
     
-      const filtered = allCars.filter(car => {
+      // 💡 Фильтрация по текстовому запросу
+      const searched = filtered.filter(car => {
         const name = ((car.brand || '') + ' ' + (car.model || '')).toLowerCase();
         const normName = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
         return normName.includes(normalizedQuery) || normName.includes(altQuery);
       });
     
-      renderFiltered(filtered);
+      renderFiltered(searched);
     }
     
-    
+
   }
 
   // === Модалка "Оставить заявку" ===
