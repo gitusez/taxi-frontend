@@ -379,11 +379,21 @@ function renderCarDetails(car) {
       const res = await fetch(`/api/photos/${carNumber}`);
       const result = await res.json();
 
+      // let validImages = [];
+
+      // if (result.success && Array.isArray(result.photos)) {
+      //   validImages = result.photos;
+      // }
+
       let validImages = [];
 
-      if (result.success && Array.isArray(result.photos)) {
-        validImages = result.photos;
-      }
+if (result.success && Array.isArray(result.photos)) {
+  validImages = result.photos.slice().sort((a, b) => {
+    const getNumber = str => parseInt(str.match(/(\d+)/)?.[0] || 0, 10);
+    return getNumber(a) - getNumber(b);
+  });
+}
+
 
       if (validImages.length === 0) {
         const model = (car.model || "").toLowerCase();
