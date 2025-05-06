@@ -94,6 +94,7 @@ async function initApp() {
         if (cachedCars) {
           allCars = cachedCars;
           originalCars = [...allCars];
+          unsortedCars = [...allCars]; // ✅ фикс: сохраняем порядок для "Без сортировки"
           offset = allCars.length;
           firstLoad = false;
           renderCars();
@@ -580,10 +581,22 @@ async function createCarCard(car) {
   const carNumber = toLatinNumber(rawNumber.toUpperCase());
 
   // 💰 Получаем цену
-  const priceValue = getCarPrice({ ...car, number: carNumber }, currentMode);
-  const price = (currentMode === 'rent' || currentMode === 'prokat')
+  // const priceValue = getCarPrice({ ...car, number: carNumber }, currentMode);
+  // const price = (currentMode === 'rent' || currentMode === 'prokat')
+  //   ? `${priceValue} руб/сутки`
+  //   : `${priceValue.toLocaleString('ru-RU')} ₽`;
+
+  // 💰 Получаем цену
+const priceValue = getCarPrice({ ...car, number: carNumber }, currentMode);
+let price;
+if (typeof priceValue === 'string') {
+  price = priceValue; // например: "1700₽ на 4 года"
+} else {
+  price = (currentMode === 'rent' || currentMode === 'prokat')
     ? `${priceValue} руб/сутки`
     : `${priceValue.toLocaleString('ru-RU')} ₽`;
+}
+
 
   // 🖼 Загрузка изображения
   const img = document.createElement("img");
@@ -636,6 +649,35 @@ async function createCarCard(car) {
 
 
 
+// function getCarPrice(car, mode) {
+//   const model = (car.model || "").toLowerCase();
+//   const number = toLatinNumber((car.number || "").toUpperCase());
+
+//   // 🚗 Специальные цены для проката
+//   const prokatCars = {
+//     'M505KY126': 5000,
+//     'H505MP126': 5000,
+//     'H300CT126': 5000
+//   };
+
+//   // Если это "Прокат" — возвращаем цену только за сутки
+//   if (mode === 'prokat' && prokatCars[number]) {
+//     return prokatCars[number];
+//   }
+
+//   // В остальных режимах исключаем прокатные машины
+//   if (['rent', 'buyout'].includes(mode) && prokatCars[number]) {
+//     return 0;
+//   }
+
+//   // 🧠 Стандартные модели
+//   if (model.includes("granta")) return mode === 'rent' ? 1700 : 850000;
+//   if (model.includes("vesta")) return mode === 'rent' ? 2400 : 1050000;
+//   if (model.includes("largus")) return mode === 'rent' ? 2600 : 1100000;
+
+//   return 0;
+// }
+
 function getCarPrice(car, mode) {
   const model = (car.model || "").toLowerCase();
   const number = toLatinNumber((car.number || "").toUpperCase());
@@ -647,23 +689,32 @@ function getCarPrice(car, mode) {
     'H300CT126': 5000
   };
 
-  // Если это "Прокат" — возвращаем цену только за сутки
   if (mode === 'prokat' && prokatCars[number]) {
     return prokatCars[number];
   }
 
-  // В остальных режимах исключаем прокатные машины
   if (['rent', 'buyout'].includes(mode) && prokatCars[number]) {
     return 0;
   }
 
-  // 🧠 Стандартные модели
-  if (model.includes("granta")) return mode === 'rent' ? 1700 : 850000;
-  if (model.includes("vesta")) return mode === 'rent' ? 2400 : 1050000;
+  // 🧠 Специальные условия для "Выкуп"
+  if (model.includes("granta")) {
+    if (mode === 'rent') return 1700;
+    if (mode === 'buyout') return "1500₽ на 4 года";
+    return 850000;
+  }
+
+  if (model.includes("vesta")) {
+    if (mode === 'rent') return 2400;
+    if (mode === 'buyout') return "1700₽ на 4 года";
+    return 1050000;
+  }
+
   if (model.includes("largus")) return mode === 'rent' ? 2600 : 1100000;
 
   return 0;
 }
+
 
 
 
