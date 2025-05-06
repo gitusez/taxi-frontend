@@ -105,42 +105,84 @@ async function initApp() {
         
     
         // автообновление данных каждые 60 секунд
-  setInterval(() => {
-    console.log('[INFO] Автообновление...');
+//   setInterval(() => {
+//     console.log('[INFO] Автообновление...');
   
-    const savedScroll = window.scrollY;
-    const savedSort = document.getElementById('sortSelect')?.value || '';
-    const savedQuery = document.getElementById('searchInput')?.value || '';
-    const savedMode = currentMode;
+//     const savedScroll = window.scrollY;
+//     const savedSort = document.getElementById('sortSelect')?.value || '';
+//     const savedQuery = document.getElementById('searchInput')?.value || '';
+//     const savedMode = currentMode;
   
-    loadCars(100, true).then(() => {
+//     loadCars(100, true).then(() => {
 
-if (["rent", "buyout", "prokat"].includes(savedMode)) {
-  switchMode(savedMode);
-}
+// if (["rent", "buyout", "prokat"].includes(savedMode)) {
+//   switchMode(savedMode);
+// }
 
 
-      currentMode = savedMode;
+//       currentMode = savedMode;
   
-      const sortSelect = document.getElementById('sortSelect');
-      if (sortSelect && savedSort) {
-        sortSelect.value = savedSort;
-        sortCars();
-      }
+//       const sortSelect = document.getElementById('sortSelect');
+//       if (sortSelect && savedSort) {
+//         sortSelect.value = savedSort;
+//         sortCars();
+//       }
   
-      const searchInput = document.getElementById('searchInput');
-      if (searchInput && savedQuery) {
-        searchInput.value = savedQuery;
-        searchCars();
+//       const searchInput = document.getElementById('searchInput');
+//       if (searchInput && savedQuery) {
+//         searchInput.value = savedQuery;
+//         searchCars();
+//       } else {
+//         renderCars();
+//       }
+  
+//       if (!document.hidden) {
+//         window.scrollTo(0, savedScroll);
+//       }
+//     });
+//   }, CACHE_TTL_MS);
+
+// автообновление данных каждые 60 секунд
+setInterval(() => {
+  console.log('[INFO] Автообновление...');
+
+  const savedScroll = window.scrollY;
+  const savedSort = document.getElementById('sortSelect')?.value || '';
+  const savedQuery = document.getElementById('searchInput')?.value || '';
+  const savedMode = currentMode;
+
+  loadCars(100, true).then(() => {
+
+    if (["rent", "buyout", "prokat"].includes(savedMode)) {
+      switchMode(savedMode);
+    }
+
+    currentMode = savedMode;
+
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+      sortSelect.value = savedSort;
+      if (savedSort) {
+        sortCars(); // применяем сортировку
       } else {
-        renderCars();
+        renderCars(); // если сортировка отсутствует — просто рендер
       }
-  
-      if (!document.hidden) {
-        window.scrollTo(0, savedScroll);
+    }
+
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+      searchInput.value = savedQuery;
+      if (savedQuery) {
+        searchCars(); // применяем поиск
       }
-    });
-  }, CACHE_TTL_MS);
+    }
+
+    if (!document.hidden) {
+      window.scrollTo(0, savedScroll);
+    }
+  });
+}, CACHE_TTL_MS);
+
   
         
 
