@@ -466,7 +466,9 @@ return;
         // } 
         if (isRefresh) {
           originalCars = [...newCars];
-          unsortedCars = [...newCars]; // ← сохраняем неизменный порядок
+          if (unsortedCars.length === 0) {
+            unsortedCars = [...newCars]; // ✅ сохраняем только один раз!
+          }
           offset = newCars.length;
         }        
         else {
