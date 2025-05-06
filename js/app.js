@@ -388,6 +388,22 @@ return;
   //     renderCars();
   //   }
 
+
+
+  function resetSortAndSearch() {
+    const sortSelect = document.getElementById('sortSelect');
+    const searchInput = document.getElementById('searchInput');
+  
+    if (sortSelect) {
+      sortSelect.value = '';
+    }
+  
+    if (searchInput) {
+      searchInput.value = '';
+    }
+  }
+  
+
   function switchMode(mode) {
     currentMode = mode;
   
@@ -397,22 +413,21 @@ return;
       if (tab) tab.classList.toggle("active", id === mode);
     });
   
-    // 👉 Сброс сортировки и поиска при переходе в Прокат
-    if (mode === 'prokat') {
-      const searchInput = document.getElementById('searchInput');
-      const sortSelect = document.getElementById('sortSelect');
-      if (searchInput) searchInput.value = '';
-      if (sortSelect) sortSelect.selectedIndex = 0;
-    }
+    // Общий сброс сортировки и поиска
+    resetSortAndSearch();
+  
+    allCars = [...unsortedCars];
+    originalCars = [...unsortedCars];    
   
     renderCars();
   
-    // 🧠 Применить текущую сортировку
+    // Применить сортировку если она осталась выбрана (например, после возврата)
     const sortSelect = document.getElementById('sortSelect');
     if (sortSelect?.value) {
       sortCars();
     }
   }
+  
   
     
 
@@ -757,7 +772,7 @@ function getCarPrice(car, mode) {
       
         allCars = [...restored];
         originalCars = [...restored];
-        document.getElementById('sortSelect').selectedIndex = 0;
+        // document.getElementById('sortSelect').selectedIndex = 0;
         renderFiltered(restored); // ✅ а не renderCars()
         return;
       }
