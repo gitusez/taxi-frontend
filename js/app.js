@@ -680,13 +680,35 @@ function getCarPrice(car, mode) {
       //   return;
       // }
 
+      // if (!value) {
+      //   allCars = [...unsortedCars]; // ⬅️ возвращаем исходный порядок с сервера
+      //   originalCars = [...unsortedCars]; // ← тоже сбрасываем сохранённый порядок
+      //   document.getElementById('sortSelect').selectedIndex = 0;
+      //   renderCars();
+      //   return;
+      // }
+
       if (!value) {
-        allCars = [...unsortedCars]; // ⬅️ возвращаем исходный порядок с сервера
-        originalCars = [...unsortedCars]; // ← тоже сбрасываем сохранённый порядок
+        const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+      
+        let restored = [...unsortedCars];
+        if (currentMode === 'prokat') {
+          restored = restored.filter(car =>
+            prokatNumbers.includes(toLatinNumber(car.number || ''))
+          );
+        } else {
+          restored = restored.filter(car =>
+            !prokatNumbers.includes(toLatinNumber(car.number || ''))
+          );
+        }
+      
+        allCars = [...restored];
+        originalCars = [...restored];
         document.getElementById('sortSelect').selectedIndex = 0;
-        renderCars();
+        renderFiltered(restored); // ✅ а не renderCars()
         return;
       }
+      
       
     
       const [field, order] = value.split('_');
@@ -729,7 +751,7 @@ function getCarPrice(car, mode) {
 originalCars = [...filtered]; // 🛠 сохраняем отсортированный порядок
 renderFiltered(filtered);
 
-    }
+}
     
     
     
