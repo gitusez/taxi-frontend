@@ -370,76 +370,148 @@ function renderCarDetails(car) {
   }
 
   // ✅ Асинхронная загрузка фотографий
-  (async () => {
-    const swiperWrapper = document.querySelector('.photo-box .swiper-wrapper');
-    const rawNumber = car.number || "";
-    const carNumber = toLatinNumber(rawNumber.toUpperCase());
+//   (async () => {
+//     const swiperWrapper = document.querySelector('.photo-box .swiper-wrapper');
+//     const rawNumber = car.number || "";
+//     const carNumber = toLatinNumber(rawNumber.toUpperCase());
 
-    try {
-      const res = await fetch(`/api/photos/${carNumber}`);
-      const result = await res.json();
+//     try {
+//       const res = await fetch(`/api/photos/${carNumber}`);
+//       const result = await res.json();
 
-      // let validImages = [];
+//       // let validImages = [];
 
-      // if (result.success && Array.isArray(result.photos)) {
-      //   validImages = result.photos;
-      // }
+//       // if (result.success && Array.isArray(result.photos)) {
+//       //   validImages = result.photos;
+//       // }
 
-      let validImages = [];
+//       let validImages = [];
 
-if (result.success && Array.isArray(result.photos)) {
-  validImages = result.photos.slice().sort((a, b) => {
-    const getNumber = str => parseInt(str.match(/(\d+)/)?.[0] || 0, 10);
-    return getNumber(a) - getNumber(b);
-  });
-}
+// if (result.success && Array.isArray(result.photos)) {
+//   validImages = result.photos.slice().sort((a, b) => {
+//     const getNumber = str => parseInt(str.match(/(\d+)/)?.[0] || 0, 10);
+//     return getNumber(a) - getNumber(b);
+//   });
+// }
 
 
-      if (validImages.length === 0) {
-        const model = (car.model || "").toLowerCase();
-        let fallback = '/img/granta1.jpg';
-        if (model.includes("vesta")) fallback = "/img/vesta1.jpg";
-        else if (model.includes("largus")) fallback = "/img/largus1.jpg";
+//       if (validImages.length === 0) {
+//         const model = (car.model || "").toLowerCase();
+//         let fallback = '/img/granta1.jpg';
+//         if (model.includes("vesta")) fallback = "/img/vesta1.jpg";
+//         else if (model.includes("largus")) fallback = "/img/largus1.jpg";
 
-        swiperWrapper.innerHTML = `
-          <div class="swiper-slide">
-            <img src="${fallback}" alt="Фото авто" class="car-photo" loading="lazy">
-          </div>
-        `;
+//         swiperWrapper.innerHTML = `
+//           <div class="swiper-slide">
+//             <img src="${fallback}" alt="Фото авто" class="car-photo" loading="lazy">
+//           </div>
+//         `;
 
-        document.querySelectorAll('.car-photo').forEach((img, i) => {
-          img.addEventListener('click', () => openLightbox([fallback], 0));
-        });
+//         document.querySelectorAll('.car-photo').forEach((img, i) => {
+//           img.addEventListener('click', () => openLightbox([fallback], 0));
+//         });
 
-        return;
-      }
+//         return;
+//       }
 
-      swiperWrapper.innerHTML = validImages.map((src, index) => `
+//       swiperWrapper.innerHTML = validImages.map((src, index) => `
+//         <div class="swiper-slide">
+//           <img src="${src}" alt="Фото авто" loading="lazy" data-index="${index}" class="car-photo">
+//         </div>
+//       `).join("");
+
+//       document.querySelectorAll('.car-photo').forEach((img, i) => {
+//         img.addEventListener('click', () => openLightbox(validImages, i));
+//       });
+
+//       requestAnimationFrame(() => {
+//         new Swiper('.car-swiper.swiper-container', {
+//           slidesPerView: 1,
+//           spaceBetween: 0,
+//           direction: 'horizontal',
+//           loop: false,
+//           observer: true,
+//           observeParents: true,
+//           preloadImages: false,
+//           lazy: true
+//         });
+//       });
+//     } catch (err) {
+//       console.error("Ошибка загрузки фото:", err);
+//     }
+//   })();
+
+(async () => {
+  const swiperWrapper = document.querySelector('.photo-box .swiper-wrapper');
+  const rawNumber = car.number || "";
+  const carNumber = toLatinNumber(rawNumber.toUpperCase());
+
+  try {
+    const res = await fetch(`/api/photos/${carNumber}`);
+    const result = await res.json();
+
+    let validImages = [];
+
+    if (result.success && Array.isArray(result.photos)) {
+      validImages = result.photos.slice().sort((a, b) => {
+        const getNum = s => {
+          const match = s.match(/_(\d+)\./);
+          return match ? parseInt(match[1], 10) : 0;
+        };
+        return getNum(a) - getNum(b);
+      });
+    }
+
+    if (validImages.length === 0) {
+      const model = (car.model || "").toLowerCase();
+      let fallback = '/img/granta1.jpg';
+      if (model.includes("vesta")) fallback = "/img/vesta1.jpg";
+      else if (model.includes("largus")) fallback = "/img/largus1.jpg";
+
+      swiperWrapper.innerHTML = `
         <div class="swiper-slide">
-          <img src="${src}" alt="Фото авто" loading="lazy" data-index="${index}" class="car-photo">
+          <img src="${fallback}" alt="Фото авто" class="car-photo" loading="lazy">
         </div>
-      `).join("");
+      `;
 
       document.querySelectorAll('.car-photo').forEach((img, i) => {
-        img.addEventListener('click', () => openLightbox(validImages, i));
+        img.addEventListener('click', () => openLightbox([fallback], 0));
       });
 
-      requestAnimationFrame(() => {
-        new Swiper('.car-swiper.swiper-container', {
-          slidesPerView: 1,
-          spaceBetween: 0,
-          direction: 'horizontal',
-          loop: false,
-          observer: true,
-          observeParents: true,
-          preloadImages: false,
-          lazy: true
-        });
-      });
-    } catch (err) {
-      console.error("Ошибка загрузки фото:", err);
+      return;
     }
-  })();
+
+    // Вставка отсортированных изображений
+    swiperWrapper.innerHTML = validImages.map((src, index) => `
+      <div class="swiper-slide">
+        <img src="${src}" alt="Фото авто" loading="lazy" data-index="${index}" class="car-photo">
+      </div>
+    `).join("");
+
+    // Обработчики для лайтбокса
+    document.querySelectorAll('.car-photo').forEach((img, i) => {
+      img.addEventListener('click', () => openLightbox(validImages, i));
+    });
+
+    requestAnimationFrame(() => {
+      new Swiper('.car-swiper.swiper-container', {
+        slidesPerView: 1,
+        spaceBetween: 0,
+        direction: 'horizontal',
+        loop: false,
+        observer: true,
+        observeParents: true,
+        preloadImages: false,
+        lazy: true
+      });
+    });
+
+  } catch (err) {
+    console.error("Ошибка загрузки фото:", err);
+  }
+})();
+
+
 }
 
 // 🔍 Полноэкранный просмотр
