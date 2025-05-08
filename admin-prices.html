@@ -17,9 +17,9 @@
     <thead>
       <tr>
         <th>Гос. номер</th>
+        <th>Прокат</th>
         <th>Аренда</th>
         <th>Выкуп</th>
-        <th>Прокат</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -58,9 +58,9 @@
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${number}</td>
+          <td><input value="${manual.prokat || ''}" data-number="${number}" data-type="prokat"></td>
           <td><input value="${manual.rent || ''}" data-number="${number}" data-type="rent"></td>
           <td><input value="${manual.buyout || ''}" data-number="${number}" data-type="buyout"></td>
-          <td><input value="${manual.prokat || ''}" data-number="${number}" data-type="prokat"></td>
         `;
         tbody.appendChild(row);
       });
