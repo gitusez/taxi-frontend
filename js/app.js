@@ -638,42 +638,54 @@ if (typeof priceValue === 'string') {
 }
 
 
+// function getCarPrice(car, mode) {
+//   const model = (car.model || "").toLowerCase();
+//   const number = toLatinNumber((car.number || "").toUpperCase());
+
+//   // 🚗 Специальные цены для проката
+//   const prokatCars = {
+//     'M505KY126': 5000,
+//     'H505MP126': 5000,
+//     'H300CT126': 5000
+//   };
+
+//   if (mode === 'prokat' && prokatCars[number]) {
+//     return prokatCars[number];
+//   }
+
+//   if (['rent', 'buyout'].includes(mode) && prokatCars[number]) {
+//     return 0;
+//   }
+
+//   // 🧠 Специальные условия для "Выкуп"
+//   if (model.includes("granta")) {
+//     if (mode === 'rent') return 1700;
+//     if (mode === 'buyout') return "1500₽ на 4 года";
+//     return 850000;
+//   }
+
+//   if (model.includes("vesta")) {
+//     if (mode === 'rent') return 2400;
+//     if (mode === 'buyout') return "1700₽ на 4 года";
+//     return 1050000;
+//   }
+
+//   if (model.includes("largus")) return mode === 'rent' ? 2600 : 1100000;
+
+//   return 0;
+// }
+
 function getCarPrice(car, mode) {
-  const model = (car.model || "").toLowerCase();
   const number = toLatinNumber((car.number || "").toUpperCase());
 
-  // 🚗 Специальные цены для проката
-  const prokatCars = {
-    'M505KY126': 5000,
-    'H505MP126': 5000,
-    'H300CT126': 5000
-  };
-
-  if (mode === 'prokat' && prokatCars[number]) {
-    return prokatCars[number];
+  // ✅ Только ручные цены
+  if (car.manual_price && car.manual_price[mode]) {
+    return car.manual_price[mode]; // строка или число
   }
 
-  if (['rent', 'buyout'].includes(mode) && prokatCars[number]) {
-    return 0;
-  }
-
-  // 🧠 Специальные условия для "Выкуп"
-  if (model.includes("granta")) {
-    if (mode === 'rent') return 1700;
-    if (mode === 'buyout') return "1500₽ на 4 года";
-    return 850000;
-  }
-
-  if (model.includes("vesta")) {
-    if (mode === 'rent') return 2400;
-    if (mode === 'buyout') return "1700₽ на 4 года";
-    return 1050000;
-  }
-
-  if (model.includes("largus")) return mode === 'rent' ? 2600 : 1100000;
-
-  return 0;
+  return "Цена не указана";
 }
+
 
 
 
