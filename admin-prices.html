@@ -28,44 +28,62 @@
 
   <script>
     let prices = {};
-
+    let allCars = [];
+  
     async function loadPrices() {
-      const res = await fetch('/api/manual-prices');
-      prices = await res.json();
+      const [pricesRes, carsRes] = await Promise.all([
+        fetch('/api/manual-prices'),
+        fetch('/api/cars/combined', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: 1000, offset: 0 })
+        })
+      ]);
+  
+      prices = await pricesRes.json();
+      const carsData = await carsRes.json();
+      allCars = carsData.cars_list || [];
+  
       const tbody = document.querySelector("#pricesTable tbody");
       tbody.innerHTML = "";
-
-      Object.keys(prices).forEach(number => {
+  
+      const seen = new Set();
+  
+      allCars.forEach(car => {
+        const number = (car.number || '').replace(/\s/g, '').toUpperCase();
+        if (!number || seen.has(number)) return;
+        seen.add(number);
+  
+        const manual = prices[number] || {};
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${number}</td>
-          <td><input value="${prices[number].rent || ''}" data-number="${number}" data-type="rent"></td>
-          <td><input value="${prices[number].buyout || ''}" data-number="${number}" data-type="buyout"></td>
-          <td><input value="${prices[number].prokat || ''}" data-number="${number}" data-type="prokat"></td>
+          <td><input value="${manual.rent || ''}" data-number="${number}" data-type="rent"></td>
+          <td><input value="${manual.buyout || ''}" data-number="${number}" data-type="buyout"></td>
+          <td><input value="${manual.prokat || ''}" data-number="${number}" data-type="prokat"></td>
         `;
         tbody.appendChild(row);
       });
     }
-
+  
     async function savePrices() {
       const inputs = document.querySelectorAll("input");
       const updated = {};
-
+  
       inputs.forEach(input => {
         const number = input.dataset.number;
         const type = input.dataset.type;
         const value = input.value.trim();
-
         if (!updated[number]) updated[number] = {};
         if (value) updated[number][type] = isNaN(value) ? value : Number(value);
       });
-
+  
       const res = await fetch('/api/manual-prices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
       });
-
+  
       const result = await res.json();
       if (result.success) {
         alert("Цены сохранены");
@@ -74,8 +92,9 @@
         alert("Ошибка сохранения: " + result.error);
       }
     }
-
+  
     loadPrices();
   </script>
+  
 </body>
 </html>
