@@ -503,26 +503,92 @@ return;
     }
     
     
+// async function renderCars() {
+//   if (!grid) return;
+
+//   const totalEl = document.getElementById("totalCount");
+//   const fragment = document.createDocumentFragment();
+//   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+
+//   // 👇 Фильтрация по текущей вкладке
+//   let filteredCars = [...allCars];
+//   if (currentMode === 'prokat') {
+//     filteredCars = allCars.filter(car =>
+//       prokatNumbers.includes(toLatinNumber(car.number || ''))
+//     );
+//   } else {
+//     filteredCars = allCars.filter(car =>
+//       !prokatNumbers.includes(toLatinNumber(car.number || ''))
+//     );
+//   }
+
+//   // 👇 Обновление счётчика
+//   if (totalEl) {
+//     if (currentMode === 'prokat') {
+//       totalEl.style.display = "none";
+//     } else {
+//       totalEl.textContent = `Всего автомобилей: ${filteredCars.length}`;
+//       totalEl.style.display = "block";
+//     }
+//   }
+
+//   // 👇 Отрисовка карточек
+//   const cardPromises = filteredCars.map(car => createCarCard(car));
+//   const cards = await Promise.all(cardPromises);
+//   cards.forEach(card => fragment.appendChild(card));
+
+//   grid.innerHTML = "";
+//   grid.appendChild(fragment);
+
+//   // 👇 Управление кнопкой "Загрузить ещё" и блоком "Не нашли авто мечты…"
+//   if (currentMode === 'prokat') {
+//     loadMoreBtn.style.display = "none";
+//     feedbackNotice.style.display = "none";
+//   } else if (!allLoaded) {
+//     loadMoreBtn.style.display = "block";
+//     loadMoreBtn.disabled = false;
+//     feedbackNotice.style.display = "none";
+//   } else {
+//     loadMoreBtn.style.display = "none";
+//     feedbackNotice.style.display = "block"; // ← это нормально, тк currentMode !== 'prokat'
+//   }
+  
+// }
+
 async function renderCars() {
   if (!grid) return;
 
   const totalEl = document.getElementById("totalCount");
   const fragment = document.createDocumentFragment();
+
+  // приводим список дополнительных номеров к латинице и без пробелов
   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
 
-  // 👇 Фильтрация по текущей вкладке
-  let filteredCars = [...allCars];
+  // 1) Базовый список машин для текущей вкладки
+  let filteredCars = [];
   if (currentMode === 'prokat') {
-    filteredCars = allCars.filter(car =>
-      prokatNumbers.includes(toLatinNumber(car.number || ''))
-    );
+    // — для "Прокат" сначала берем ВСЕ машины
+    filteredCars = [...allCars];
+
+    // — затем добавляем доп. машины по номерам, которых может не быть в allCars
+    prokatNumbers.forEach(num => {
+      if (!filteredCars.some(car => toLatinNumber(car.number || '') === num)) {
+        // если в allCars нет, ищем в оригинальных (unsortedCars) или просто создаём заглушку
+        const extra = unsortedCars.find(car => toLatinNumber(car.number || '') === num);
+        if (extra) filteredCars.push(extra);
+      }
+    });
+
+    // в будущем здесь можно добавить отсеивание по описанию:
+    // filteredCars = filteredCars.filter(car => !car.description.includes("КлючевоеСлово"));
   } else {
+    // для rent и buyout — все машины, кроме доп. прокатных
     filteredCars = allCars.filter(car =>
       !prokatNumbers.includes(toLatinNumber(car.number || ''))
     );
   }
 
-  // 👇 Обновление счётчика
+  // 2) Обновляем счётчик
   if (totalEl) {
     if (currentMode === 'prokat') {
       totalEl.style.display = "none";
@@ -532,15 +598,13 @@ async function renderCars() {
     }
   }
 
-  // 👇 Отрисовка карточек
-  const cardPromises = filteredCars.map(car => createCarCard(car));
-  const cards = await Promise.all(cardPromises);
-  cards.forEach(card => fragment.appendChild(card));
-
+  // 3) Рендер карточек
+  const cards = await Promise.all(filteredCars.map(createCarCard));
   grid.innerHTML = "";
+  cards.forEach(c => fragment.appendChild(c));
   grid.appendChild(fragment);
 
-  // 👇 Управление кнопкой "Загрузить ещё" и блоком "Не нашли авто мечты…"
+  // 4) Кнопка "Загрузить ещё" и уведомление
   if (currentMode === 'prokat') {
     loadMoreBtn.style.display = "none";
     feedbackNotice.style.display = "none";
@@ -550,10 +614,10 @@ async function renderCars() {
     feedbackNotice.style.display = "none";
   } else {
     loadMoreBtn.style.display = "none";
-    feedbackNotice.style.display = "block"; // ← это нормально, тк currentMode !== 'prokat'
+    feedbackNotice.style.display = "block";
   }
-  
 }
+
 
 
     async function renderFiltered(filteredCars) {
