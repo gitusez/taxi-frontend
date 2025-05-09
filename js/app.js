@@ -966,7 +966,7 @@ function sortCars() {
   const sortValue = document.getElementById('sortSelect')?.value;
   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
 
-  // Вспомогательная функция для получения полного списка прокатных машин
+  // Вспомогательная функция для расширенного списка прокатных машин
   function getProkatList() {
     const list = [...allCars];
     prokatNumbers.forEach(num => {
@@ -978,8 +978,24 @@ function sortCars() {
     return list;
   }
 
-  // 1) Определяем исходный массив перед сортировкой
-  let target = [];
+  // Вспомогательная функция для приоритизации по списку prokatNumbers
+  function prioritize(list) {
+    return list.sort((a, b) => {
+      const na = toLatinNumber(a.number || '');
+      const nb = toLatinNumber(b.number || '');
+      const ia = prokatNumbers.indexOf(na);
+      const ib = prokatNumbers.indexOf(nb);
+      if (ia !== -1 || ib !== -1) {
+        if (ia === -1) return 1;   // a не приоритет, b — приоритет → b выше
+        if (ib === -1) return -1;  // b не приоритет, a — приоритет → a выше
+        return ia - ib;            // оба приоритетные — по их порядку в prokatNumbers
+      }
+      return 0; // если ни одна не в приоритете — сохраняем относительный порядок
+    });
+  }
+
+  // 1) Собираем исходный массив перед сортировкой
+  let target;
   if (currentMode === 'prokat') {
     target = getProkatList();
   } else {
@@ -988,18 +1004,22 @@ function sortCars() {
     );
   }
 
-  // 2) Если сортировка не выбрана, просто рендерим исходный порядок
+  // 2) Если "Без сортировки":
   if (!sortValue) {
+    if (currentMode === 'prokat') {
+      // приоритетные номера наверх
+      target = prioritize(target);
+    }
     allCars = [...target];
     originalCars = [...target];
     renderFiltered(target);
     return;
   }
 
-  // 3) Распарсим направление и поле сортировки
+  // 3) Иначе — парсим направление и поле
   const [field, order] = sortValue.split('_');
 
-  // 4) Выполним сортировку
+  // 4) Сортируем копию target
   const sorted = [...target].sort((a, b) => {
     let aVal, bVal;
 
@@ -1016,14 +1036,13 @@ function sortCars() {
         ? aVal.localeCompare(bVal)
         : bVal.localeCompare(aVal);
     }
-
     return order === 'asc' ? aVal - bVal : bVal - aVal;
   });
 
-  // 5) Сохраняем и рендерим
   originalCars = [...sorted];
   renderFiltered(sorted);
 }
+
 
     
     
