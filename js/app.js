@@ -555,56 +555,128 @@ return;
   
 // }
 
+// async function renderCars() {
+//   if (!grid) return;
+
+//   const totalEl = document.getElementById("totalCount");
+//   const fragment = document.createDocumentFragment();
+
+//   // приводим список дополнительных номеров к латинице и без пробелов
+//   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+
+//   // 1) Базовый список машин для текущей вкладки
+//   let filteredCars = [];
+//   if (currentMode === 'prokat') {
+//     // — для "Прокат" сначала берем ВСЕ машины
+//     filteredCars = [...allCars];
+
+//     // — затем добавляем доп. машины по номерам, которых может не быть в allCars
+//     prokatNumbers.forEach(num => {
+//       if (!filteredCars.some(car => toLatinNumber(car.number || '') === num)) {
+//         // если в allCars нет, ищем в оригинальных (unsortedCars) или просто создаём заглушку
+//         const extra = unsortedCars.find(car => toLatinNumber(car.number || '') === num);
+//         if (extra) filteredCars.push(extra);
+//       }
+//     });
+
+//     // в будущем здесь можно добавить отсеивание по описанию:
+//     // filteredCars = filteredCars.filter(car => !car.description.includes("КлючевоеСлово"));
+//   } else {
+//     // для rent и buyout — все машины, кроме доп. прокатных
+//     filteredCars = allCars.filter(car =>
+//       !prokatNumbers.includes(toLatinNumber(car.number || ''))
+//     );
+//   }
+
+//   // 2) Обновляем счётчик
+//   if (totalEl) {
+//     if (currentMode === 'prokat') {
+//       totalEl.style.display = "none";
+//     } else {
+//       totalEl.textContent = `Всего автомобилей: ${filteredCars.length}`;
+//       totalEl.style.display = "block";
+//     }
+//   }
+
+//   // 3) Рендер карточек
+//   const cards = await Promise.all(filteredCars.map(createCarCard));
+//   grid.innerHTML = "";
+//   cards.forEach(c => fragment.appendChild(c));
+//   grid.appendChild(fragment);
+
+//   // 4) Кнопка "Загрузить ещё" и уведомление
+//   if (currentMode === 'prokat') {
+//     loadMoreBtn.style.display = "none";
+//     feedbackNotice.style.display = "none";
+//   } else if (!allLoaded) {
+//     loadMoreBtn.style.display = "block";
+//     loadMoreBtn.disabled = false;
+//     feedbackNotice.style.display = "none";
+//   } else {
+//     loadMoreBtn.style.display = "none";
+//     feedbackNotice.style.display = "block";
+//   }
+// }
+
+
 async function renderCars() {
   if (!grid) return;
 
   const totalEl = document.getElementById("totalCount");
   const fragment = document.createDocumentFragment();
 
-  // приводим список дополнительных номеров к латинице и без пробелов
+  // 1) Список дополнительных номеров проката
   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
 
-  // 1) Базовый список машин для текущей вкладки
+  // 2) Формируем filteredCars в зависимости от вкладки
   let filteredCars = [];
   if (currentMode === 'prokat') {
-    // — для "Прокат" сначала берем ВСЕ машины
+    // — берем все машины
     filteredCars = [...allCars];
 
-    // — затем добавляем доп. машины по номерам, которых может не быть в allCars
+    // — добавляем недостающие по номерам из unsortedCars
     prokatNumbers.forEach(num => {
       if (!filteredCars.some(car => toLatinNumber(car.number || '') === num)) {
-        // если в allCars нет, ищем в оригинальных (unsortedCars) или просто создаём заглушку
         const extra = unsortedCars.find(car => toLatinNumber(car.number || '') === num);
         if (extra) filteredCars.push(extra);
       }
     });
 
-    // в будущем здесь можно добавить отсеивание по описанию:
-    // filteredCars = filteredCars.filter(car => !car.description.includes("КлючевоеСлово"));
+    // — упорядочиваем так, чтобы приоритетные номера шли первыми
+    filteredCars.sort((a, b) => {
+      const na = toLatinNumber(a.number || '');
+      const nb = toLatinNumber(b.number || '');
+      const ia = prokatNumbers.indexOf(na);
+      const ib = prokatNumbers.indexOf(nb);
+      if (ia !== -1 || ib !== -1) {
+        // если оба в списке, по их порядку; если только один, он выше
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+      }
+      return 0; // остальные остаются в исходном порядке
+    });
+
   } else {
-    // для rent и buyout — все машины, кроме доп. прокатных
+    // для rent/buyout — все, кроме тех, что в prokatNumbers
     filteredCars = allCars.filter(car =>
       !prokatNumbers.includes(toLatinNumber(car.number || ''))
     );
   }
 
-  // 2) Обновляем счётчик
+  // 3) Отображаем количество на всех вкладках
   if (totalEl) {
-    if (currentMode === 'prokat') {
-      totalEl.style.display = "none";
-    } else {
-      totalEl.textContent = `Всего автомобилей: ${filteredCars.length}`;
-      totalEl.style.display = "block";
-    }
+    totalEl.textContent = `Всего автомобилей: ${filteredCars.length}`;
+    totalEl.style.display = "block";
   }
 
-  // 3) Рендер карточек
+  // 4) Рендер карточек
   const cards = await Promise.all(filteredCars.map(createCarCard));
   grid.innerHTML = "";
   cards.forEach(c => fragment.appendChild(c));
   grid.appendChild(fragment);
 
-  // 4) Кнопка "Загрузить ещё" и уведомление
+  // 5) Логика кнопки "Загрузить ещё" и уведомления
   if (currentMode === 'prokat') {
     loadMoreBtn.style.display = "none";
     feedbackNotice.style.display = "none";
@@ -617,6 +689,7 @@ async function renderCars() {
     feedbackNotice.style.display = "block";
   }
 }
+
 
 
 
