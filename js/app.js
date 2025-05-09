@@ -569,73 +569,73 @@ async function renderCars() {
     }
 
 
-async function createCarCard(car) {
-  const card = document.createElement('div');
-  card.className = 'car-card';
+// async function createCarCard(car) {
+//   const card = document.createElement('div');
+//   card.className = 'car-card';
 
-  const model = (car.model || "").toLowerCase();
-  const rawNumber = car.number || "";
-  const carNumber = toLatinNumber(rawNumber.toUpperCase());
-  // 💰 Получаем цену
-const priceValue = getCarPrice({ ...car, number: carNumber }, currentMode);
-let price;
-if (typeof priceValue === 'string') {
-  price = priceValue; // например: "1700₽ на 4 года"
-} else {
-  price = (currentMode === 'rent' || currentMode === 'prokat')
-    ? `${priceValue} руб/сутки`
-    : `${priceValue.toLocaleString('ru-RU')} ₽`;
-}
+//   const model = (car.model || "").toLowerCase();
+//   const rawNumber = car.number || "";
+//   const carNumber = toLatinNumber(rawNumber.toUpperCase());
+//   // 💰 Получаем цену
+// const priceValue = getCarPrice({ ...car, number: carNumber }, currentMode);
+// let price;
+// if (typeof priceValue === 'string') {
+//   price = priceValue; // например: "1700₽ на 4 года"
+// } else {
+//   price = (currentMode === 'rent' || currentMode === 'prokat')
+//     ? `${priceValue} руб/сутки`
+//     : `${priceValue.toLocaleString('ru-RU')} ₽`;
+// }
 
 
-  // 🖼 Загрузка изображения
-  const img = document.createElement("img");
-  img.alt = "Фото авто";
-  img.loading = "lazy";
-  img.className = "car-img";
+//   // 🖼 Загрузка изображения
+//   const img = document.createElement("img");
+//   img.alt = "Фото авто";
+//   img.loading = "lazy";
+//   img.className = "car-img";
 
-  const fallback = model.includes("vesta")
-    ? 'img/vesta1.jpg'
-    : model.includes("largus")
-      ? 'img/largus1.jpg'
-      : 'img/granta1.jpg';
+//   const fallback = model.includes("vesta")
+//     ? 'img/vesta1.jpg'
+//     : model.includes("largus")
+//       ? 'img/largus1.jpg'
+//       : 'img/granta1.jpg';
 
-  try {
-    const res = await fetch(`/api/photos/${carNumber}`);
-    const result = await res.json();
-    img.src = (result.success && result.photos.length > 0) ? result.photos[0] : fallback;
-  } catch (e) {
-    img.src = fallback;
-  }
+//   try {
+//     const res = await fetch(`/api/photos/${carNumber}`);
+//     const result = await res.json();
+//     img.src = (result.success && result.photos.length > 0) ? result.photos[0] : fallback;
+//   } catch (e) {
+//     img.src = fallback;
+//   }
 
-  // 📋 Детали карточки
-  const details = `
-    <h3 class="car-price">Цена: ${price}</h3>
-    <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
-    <div class="car-detal">
-      <p>Год: ${car.year || '—'}</p>
-      <p>Цвет: ${car.color || '—'}</p>
-      <p>Гос.Номер: ${car.number || '—'}</p>
-      <p>Пробег: ${car.odometer_display || '—'}</p>
-    </div>
-  `;
+//   // 📋 Детали карточки
+//   const details = `
+//     <h3 class="car-price">Цена: ${price}</h3>
+//     <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
+//     <div class="car-detal">
+//       <p>Год: ${car.year || '—'}</p>
+//       <p>Цвет: ${car.color || '—'}</p>
+//       <p>Гос.Номер: ${car.number || '—'}</p>
+//       <p>Пробег: ${car.odometer_display || '—'}</p>
+//     </div>
+//   `;
 
-  card.appendChild(img);
-  card.insertAdjacentHTML("beforeend", details);
+//   card.appendChild(img);
+//   card.insertAdjacentHTML("beforeend", details);
 
-  card.onclick = () => {
-    localStorage.setItem('scrollPosition', window.scrollY);
-    localStorage.setItem('savedCars', JSON.stringify(allCars));
-    localStorage.setItem('originalCars', JSON.stringify(originalCars));
-    localStorage.setItem('savedOffset', offset);
-    localStorage.setItem('savedMode', currentMode);
-    const sortValue = document.getElementById('sortSelect')?.value || '';
-    localStorage.setItem('savedSort', sortValue);
-    window.location.href = `car-details.html?car=${car.id}`;
-  };
+//   card.onclick = () => {
+//     localStorage.setItem('scrollPosition', window.scrollY);
+//     localStorage.setItem('savedCars', JSON.stringify(allCars));
+//     localStorage.setItem('originalCars', JSON.stringify(originalCars));
+//     localStorage.setItem('savedOffset', offset);
+//     localStorage.setItem('savedMode', currentMode);
+//     const sortValue = document.getElementById('sortSelect')?.value || '';
+//     localStorage.setItem('savedSort', sortValue);
+//     window.location.href = `car-details.html?car=${car.id}`;
+//   };
 
-  return card;
-}
+//   return card;
+// }
 
 
 // function getCarPrice(car, mode) {
@@ -674,6 +674,68 @@ if (typeof priceValue === 'string') {
 
 //   return 0;
 // }
+
+
+async function createCarCard(car) {
+  const card = document.createElement('div');
+  card.className = 'car-card';
+
+  const model = (car.model || "").toLowerCase();
+  const rawNumber = car.number || "";
+  const carNumber = toLatinNumber(rawNumber.toUpperCase());
+
+  // 💰 Получаем цену как есть
+  const price = getCarPrice(car, currentMode) || "";
+
+  // 🖼 Загрузка изображения
+  const img = document.createElement("img");
+  img.alt = "Фото авто";
+  img.loading = "lazy";
+  img.className = "car-img";
+
+  const fallback = model.includes("vesta")
+    ? 'img/vesta1.jpg'
+    : model.includes("largus")
+      ? 'img/largus1.jpg'
+      : 'img/granta1.jpg';
+
+  try {
+    const res = await fetch(`/api/photos/${carNumber}`);
+    const result = await res.json();
+    img.src = (result.success && result.photos.length > 0) ? result.photos[0] : fallback;
+  } catch {
+    img.src = fallback;
+  }
+
+  // 📋 Детали карточки
+  const details = `
+    <h3 class="car-price">Цена: ${price}</h3>
+    <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
+    <div class="car-detal">
+      <p>Год: ${car.year || '—'}</p>
+      <p>Цвет: ${car.color || '—'}</p>
+      <p>Гос.Номер: ${car.number || '—'}</p>
+      <p>Пробег: ${car.odometer_display || '—'}</p>
+    </div>
+  `;
+
+  card.appendChild(img);
+  card.insertAdjacentHTML("beforeend", details);
+
+  card.onclick = () => {
+    localStorage.setItem('scrollPosition', window.scrollY);
+    localStorage.setItem('savedCars', JSON.stringify(allCars));
+    localStorage.setItem('originalCars', JSON.stringify(originalCars));
+    localStorage.setItem('savedOffset', offset);
+    localStorage.setItem('savedMode', currentMode);
+    const sortValue = document.getElementById('sortSelect')?.value || '';
+    localStorage.setItem('savedSort', sortValue);
+    window.location.href = `car-details.html?car=${car.id}`;
+  };
+
+  return card;
+}
+
 
 function getCarPrice(car, mode) {
   const number = toLatinNumber((car.number || "").toUpperCase());
