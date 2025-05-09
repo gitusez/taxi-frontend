@@ -1,4 +1,4 @@
-<!-- admin-prices.html -->
+<!-- admin-prices.html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -96,5 +96,97 @@
     loadPrices();
   </script>
   
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Редактирование цен</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+    input { padding: 5px; width: 100px; }
+    td, th { padding: 5px; }
+    .save-btn { margin-top: 10px; padding: 10px 20px; }
+  </style>
+</head>
+<body>
+  <h1>Ручные цены на авто</h1>
+  <table border="1" id="pricesTable">
+    <thead>
+      <tr>
+        <th>Гос. номер</th>
+        <th>Прокат</th>
+        <th>Аренда</th>
+        <th>Выкуп</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button class="save-btn" onclick="savePrices()">💾 Сохранить</button>
+
+  <script>
+    let prices = {}, allCars = [];
+
+    async function loadPrices() {
+      const [pr, cr] = await Promise.all([
+        fetch('/api/manual-prices', { credentials: 'include' }),
+        fetch('/api/cars/combined', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: 1000, offset: 0 })
+        })
+      ]);
+      prices = await pr.json();
+      const carsData = await cr.json();
+      allCars = carsData.cars_list || [];
+
+      const tbody = document.querySelector("#pricesTable tbody");
+      tbody.innerHTML = "";
+      const seen = new Set();
+
+      allCars.forEach(car => {
+        const num = (car.number||'').replace(/\s/g,'').toUpperCase();
+        if (!num || seen.has(num)) return;
+        seen.add(num);
+        const m = prices[num]||{};
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${num}</td>
+          <td><input value="${m.prokat||''}" data-number="${num}" data-type="prokat"></td>
+          <td><input value="${m.rent||''}"  data-number="${num}" data-type="rent"></td>
+          <td><input value="${m.buyout||''}" data-number="${num}" data-type="buyout"></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function savePrices() {
+      const updated = {};
+      document.querySelectorAll("input").forEach(i => {
+        const num = i.dataset.number, t = i.dataset.type, v = i.value.trim();
+        if (!updated[num]) updated[num]={};
+        if (v) updated[num][t] = isNaN(v)?v:Number(v);
+      });
+      const res = await fetch('/api/manual-prices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      });
+      const rj = await res.json();
+      if (rj.success) { alert("Цены сохранены"); loadPrices(); }
+      else alert("Ошибка: "+rj.error);
+    }
+
+    // Загружаем при старте
+    loadPrices();
+
+    // При закрытии вкладки — сбрасываем Basic Auth
+    window.addEventListener('beforeunload', () => {
+      navigator.sendBeacon('/logout');
+    });
+  </script>
 </body>
 </html>
