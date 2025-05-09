@@ -619,76 +619,135 @@ return;
 // }
 
 
+// async function renderCars() {
+//   if (!grid) return;
+
+//   const totalEl = document.getElementById("totalCount");
+//   const fragment = document.createDocumentFragment();
+
+//   // 1) Список дополнительных номеров проката
+//   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+
+//   // 2) Формируем filteredCars в зависимости от вкладки
+//   let filteredCars = [];
+//   if (currentMode === 'prokat') {
+//     // — берем все машины
+//     filteredCars = [...allCars];
+
+//     // — добавляем недостающие по номерам из unsortedCars
+//     prokatNumbers.forEach(num => {
+//       if (!filteredCars.some(car => toLatinNumber(car.number || '') === num)) {
+//         const extra = unsortedCars.find(car => toLatinNumber(car.number || '') === num);
+//         if (extra) filteredCars.push(extra);
+//       }
+//     });
+
+//     // — упорядочиваем так, чтобы приоритетные номера шли первыми
+//     filteredCars.sort((a, b) => {
+//       const na = toLatinNumber(a.number || '');
+//       const nb = toLatinNumber(b.number || '');
+//       const ia = prokatNumbers.indexOf(na);
+//       const ib = prokatNumbers.indexOf(nb);
+//       if (ia !== -1 || ib !== -1) {
+//         // если оба в списке, по их порядку; если только один, он выше
+//         if (ia === -1) return 1;
+//         if (ib === -1) return -1;
+//         return ia - ib;
+//       }
+//       return 0; // остальные остаются в исходном порядке
+//     });
+
+//   } else {
+//     // для rent/buyout — все, кроме тех, что в prokatNumbers
+//     filteredCars = allCars.filter(car =>
+//       !prokatNumbers.includes(toLatinNumber(car.number || ''))
+//     );
+//   }
+
+//   // 3) Отображаем количество на всех вкладках
+//   if (totalEl) {
+//     totalEl.textContent = `Всего автомобилей: ${filteredCars.length}`;
+//     totalEl.style.display = "block";
+//   }
+
+//   // 4) Рендер карточек
+//   const cards = await Promise.all(filteredCars.map(createCarCard));
+//   grid.innerHTML = "";
+//   cards.forEach(c => fragment.appendChild(c));
+//   grid.appendChild(fragment);
+
+//   // 5) Логика кнопки "Загрузить ещё" и уведомления
+//   if (currentMode === 'prokat') {
+//     loadMoreBtn.style.display = "none";
+//     feedbackNotice.style.display = "none";
+//   } else if (!allLoaded) {
+//     loadMoreBtn.style.display = "block";
+//     loadMoreBtn.disabled = false;
+//     feedbackNotice.style.display = "none";
+//   } else {
+//     loadMoreBtn.style.display = "none";
+//     feedbackNotice.style.display = "block";
+//   }
+// }
+
+// ========== renderCars ==========
 async function renderCars() {
   if (!grid) return;
 
   const totalEl = document.getElementById("totalCount");
   const fragment = document.createDocumentFragment();
 
-  // 1) Список дополнительных номеров проката
+  // 1) Список прокатных номеров из config
   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
 
-  // 2) Формируем filteredCars в зависимости от вкладки
-  let filteredCars = [];
+  // 2) Формируем базовый массив filteredCars в зависимости от вкладки
+  let filteredCars;
   if (currentMode === 'prokat') {
-    // — берем все машины
+    // — берем все машины + доп. по номерам
     filteredCars = [...allCars];
-
-    // — добавляем недостающие по номерам из unsortedCars
     prokatNumbers.forEach(num => {
-      if (!filteredCars.some(car => toLatinNumber(car.number || '') === num)) {
-        const extra = unsortedCars.find(car => toLatinNumber(car.number || '') === num);
+      if (!filteredCars.some(c => toLatinNumber(c.number || '') === num)) {
+        const extra = unsortedCars.find(c => toLatinNumber(c.number || '') === num);
         if (extra) filteredCars.push(extra);
       }
     });
-
-    // — упорядочиваем так, чтобы приоритетные номера шли первыми
+    // — приоритет прокатных номеров сверху
     filteredCars.sort((a, b) => {
-      const na = toLatinNumber(a.number || '');
-      const nb = toLatinNumber(b.number || '');
-      const ia = prokatNumbers.indexOf(na);
-      const ib = prokatNumbers.indexOf(nb);
+      const na = toLatinNumber(a.number || ''), nb = toLatinNumber(b.number || '');
+      const ia = prokatNumbers.indexOf(na), ib = prokatNumbers.indexOf(nb);
       if (ia !== -1 || ib !== -1) {
-        // если оба в списке, по их порядку; если только один, он выше
         if (ia === -1) return 1;
         if (ib === -1) return -1;
         return ia - ib;
       }
-      return 0; // остальные остаются в исходном порядке
+      return 0;
     });
-
   } else {
-    // для rent/buyout — все, кроме тех, что в prokatNumbers
+    // для rent/buyout — исключаем прокатные номера
     filteredCars = allCars.filter(car =>
       !prokatNumbers.includes(toLatinNumber(car.number || ''))
     );
   }
 
-  // 3) Отображаем количество на всех вкладках
+  // 3) Обновляем счётчик на всех вкладках
   if (totalEl) {
     totalEl.textContent = `Всего автомобилей: ${filteredCars.length}`;
     totalEl.style.display = "block";
   }
 
-  // 4) Рендер карточек
+  // 4) Рендерим карточки
   const cards = await Promise.all(filteredCars.map(createCarCard));
   grid.innerHTML = "";
   cards.forEach(c => fragment.appendChild(c));
   grid.appendChild(fragment);
 
-  // 5) Логика кнопки "Загрузить ещё" и уведомления
-  if (currentMode === 'prokat') {
-    loadMoreBtn.style.display = "none";
-    feedbackNotice.style.display = "none";
-  } else if (!allLoaded) {
-    loadMoreBtn.style.display = "block";
-    loadMoreBtn.disabled = false;
-    feedbackNotice.style.display = "none";
-  } else {
-    loadMoreBtn.style.display = "none";
-    feedbackNotice.style.display = "block";
-  }
+  // 5) Кнопка “Загрузить ещё” показываем всегда, пока есть что грузить
+  loadMoreBtn.style.display = allLoaded ? "none" : "block";
+
+  // 6) Модалка “Не нашли авто мечты…” показывается, если нет ни одной карточки
+  feedbackNotice.style.display = filteredCars.length === 0 ? "block" : "none";
 }
+
 
 
 
@@ -1101,80 +1160,141 @@ function sortCars() {
     // }
 
 
-    function searchCars() {
-      const searchInput = document.getElementById('searchInput');
-      const totalEl     = document.getElementById('totalCount');
-      const query       = (searchInput?.value || '').toLowerCase().trim();
+    // function searchCars() {
+    //   const searchInput = document.getElementById('searchInput');
+    //   const totalEl     = document.getElementById('totalCount');
+    //   const query       = (searchInput?.value || '').toLowerCase().trim();
     
-      // 1) Подготовка translit-функции
-      const translitMap = {
-        а:'a', в:'v', г:'g', д:'d', е:'e', ё:'e', ж:'zh', з:'z',
-        и:'i', й:'y', к:'k', л:'l', м:'m', н:'n', о:'o', п:'p',
-        р:'r', с:'s', т:'t', у:'u', ф:'f', х:'h', ц:'ts', ч:'ch',
-        ш:'sh', щ:'sch', ъ:'', ы:'y', ь:'', э:'e', ю:'yu', я:'ya'
-      };
-      const translit = str =>
-        str.split('')
-           .map(c => translitMap[c] || translitMap[c.toLowerCase()] || c)
-           .join('');
+    //   // 1) Подготовка translit-функции
+    //   const translitMap = {
+    //     а:'a', в:'v', г:'g', д:'d', е:'e', ё:'e', ж:'zh', з:'z',
+    //     и:'i', й:'y', к:'k', л:'l', м:'m', н:'n', о:'o', п:'p',
+    //     р:'r', с:'s', т:'t', у:'u', ф:'f', х:'h', ц:'ts', ч:'ch',
+    //     ш:'sh', щ:'sch', ъ:'', ы:'y', ь:'', э:'e', ю:'yu', я:'ya'
+    //   };
+    //   const translit = str =>
+    //     str.split('')
+    //        .map(c => translitMap[c] || translitMap[c.toLowerCase()] || c)
+    //        .join('');
     
-      const normalizedQuery = query.normalize("NFD").replace(/[̀-ͯ]/g, "");
-      const altQuery        = translit(normalizedQuery);
+    //   const normalizedQuery = query.normalize("NFD").replace(/[̀-ͯ]/g, "");
+    //   const altQuery        = translit(normalizedQuery);
     
-      // 2) Список прокатных номеров
-      const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+    //   // 2) Список прокатных номеров
+    //   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
     
-      // 3) Функция для получения полного списка "Проката"
-      function getProkatList() {
-        // берём ВСЕ машины
-        const list = [...allCars];
-        // дополняем отсутствующие по номерам
-        prokatNumbers.forEach(num => {
-          if (!list.some(c => toLatinNumber(c.number || '') === num)) {
-            const extra = unsortedCars.find(c => toLatinNumber(c.number || '') === num);
-            if (extra) list.push(extra);
-          }
-        });
-        return list;
+    //   // 3) Функция для получения полного списка "Проката"
+    //   function getProkatList() {
+    //     // берём ВСЕ машины
+    //     const list = [...allCars];
+    //     // дополняем отсутствующие по номерам
+    //     prokatNumbers.forEach(num => {
+    //       if (!list.some(c => toLatinNumber(c.number || '') === num)) {
+    //         const extra = unsortedCars.find(c => toLatinNumber(c.number || '') === num);
+    //         if (extra) list.push(extra);
+    //       }
+    //     });
+    //     return list;
+    //   }
+    
+    //   // 4) Начальное разделение по вкладке
+    //   let filtered;
+    //   if (currentMode === 'prokat') {
+    //     filtered = getProkatList();
+    //   } else {
+    //     filtered = allCars.filter(car =>
+    //       !prokatNumbers.includes(toLatinNumber(car.number || ''))
+    //     );
+    //   }
+    
+    //   // 5) Если есть текст в поиске — фильтруем по нему
+    //   if (normalizedQuery) {
+    //     filtered = filtered.filter(car => {
+    //       const name = ((car.brand||'') + ' ' + (car.model||'')).toLowerCase();
+    //       const normName = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
+    //       return normName.includes(normalizedQuery) || normName.includes(altQuery);
+    //     });
+    //   }
+    
+    //   // 6) Обновляем счётчик на всех вкладках
+    //   if (totalEl) {
+    //     totalEl.textContent = `Всего автомобилей: ${filtered.length}`;
+    //     totalEl.style.display = "block";
+    //   }
+    
+    //   // 7) Рендерим отфильтрованные
+    //   renderFiltered(filtered);
+    
+    //   // 8) Показ «Не нашли авто мечты» если нет результатов
+    //   if (filtered.length === 0) {
+    //     feedbackNotice.style.display = "block";
+    //   } else {
+    //     feedbackNotice.style.display = "none";
+    //   }
+    // }
+    
+    
+
+    // ========== searchCars ==========
+function searchCars() {
+  const searchInput = document.getElementById('searchInput');
+  const totalEl     = document.getElementById('totalCount');
+  const query       = (searchInput?.value || '').toLowerCase().trim();
+
+  // Транслит для кириллицы → латиницы
+  const translitMap = {
+    а:'a', в:'v', г:'g', д:'d', е:'e', ё:'e', ж:'zh', з:'z',
+    и:'i', й:'y', к:'k', л:'l', м:'m', н:'n', о:'o', п:'p',
+    р:'r', с:'s', т:'t', у:'u', ф:'f', х:'h', ц:'ts', ч:'ch',
+    ш:'sh', щ:'sch', ъ:'', ы:'y', ь:'', э:'e', ю:'yu', я:'ya'
+  };
+  const translit = str =>
+    str.split('').map(c => translitMap[c] || translitMap[c.toLowerCase()] || c).join('');
+
+  const normalizedQuery = query.normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const altQuery        = translit(normalizedQuery);
+
+  const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+
+  // Функция, возвращающая полный список для «Проката»
+  const getProkatList = () => {
+    const list = [...allCars];
+    prokatNumbers.forEach(num => {
+      if (!list.some(c => toLatinNumber(c.number || '') === num)) {
+        const extra = unsortedCars.find(c => toLatinNumber(c.number || '') === num);
+        if (extra) list.push(extra);
       }
-    
-      // 4) Начальное разделение по вкладке
-      let filtered;
-      if (currentMode === 'prokat') {
-        filtered = getProkatList();
-      } else {
-        filtered = allCars.filter(car =>
-          !prokatNumbers.includes(toLatinNumber(car.number || ''))
-        );
-      }
-    
-      // 5) Если есть текст в поиске — фильтруем по нему
-      if (normalizedQuery) {
-        filtered = filtered.filter(car => {
-          const name = ((car.brand||'') + ' ' + (car.model||'')).toLowerCase();
-          const normName = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
-          return normName.includes(normalizedQuery) || normName.includes(altQuery);
-        });
-      }
-    
-      // 6) Обновляем счётчик на всех вкладках
-      if (totalEl) {
-        totalEl.textContent = `Всего автомобилей: ${filtered.length}`;
-        totalEl.style.display = "block";
-      }
-    
-      // 7) Рендерим отфильтрованные
-      renderFiltered(filtered);
-    
-      // 8) Показ «Не нашли авто мечты» если нет результатов
-      if (filtered.length === 0) {
-        feedbackNotice.style.display = "block";
-      } else {
-        feedbackNotice.style.display = "none";
-      }
-    }
-    
-    
+    });
+    return list;
+  };
+
+  // Начальный фильтр по вкладке
+  let filtered = currentMode === 'prokat'
+    ? getProkatList()
+    : allCars.filter(car => !prokatNumbers.includes(toLatinNumber(car.number || '')));
+
+  // Если есть текст — применяем поиск по бренд+модель
+  if (normalizedQuery) {
+    filtered = filtered.filter(car => {
+      const name = ((car.brand||'') + ' ' + (car.model||'')).toLowerCase();
+      const normName = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
+      return normName.includes(normalizedQuery) || normName.includes(altQuery);
+    });
+  }
+
+  // Обновляем счётчик
+  if (totalEl) {
+    totalEl.textContent = `Всего автомобилей: ${filtered.length}`;
+    totalEl.style.display = "block";
+  }
+
+  // Рендерим найденные
+  renderFiltered(filtered);
+
+  // Показ “Не нашли авто мечты…” если ничего не найдено
+  feedbackNotice.style.display = filtered.length === 0 ? "block" : "none";
+}
+
 
   }
 
