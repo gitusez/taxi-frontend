@@ -100,7 +100,7 @@
 </html> -->
 
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -172,6 +172,7 @@
       });
       const res = await fetch('/api/manual-prices', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
       });
@@ -184,6 +185,139 @@
     loadPrices();
 
     // При закрытии вкладки — сбрасываем Basic Auth
+    window.addEventListener('beforeunload', () => {
+      navigator.sendBeacon('/logout');
+    });
+  </script>
+</body>
+</html> -->
+
+
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Редактирование цен</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+    input { padding: 5px; width: 100px; }
+    td, th { padding: 5px; }
+    .save-btn { margin-top: 10px; padding: 10px 20px; }
+    #spinner { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Ручные цены на авто</h1>
+  <div id="spinner">Загрузка…</div>
+  <table border="1" id="pricesTable">
+    <thead>
+      <tr>
+        <th>Гос. номер</th>
+        <th>Прокат</th>
+        <th>Аренда</th>
+        <th>Выкуп</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button class="save-btn" onclick="savePrices()">💾 Сохранить</button>
+
+  <script>
+    let prices = {}, allCars = [];
+
+    async function loadPrices() {
+      document.getElementById('spinner').style.display = 'block';
+      try {
+        const [pr, cr] = await Promise.all([
+          fetch('/api/manual-prices', { credentials: 'include' }),
+          fetch('/api/cars/combined', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items: 1000, offset: 0 })
+          })
+        ]);
+
+        // если не авторизованы — перебросим на Basic Auth  
+        if (pr.status === 401) {
+          window.location.reload();
+          return;
+        }
+        if (!pr.ok) throw new Error(`Ошибка загрузки цен: ${pr.status}`);
+        if (!cr.ok) throw new Error(`Ошибка загрузки списка авто: ${cr.status}`);
+
+        prices = await pr.json();
+        const carsData = await cr.json();
+        allCars = carsData.cars_list || [];
+
+        renderTable();
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        document.getElementById('spinner').style.display = 'none';
+      }
+    }
+
+    function renderTable() {
+      const tbody = document.querySelector("#pricesTable tbody");
+      tbody.innerHTML = "";
+      const seen = new Set();
+
+      allCars.forEach(car => {
+        const num = (car.number||'').replace(/\s/g,'').toUpperCase();
+        if (!num || seen.has(num)) return;
+        seen.add(num);
+        const m = prices[num] || {};
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${num}</td>
+          <td><input value="${m.prokat||''}" data-number="${num}" data-type="prokat"></td>
+          <td><input value="${m.rent||''}"  data-number="${num}" data-type="rent"></td>
+          <td><input value="${m.buyout||''}" data-number="${num}" data-type="buyout"></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function savePrices() {
+      const updated = {};
+      document.querySelectorAll("input").forEach(i => {
+        const num = i.dataset.number, t = i.dataset.type, v = i.value.trim();
+        if (!updated[num]) updated[num] = {};
+        if (v) updated[num][t] = isNaN(v) ? v : Number(v);
+      });
+
+      try {
+        const res = await fetch('/api/manual-prices', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updated)
+        });
+        if (res.status === 401) {
+          window.location.reload();
+          return;
+        }
+        if (!res.ok) throw new Error(`Сервер вернул ${res.status}`);
+        const rj = await res.json();
+        if (rj.success) {
+          alert("Цены сохранены");
+          await loadPrices();
+        } else {
+          throw new Error(rj.error || 'Неизвестная ошибка');
+        }
+      } catch (err) {
+        alert("Ошибка сохранения: " + err.message);
+      }
+    }
+
+    // При старте
+    loadPrices();
+
+    // При закрытии вкладки — сброс Basic Auth
     window.addEventListener('beforeunload', () => {
       navigator.sendBeacon('/logout');
     });
