@@ -893,75 +893,138 @@ function getCarPrice(car, mode) {
 
       // === Сортировка ===
 
-    function sortCars() {
-      const value = document.getElementById('sortSelect')?.value;
+//     function sortCars() {
+//       const value = document.getElementById('sortSelect')?.value;
 
-      if (!value) {
-        const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+//       if (!value) {
+//         const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
       
-        let restored = [...unsortedCars];
-        if (currentMode === 'prokat') {
-          restored = restored.filter(car =>
-            prokatNumbers.includes(toLatinNumber(car.number || ''))
-          );
-        } else {
-          restored = restored.filter(car =>
-            !prokatNumbers.includes(toLatinNumber(car.number || ''))
-          );
-        }
+//         let restored = [...unsortedCars];
+//         if (currentMode === 'prokat') {
+//           restored = restored.filter(car =>
+//             prokatNumbers.includes(toLatinNumber(car.number || ''))
+//           );
+//         } else {
+//           restored = restored.filter(car =>
+//             !prokatNumbers.includes(toLatinNumber(car.number || ''))
+//           );
+//         }
       
-        allCars = [...restored];
-        originalCars = [...restored];
-        // document.getElementById('sortSelect').selectedIndex = 0;
-        renderFiltered(restored); // ✅ а не renderCars()
-        return;
-      }
+//         allCars = [...restored];
+//         originalCars = [...restored];
+//         // document.getElementById('sortSelect').selectedIndex = 0;
+//         renderFiltered(restored); // ✅ а не renderCars()
+//         return;
+//       }
       
       
     
-      const [field, order] = value.split('_');
+//       const [field, order] = value.split('_');
     
-      // Преобразуем номера для фильтрации "Проката"
-      const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+//       // Преобразуем номера для фильтрации "Проката"
+//       const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
     
-      // Фильтруем нужные машины в зависимости от режима
-      let filtered = [...allCars];
-      if (currentMode === 'prokat') {
-        filtered = filtered.filter(car =>
-          prokatNumbers.includes(toLatinNumber(car.number || ''))
-        );
-      } else {
-        filtered = filtered.filter(car =>
-          !prokatNumbers.includes(toLatinNumber(car.number || ''))
-        );
-      }
+//       // Фильтруем нужные машины в зависимости от режима
+//       let filtered = [...allCars];
+//       if (currentMode === 'prokat') {
+//         filtered = filtered.filter(car =>
+//           prokatNumbers.includes(toLatinNumber(car.number || ''))
+//         );
+//       } else {
+//         filtered = filtered.filter(car =>
+//           !prokatNumbers.includes(toLatinNumber(car.number || ''))
+//         );
+//       }
     
-      // Сортируем отфильтрованные
-      filtered.sort((a, b) => {
-        let aVal, bVal;
+//       // Сортируем отфильтрованные
+//       filtered.sort((a, b) => {
+//         let aVal, bVal;
     
-        if (field === 'price') {
-          aVal = getCarPrice(a, currentMode);
-          bVal = getCarPrice(b, currentMode);
-        } else if (field === 'mileage') {
-          aVal = parseInt(a.odometer || 0, 10);
-          bVal = parseInt(b.odometer || 0, 10);
-        } else {
-          aVal = String(a[field] || '');
-          bVal = String(b[field] || '');
-          return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-        }
+//         if (field === 'price') {
+//           aVal = getCarPrice(a, currentMode);
+//           bVal = getCarPrice(b, currentMode);
+//         } else if (field === 'mileage') {
+//           aVal = parseInt(a.odometer || 0, 10);
+//           bVal = parseInt(b.odometer || 0, 10);
+//         } else {
+//           aVal = String(a[field] || '');
+//           bVal = String(b[field] || '');
+//           return order === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+//         }
     
-        return order === 'asc' ? aVal - bVal : bVal - aVal;
-      });
+//         return order === 'asc' ? aVal - bVal : bVal - aVal;
+//       });
     
-// Обновляем отображение с учётом сортировки
-originalCars = [...filtered]; // 🛠 сохраняем отсортированный порядок
-renderFiltered(filtered);
+// // Обновляем отображение с учётом сортировки
+// originalCars = [...filtered]; // 🛠 сохраняем отсортированный порядок
+// renderFiltered(filtered);
 
+// }
+    
+    
+function sortCars() {
+  const sortValue = document.getElementById('sortSelect')?.value;
+  const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+
+  // Вспомогательная функция для получения полного списка прокатных машин
+  function getProkatList() {
+    const list = [...allCars];
+    prokatNumbers.forEach(num => {
+      if (!list.some(car => toLatinNumber(car.number || '') === num)) {
+        const extra = unsortedCars.find(car => toLatinNumber(car.number || '') === num);
+        if (extra) list.push(extra);
+      }
+    });
+    return list;
+  }
+
+  // 1) Определяем исходный массив перед сортировкой
+  let target = [];
+  if (currentMode === 'prokat') {
+    target = getProkatList();
+  } else {
+    target = allCars.filter(car =>
+      !prokatNumbers.includes(toLatinNumber(car.number || ''))
+    );
+  }
+
+  // 2) Если сортировка не выбрана, просто рендерим исходный порядок
+  if (!sortValue) {
+    allCars = [...target];
+    originalCars = [...target];
+    renderFiltered(target);
+    return;
+  }
+
+  // 3) Распарсим направление и поле сортировки
+  const [field, order] = sortValue.split('_');
+
+  // 4) Выполним сортировку
+  const sorted = [...target].sort((a, b) => {
+    let aVal, bVal;
+
+    if (field === 'price') {
+      aVal = getCarPrice(a, currentMode);
+      bVal = getCarPrice(b, currentMode);
+    } else if (field === 'mileage') {
+      aVal = parseInt(a.odometer || 0, 10);
+      bVal = parseInt(b.odometer || 0, 10);
+    } else {
+      aVal = String(a[field] || '');
+      bVal = String(b[field] || '');
+      return order === 'asc'
+        ? aVal.localeCompare(bVal)
+        : bVal.localeCompare(aVal);
+    }
+
+    return order === 'asc' ? aVal - bVal : bVal - aVal;
+  });
+
+  // 5) Сохраняем и рендерим
+  originalCars = [...sorted];
+  renderFiltered(sorted);
 }
-    
-    
+
     
     
 
