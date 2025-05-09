@@ -251,35 +251,86 @@ return;
     initEventListeners();
     loadCars(config.itemsInitial);
 
-    function initEventListeners() {
-      const searchInput = document.getElementById('searchInput');
-      const sortSelect = document.getElementById('sortSelect');
-      const rentTab = document.getElementById("rentTab");
-      const buyoutTab = document.getElementById("buyoutTab");
-      const prokatTab = document.getElementById("prokatTab");
+//     function initEventListeners() {
+//       const searchInput = document.getElementById('searchInput');
+//       const sortSelect = document.getElementById('sortSelect');
+//       const rentTab = document.getElementById("rentTab");
+//       const buyoutTab = document.getElementById("buyoutTab");
+//       const prokatTab = document.getElementById("prokatTab");
 
-      if (rentTab && buyoutTab && prokatTab) {
-        rentTab.addEventListener("click", () => switchMode("rent"));
-        buyoutTab.addEventListener("click", () => switchMode("buyout"));
-        prokatTab.addEventListener("click", () => switchMode("prokat"));
-      }
+//       if (rentTab && buyoutTab && prokatTab) {
+//         rentTab.addEventListener("click", () => switchMode("rent"));
+//         buyoutTab.addEventListener("click", () => switchMode("buyout"));
+//         prokatTab.addEventListener("click", () => switchMode("prokat"));
+//       }
 
-      if (searchInput) searchInput.addEventListener('input', debounce(searchCars, 300));
-      // if (sortSelect) sortSelect.addEventListener('change', () => {
-      //   sortCars();
-      //   renderCars();
-      // });
-      sortSelect.addEventListener('change', sortCars);
+//       if (searchInput) searchInput.addEventListener('input', debounce(searchCars, 300));
+//       // if (sortSelect) sortSelect.addEventListener('change', () => {
+//       //   sortCars();
+//       //   renderCars();
+//       // });
+//       sortSelect.addEventListener('change', sortCars);
 
 
-      // Клик вне поля поиска убирает фокус
-    document.addEventListener("click", (e) => {
-    const searchInput = document.getElementById("searchInput");
-    if (searchInput && !searchInput.contains(e.target)) {
-    searchInput.blur(); // убираем фокус
-    }
+//       // Клик вне поля поиска убирает фокус
+//     document.addEventListener("click", (e) => {
+//     const searchInput = document.getElementById("searchInput");
+//     if (searchInput && !searchInput.contains(e.target)) {
+//     searchInput.blur(); // убираем фокус
+//     }
+//     });
+// }
+
+function initEventListeners() {
+  const searchInput = document.getElementById('searchInput');
+  const sortSelect = document.getElementById('sortSelect');
+  const rentTab = document.getElementById("rentTab");
+  const buyoutTab = document.getElementById("buyoutTab");
+  const prokatTab = document.getElementById("prokatTab");
+
+  if (rentTab && buyoutTab && prokatTab) {
+    rentTab.addEventListener("click", () => switchMode("rent"));
+    buyoutTab.addEventListener("click", () => switchMode("buyout"));
+    prokatTab.addEventListener("click", () => switchMode("prokat"));
+  }
+
+  if (searchInput) searchInput.addEventListener('input', debounce(searchCars, 300));
+  if (sortSelect) sortSelect.addEventListener('change', sortCars);
+
+  // повторная инициализация кнопки модального окна
+  const openContactBtn = document.getElementById("openContactBtn");
+  if (openContactBtn) {
+    openContactBtn.addEventListener("click", () => {
+      const contactModal = document.getElementById("contactModal");
+      if (contactModal) contactModal.style.display = "flex";
     });
+  }
+
+  // закрытие модального окна
+  const closeContactBtn = document.getElementById("closeContactBtn");
+  if (closeContactBtn) {
+    closeContactBtn.addEventListener("click", () => {
+      const contactModal = document.getElementById("contactModal");
+      if (contactModal) contactModal.style.display = "none";
+    });
+  }
+
+  // закрытие при клике вне окна
+  window.addEventListener("click", (e) => {
+    const contactModal = document.getElementById("contactModal");
+    if (e.target === contactModal) {
+      contactModal.style.display = "none";
     }
+  });
+
+  // убрать фокус с поля поиска
+  document.addEventListener("click", (e) => {
+    if (searchInput && !searchInput.contains(e.target)) {
+      searchInput.blur();
+    }
+  });
+}
+
 
 
   function resetSortAndSearch() {
