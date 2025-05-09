@@ -967,56 +967,131 @@ renderFiltered(filtered);
 
     // === Поиск ===
     
+    // function searchCars() {
+    //   const searchInput = document.getElementById('searchInput');
+    //   const totalEl = document.getElementById('totalCount');
+    //   const query = searchInput?.value.toLowerCase() || '';
+    
+    //   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+    
+    //   const translitMap = {
+    //     а: 'a', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z',
+    //     и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p',
+    //     р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch',
+    //     ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya'
+    //   };
+    
+    //   const translit = str =>
+    //     str.split('').map(c => translitMap[c] || translitMap[c.toLowerCase()] || c).join('');
+    
+    //   const normalizedQuery = query.normalize("NFD").replace(/[̀-ͯ]/g, "");
+    //   const altQuery = translit(normalizedQuery);
+    
+    //   let filtered = [...allCars];
+    
+    //   // 💡 Фильтрация по текущей вкладке
+    //   if (currentMode === 'prokat') {
+    //     filtered = filtered.filter(car =>
+    //       prokatNumbers.includes(toLatinNumber(car.number || ''))
+    //     );
+    //   } else {
+    //     filtered = filtered.filter(car =>
+    //       !prokatNumbers.includes(toLatinNumber(car.number || ''))
+    //     );
+    //   }
+    
+    //   if (!query) {
+    //     if (totalEl) totalEl.style.display = "block";
+    //     renderFiltered(filtered);
+    //     return;
+    //   }
+    
+    //   if (totalEl) totalEl.style.display = "none";
+    
+    //   // 💡 Фильтрация по текстовому запросу
+    //   const searched = filtered.filter(car => {
+    //     const name = ((car.brand || '') + ' ' + (car.model || '')).toLowerCase();
+    //     const normName = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
+    //     return normName.includes(normalizedQuery) || normName.includes(altQuery);
+    //   });
+    
+    //   renderFiltered(searched);
+    // }
+
+
     function searchCars() {
       const searchInput = document.getElementById('searchInput');
-      const totalEl = document.getElementById('totalCount');
-      const query = searchInput?.value.toLowerCase() || '';
+      const totalEl     = document.getElementById('totalCount');
+      const query       = (searchInput?.value || '').toLowerCase().trim();
     
-      const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
-    
+      // 1) Подготовка translit-функции
       const translitMap = {
-        а: 'a', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z',
-        и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p',
-        р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch',
-        ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya'
+        а:'a', в:'v', г:'g', д:'d', е:'e', ё:'e', ж:'zh', з:'z',
+        и:'i', й:'y', к:'k', л:'l', м:'m', н:'n', о:'o', п:'p',
+        р:'r', с:'s', т:'t', у:'u', ф:'f', х:'h', ц:'ts', ч:'ch',
+        ш:'sh', щ:'sch', ъ:'', ы:'y', ь:'', э:'e', ю:'yu', я:'ya'
       };
-    
       const translit = str =>
-        str.split('').map(c => translitMap[c] || translitMap[c.toLowerCase()] || c).join('');
+        str.split('')
+           .map(c => translitMap[c] || translitMap[c.toLowerCase()] || c)
+           .join('');
     
       const normalizedQuery = query.normalize("NFD").replace(/[̀-ͯ]/g, "");
-      const altQuery = translit(normalizedQuery);
+      const altQuery        = translit(normalizedQuery);
     
-      let filtered = [...allCars];
+      // 2) Список прокатных номеров
+      const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
     
-      // 💡 Фильтрация по текущей вкладке
+      // 3) Функция для получения полного списка "Проката"
+      function getProkatList() {
+        // берём ВСЕ машины
+        const list = [...allCars];
+        // дополняем отсутствующие по номерам
+        prokatNumbers.forEach(num => {
+          if (!list.some(c => toLatinNumber(c.number || '') === num)) {
+            const extra = unsortedCars.find(c => toLatinNumber(c.number || '') === num);
+            if (extra) list.push(extra);
+          }
+        });
+        return list;
+      }
+    
+      // 4) Начальное разделение по вкладке
+      let filtered;
       if (currentMode === 'prokat') {
-        filtered = filtered.filter(car =>
-          prokatNumbers.includes(toLatinNumber(car.number || ''))
-        );
+        filtered = getProkatList();
       } else {
-        filtered = filtered.filter(car =>
+        filtered = allCars.filter(car =>
           !prokatNumbers.includes(toLatinNumber(car.number || ''))
         );
       }
     
-      if (!query) {
-        if (totalEl) totalEl.style.display = "block";
-        renderFiltered(filtered);
-        return;
+      // 5) Если есть текст в поиске — фильтруем по нему
+      if (normalizedQuery) {
+        filtered = filtered.filter(car => {
+          const name = ((car.brand||'') + ' ' + (car.model||'')).toLowerCase();
+          const normName = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
+          return normName.includes(normalizedQuery) || normName.includes(altQuery);
+        });
       }
     
-      if (totalEl) totalEl.style.display = "none";
+      // 6) Обновляем счётчик на всех вкладках
+      if (totalEl) {
+        totalEl.textContent = `Всего автомобилей: ${filtered.length}`;
+        totalEl.style.display = "block";
+      }
     
-      // 💡 Фильтрация по текстовому запросу
-      const searched = filtered.filter(car => {
-        const name = ((car.brand || '') + ' ' + (car.model || '')).toLowerCase();
-        const normName = name.normalize("NFD").replace(/[̀-ͯ]/g, "");
-        return normName.includes(normalizedQuery) || normName.includes(altQuery);
-      });
+      // 7) Рендерим отфильтрованные
+      renderFiltered(filtered);
     
-      renderFiltered(searched);
+      // 8) Показ «Не нашли авто мечты» если нет результатов
+      if (filtered.length === 0) {
+        feedbackNotice.style.display = "block";
+      } else {
+        feedbackNotice.style.display = "none";
+      }
     }
+    
     
 
   }
