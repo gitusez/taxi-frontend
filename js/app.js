@@ -12,6 +12,11 @@ function toLatinNumber(plate) {
   return plate.replace(/\s/g, '').split('').map(c => map[c] || c).join('');
 }
 
+function hasSupplementary(car) {
+  const eq = car.equipment || "";
+  return /Установлено доп/i.test(eq);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
 });
@@ -251,36 +256,6 @@ return;
     initEventListeners();
     loadCars(config.itemsInitial);
 
-//     function initEventListeners() {
-//       const searchInput = document.getElementById('searchInput');
-//       const sortSelect = document.getElementById('sortSelect');
-//       const rentTab = document.getElementById("rentTab");
-//       const buyoutTab = document.getElementById("buyoutTab");
-//       const prokatTab = document.getElementById("prokatTab");
-
-//       if (rentTab && buyoutTab && prokatTab) {
-//         rentTab.addEventListener("click", () => switchMode("rent"));
-//         buyoutTab.addEventListener("click", () => switchMode("buyout"));
-//         prokatTab.addEventListener("click", () => switchMode("prokat"));
-//       }
-
-//       if (searchInput) searchInput.addEventListener('input', debounce(searchCars, 300));
-//       // if (sortSelect) sortSelect.addEventListener('change', () => {
-//       //   sortCars();
-//       //   renderCars();
-//       // });
-//       sortSelect.addEventListener('change', sortCars);
-
-
-//       // Клик вне поля поиска убирает фокус
-//     document.addEventListener("click", (e) => {
-//     const searchInput = document.getElementById("searchInput");
-//     if (searchInput && !searchInput.contains(e.target)) {
-//     searchInput.blur(); // убираем фокус
-//     }
-//     });
-// }
-
 function initEventListeners() {
   const searchInput = document.getElementById('searchInput');
   const sortSelect = document.getElementById('sortSelect');
@@ -373,85 +348,6 @@ function initEventListeners() {
   
     // // // === Загрузка данных с сервера ===
 
-    // async function loadCars(itemsCount, isRefresh = false) {
-    //   if (currentMode === 'prokat') {
-    //     renderCars(); // только рендерим (из кэша)
-    //     loader.style.display = "none";
-    //     return;
-    //   }
-    
-    //   try {
-    //     if (feedbackNotice) feedbackNotice.style.display = "none";
-    //     errorBox.style.display = "none";
-    //     loadMoreBtn.style.display = "none";
-    //     loader.style.display = "block";
-    
-    //     if (isRefresh) clearCache();
-    
-    //     const response = await fetch(config.apiUrl, {
-    //       method: "POST",
-    //       headers: { "Content-Type": "application/json" },
-    //       body: JSON.stringify({ items: itemsCount, offset: isRefresh ? 0 : offset })
-    //     });
-    
-    //     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    //     const result = await response.json();
-    //     if (!result.success) throw new Error(result.error || "Ошибка сервера");
-    
-    //     const newCars = Array.isArray(result.cars_list)
-    //       ? result.cars_list
-    //       : Object.values(result.cars_list || {});
-    //     const total = result.total || 0;
-    //     localStorage.setItem('carsTotal', total);
-    
-    //     const newIds = new Set(newCars.map(car => car.id));
-    //     allCars = isRefresh
-    //       ? [...newCars]
-    //       : [...allCars.filter(car => !newIds.has(car.id)), ...newCars];
-    
-    //     // ✅ Устанавливаем unsortedCars при любом первом получении
-    //     if (unsortedCars.length === 0) {
-    //       unsortedCars = [...newCars];
-    //     }
-    
-    //     if (isRefresh) {
-    //       originalCars = [...newCars];
-    //       offset = newCars.length;
-    //     } else {
-    //       const existingIds = new Set(originalCars.map(car => car.id));
-    //       const uniqueNew = newCars.filter(car => !existingIds.has(car.id));
-    //       originalCars.push(...uniqueNew);
-    //       offset += itemsCount;
-    //     }
-    
-    //     saveCache(allCars);
-    //     renderCars();
-    
-    //     if (total <= 100 || offset >= total) {
-    //       allLoaded = true;
-    //       loadMoreBtn.style.display = "none";
-    //       loadMoreBtn.disabled = true;
-    
-    //       setTimeout(() => {
-    //         feedbackNotice.style.display = (total <= 100 && currentMode !== 'prokat') ? "block" : "none";
-    //       }, 300);
-    //     } else {
-    //       allLoaded = false;
-    //       loadMoreBtn.style.display = "block";
-    //       loadMoreBtn.disabled = false;
-    //       feedbackNotice.style.display = "none";
-    //     }
-    
-    //   } catch (error) {
-    //     showError(error.message);
-    //   } finally {
-    //     loader.style.display = "none";
-    //     firstLoad = false;
-    //   }
-    // }
-
-
-
     async function loadCars(itemsCount, isRefresh = false) {
       if (currentMode === 'prokat') {
         renderCars();
@@ -530,62 +426,6 @@ function initEventListeners() {
     
 
 // ========== renderCars ==========
-// async function renderCars() {
-//   if (!grid) return;
-
-//   const totalEl = document.getElementById("totalCount");
-//   const fragment = document.createDocumentFragment();
-
-//   // 1) Список прокатных номеров
-//   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
-
-//   // 2) Формируем базовый массив filteredCars
-//   let filteredCars;
-//   if (currentMode === 'prokat') {
-//     // — все + подмешиваем отсутствующие по config
-//     filteredCars = [...allCars];
-//     prokatNumbers.forEach(num => {
-//       if (!filteredCars.some(c => toLatinNumber(c.number || '') === num)) {
-//         const extra = unsortedCars.find(c => toLatinNumber(c.number || '') === num);
-//         if (extra) filteredCars.push(extra);
-//       }
-//     });
-//     // — приоритет прокатных номеров вверх
-//     filteredCars.sort((a, b) => {
-//       const na = toLatinNumber(a.number || ''), nb = toLatinNumber(b.number || '');
-//       const ia = prokatNumbers.indexOf(na), ib = prokatNumbers.indexOf(nb);
-//       if (ia !== -1 || ib !== -1) {
-//         if (ia === -1) return 1;
-//         if (ib === -1) return -1;
-//         return ia - ib;
-//       }
-//       return 0;
-//     });
-//   } else {
-//     // rent/buyout — исключаем прокатные
-//     filteredCars = allCars.filter(car =>
-//       !prokatNumbers.includes(toLatinNumber(car.number || ''))
-//     );
-//   }
-
-//   // 3) Счётчик
-//   if (totalEl) {
-//     totalEl.textContent = `Всего автомобилей: ${filteredCars.length}`;
-//     totalEl.style.display = "block";
-//   }
-
-//   // 4) Рендер карточек
-//   const cards = await Promise.all(filteredCars.map(createCarCard));
-//   grid.innerHTML = "";
-//   cards.forEach(c => fragment.appendChild(c));
-//   grid.appendChild(fragment);
-
-//   // 5) Кнопка «Загрузить ещё» — пока allLoaded === false
-//   loadMoreBtn.style.display = allLoaded ? "none" : "block";
-
-//   // 6) Модалка «Не нашли авто мечты…» — на всех вкладках, если результатов нет
-//   feedbackNotice.style.display = filteredCars.length === 0 ? "block" : "none";
-// }
 
 async function renderCars() {
   if (!grid) return;
@@ -626,6 +466,13 @@ async function renderCars() {
       !prokatNumbers.includes(toLatinNumber(car.number || ''))
     );
   }
+
+  // Исключаем «Установлено доп» из всех табов, кроме buyout
+  filteredCars = filteredCars.filter(car => {
+    return hasSupplementary(car)
+      ? currentMode === 'buyout'
+      : true;
+  });
 
   // 2. Обновляем счётчик
   if (totalEl) {
@@ -872,6 +719,13 @@ function searchCars() {
     });
   }
 
+  // 2.1) и здесь тоже отбрасываем «Установлено доп» вне buyout
+  filtered = filtered.filter(car => {
+    return hasSupplementary(car)
+      ? currentMode === 'buyout'
+      : true;
+  });
+
   // 3) обновляем счётчик
   if (totalEl) {
     totalEl.textContent = `Всего автомобилей: ${filtered.length}`;
@@ -892,13 +746,13 @@ if (filtered.length === 0) {
 }
 
 
-  // 8. Показ «Не нашли авто мечты» если нет результатов
-if (filtered.length === 0) {
-  feedbackNotice.style.display = "block";
-} else {
-  // 🧠 Показываем только если список полностью загружен
-  feedbackNotice.style.display = allLoaded ? "block" : "none";
-}
+//   // 8. Показ «Не нашли авто мечты» если нет результатов
+// if (filtered.length === 0) {
+//   feedbackNotice.style.display = "block";
+// } else {
+//   // 🧠 Показываем только если список полностью загружен
+//   feedbackNotice.style.display = allLoaded ? "block" : "none";
+// }
 
 }
 
