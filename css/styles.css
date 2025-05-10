@@ -1196,3 +1196,25 @@ body.lightbox-open {
 }
 
 
+/* Блок цены в деталях */
+.detail-price {
+  background-color: #1e1e1e;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 16px;               /* отступы со всех сторон */
+}
+
+.detail-price h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #ffffff;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.detail-price .price-value {
+  color: #FFC800;             /* ваш фирменный жёлтый */
+  font-weight: 600;
+}
+
+
