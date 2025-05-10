@@ -1201,7 +1201,7 @@ body.lightbox-open {
   background-color: #1e1e1e;
   padding: 16px;
   border-radius: 8px;
-  margin: 16px;               /* отступы со всех сторон */
+  margin: 0%;               /* отступы со всех сторон */
 }
 
 .detail-price h3 {
