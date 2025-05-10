@@ -502,6 +502,13 @@ async function renderCars() {
 
     async function renderFiltered(filteredCars) {
       if (!grid) return;
+
+        //  ─────── ДОБАВИЛИ ФИЛЬТРАЦИЮ ───────
+  filteredCars = filteredCars.filter(car =>
+    hasSupplementary(car)
+      ? currentMode === 'buyout'     // если «Установлено доп» — только в buyout
+      : true                         // иначе — всегда
+  );
     
       const fragment = document.createDocumentFragment();
       const cardPromises = filteredCars.map(car => createCarCard(car));
