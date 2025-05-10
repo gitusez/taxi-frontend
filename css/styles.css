@@ -1208,7 +1208,7 @@ body.lightbox-open {
   margin: 0;
   font-size: 1rem;
   color: #ffffff;
-  font-weight: 500;
+  /* font-weight: 500; */
   line-height: 1.2;
 }
 
