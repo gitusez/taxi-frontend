@@ -574,7 +574,8 @@ async function createCarCard(car) {
     localStorage.setItem('savedMode', currentMode);
     const sortValue = document.getElementById('sortSelect')?.value || '';
     localStorage.setItem('savedSort', sortValue);
-    window.location.href = `car-details.html?car=${car.id}`;
+    // window.location.href = `car-details.html?car=${car.id}`;
+    window.location.href = `car-details.html?car=${car.id}&mode=${currentMode}`;
   };
 
   return card;

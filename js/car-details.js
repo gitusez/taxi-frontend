@@ -13,9 +13,18 @@ function toLatinNumber(plate) {
   return plate.replace(/\s/g, '').split('').map(c => map[c] || c).join('');
 }
 
+function getCarPrice(car, mode) {
+  if (car.manual_price && car.manual_price[mode]) {
+    return car.manual_price[mode];
+  }
+  return "Цена не указана";
+}
+
+
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const carId = params.get('car');
+  const mode  = params.get('mode') || 'rent';
 
   if (!carId || isNaN(carId)) {
     showError("Некорректный ID автомобиля");
@@ -24,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   try {
     const car = await loadCarDetails(carId);
-    renderCarDetails(car);
+    renderCarDetails(car, mode);
   } catch (error) {
     showError(`Ошибка загрузки: ${error.message}`);
   }
@@ -61,7 +70,27 @@ async function loadCarDetails(carId) {
   return car;
 }
 
-function renderCarDetails(car) {
+function renderCarDetails(car, mode) {
+
+  // // 1) получаем текущий таб (rent/buyout/prokat)
+  // const mode = localStorage.getItem('savedMode') || 'rent';
+
+  // // 2) переиспользуем getCarPrice из app.js/car-details.js
+  // const priceStr = getCarPrice(car, mode);
+
+  // // 3) вставляем в DOM
+  // const priceEl = document.querySelector('.price-value');
+  // if (priceEl) {
+  //   priceEl.textContent = priceStr;
+  // }
+
+    // 1) получаем цену
+    const priceStr = getCarPrice(car, mode);
+
+    // 2) вставляем в DOM
+    const priceEl = document.querySelector('.price-value');
+    if (priceEl) priceEl.textContent = priceStr;
+
   let transmission = car.transmission;
   if (typeof transmission === 'string') {
     const type = transmission.toLowerCase();
