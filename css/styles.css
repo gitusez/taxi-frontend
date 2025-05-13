@@ -1197,30 +1197,6 @@ body.lightbox-open {
   color: var(--text-color);
 }
 
-
-/* Блок цены в деталях */
-/* font-weight: 500; */
-/* .detail-price {
-  background-color: #1e1e1e;
-  padding: 16px;
-  border-radius: 8px;
-  margin: 0%;
-}
-
-.detail-price h3 {
-  margin: 0;
-  font-size: 1rem;
-  color: #ffffff;
-  
-  line-height: 1.2;
-}
-
-.detail-price .price-value {
-  color: #FFC800;
-  font-weight: 600;
-} */
-
-
 /* Блок цены в деталях */
 .detail-price {
   background: var(--card-bg);

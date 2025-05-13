@@ -765,9 +765,6 @@ function searchCars() {
   renderFiltered(filtered);
 
   // 5) модалка «Не нашли авто мечты…»
-  // feedbackNotice.style.display = filtered.length === 0 ? "block" : "none";
-
-  // 5) модалка «Не нашли авто мечты…»
 if (filtered.length === 0) {
   feedbackNotice.style.display = "block";
 } else {
@@ -775,19 +772,9 @@ if (filtered.length === 0) {
 }
 
 
-//   // 8. Показ «Не нашли авто мечты» если нет результатов
-// if (filtered.length === 0) {
-//   feedbackNotice.style.display = "block";
-// } else {
-//   // 🧠 Показываем только если список полностью загружен
-//   feedbackNotice.style.display = allLoaded ? "block" : "none";
-// }
-
 }
 
-
   }
-
   // === Модалка "Оставить заявку" ===
   const contactModal = document.getElementById("contactModal");
   const openContactBtn = document.getElementById("openContactBtn");

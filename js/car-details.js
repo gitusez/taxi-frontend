@@ -74,18 +74,6 @@ function renderCarDetails(car, mode) {
 
   console.log('raw equipment:', JSON.stringify(car.equipment));
 
-  // // 1) получаем текущий таб (rent/buyout/prokat)
-  // const mode = localStorage.getItem('savedMode') || 'rent';
-
-  // // 2) переиспользуем getCarPrice из app.js/car-details.js
-  // const priceStr = getCarPrice(car, mode);
-
-  // // 3) вставляем в DOM
-  // const priceEl = document.querySelector('.price-value');
-  // if (priceEl) {
-  //   priceEl.textContent = priceStr;
-  // }
-
     // 1) получаем цену
     const priceStr = getCarPrice(car, mode);
 
@@ -114,17 +102,6 @@ function renderCarDetails(car, mode) {
   let features = [];
   let description = "";
 
-  // if (typeof car.equipment === 'string') {
-  //   const lines = car.equipment.split('\n').map(line => line.trim()).filter(Boolean);
-  //   const descStart = lines.findIndex(line => line.toLowerCase().startsWith('описание'));
-  //   if (descStart !== -1) {
-  //     features = lines.slice(0, descStart);
-  //     description = lines.slice(descStart + 1).join('\n');
-  //   } else {
-  //     features = lines;
-  //   }
-  // }
-
   if (typeof car.equipment === 'string') {
     // разбиваем по '\n', сохраняем пустые строки для абзацев
     const lines = car.equipment.split('\n').map(line => line.trim());
@@ -151,24 +128,6 @@ function renderCarDetails(car, mode) {
   if (equipEl) {
     equipEl.innerHTML = features.map(item => `<div class="feature-line">${item}</div>`).join('');
   }
-
-  // const descEl = document.querySelector(".detail-description");
-  // if (descEl) {
-  //   descEl.textContent = description || "Описание отсутствует";
-  // }
-
-  // const descEl = document.querySelector(".detail-description");
-  // if (descEl) {
-  //   if (!description) {
-  //     descEl.textContent = "Описание отсутствует";
-  //   } else {
-  //     // разбиваем по любым переносам и вставляем <br>, а для пустых строк — двойной <br>
-  //     const parts = description.split(/[\r\n\u2028\u2029]/);
-  //     descEl.innerHTML = parts
-  //       .map(line => line === "" ? "<br>" : line)
-  //       .join("<br>");
-  //   }
-  // }
 
   const descEl = document.querySelector(".detail-description");
   if (descEl) {
