@@ -141,17 +141,18 @@ function renderCarDetails(car, mode) {
   // }
 
   const descEl = document.querySelector(".detail-description");
-if (descEl) {
-  if (!description) {
-    descEl.textContent = "Описание отсутствует";
-  } else {
-    // каждую строку меняем на <br>
-    descEl.innerHTML = description
-      .split("\n")
-      .map(line => line.trim())
-      .join("<br>");
+  if (descEl) {
+    if (!description) {
+      descEl.textContent = "Описание отсутствует";
+    } else {
+      // разбиваем по любым переносам, сохраняем пустые строки
+      const parts = description.split(/[\r\n\u2028\u2029]/);
+      descEl.innerHTML = parts
+        .map(line => line === "" ? "" : line)  // пустые остаются пустыми
+        .join("<br>");
+    }
   }
-}
+  
 
 
 (async () => {
