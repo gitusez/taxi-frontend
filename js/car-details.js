@@ -72,6 +72,8 @@ async function loadCarDetails(carId) {
 
 function renderCarDetails(car, mode) {
 
+  console.log('raw equipment:', JSON.stringify(car.equipment));
+
   // // 1) получаем текущий таб (rent/buyout/prokat)
   // const mode = localStorage.getItem('savedMode') || 'rent';
 
@@ -221,7 +223,6 @@ if (descEl) {
     console.error("Ошибка загрузки фото:", err);
   }
 })();
-
 
 }
 
