@@ -133,10 +133,24 @@ function renderCarDetails(car, mode) {
     equipEl.innerHTML = features.map(item => `<div class="feature-line">${item}</div>`).join('');
   }
 
+  // const descEl = document.querySelector(".detail-description");
+  // if (descEl) {
+  //   descEl.textContent = description || "Описание отсутствует";
+  // }
+
   const descEl = document.querySelector(".detail-description");
-  if (descEl) {
-    descEl.textContent = description || "Описание отсутствует";
+if (descEl) {
+  if (!description) {
+    descEl.textContent = "Описание отсутствует";
+  } else {
+    // каждую строку меняем на <br>
+    descEl.innerHTML = description
+      .split("\n")
+      .map(line => line.trim())
+      .join("<br>");
   }
+}
+
 
 (async () => {
   const swiperWrapper = document.querySelector('.photo-box .swiper-wrapper');

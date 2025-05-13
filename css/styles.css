@@ -1087,6 +1087,8 @@ body.lightbox-open {
 }
 
 .detail-description {
+  white-space: pre-wrap;
+  word-wrap: break-word;
   font-size: 16px;
   line-height: 1.5;
   margin-top: 10px;
