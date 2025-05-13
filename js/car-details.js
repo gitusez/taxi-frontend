@@ -157,18 +157,28 @@ function renderCarDetails(car, mode) {
   //   descEl.textContent = description || "Описание отсутствует";
   // }
 
+  // const descEl = document.querySelector(".detail-description");
+  // if (descEl) {
+  //   if (!description) {
+  //     descEl.textContent = "Описание отсутствует";
+  //   } else {
+  //     // разбиваем по любым переносам и вставляем <br>, а для пустых строк — двойной <br>
+  //     const parts = description.split(/[\r\n\u2028\u2029]/);
+  //     descEl.innerHTML = parts
+  //       .map(line => line === "" ? "<br>" : line)
+  //       .join("<br>");
+  //   }
+  // }
+
   const descEl = document.querySelector(".detail-description");
   if (descEl) {
     if (!description) {
       descEl.textContent = "Описание отсутствует";
     } else {
-      // разбиваем по любым переносам и вставляем <br>, а для пустых строк — двойной <br>
-      const parts = description.split(/[\r\n\u2028\u2029]/);
-      descEl.innerHTML = parts
-        .map(line => line === "" ? "<br>" : line)
-        .join("<br>");
+      // каждую одиночную перевод строки заменяем на один <br>
+      descEl.innerHTML = description.replace(/\r\n|\r|\n/g, "<br>");
     }
-  }
+}
   
   
   
