@@ -801,7 +801,7 @@ body.lightbox-open {
 .modal-content input {
   width: 100%;
   padding: 12px;
-  margin: 10px 0;
+  margin: 10px 0 5px;
   border: 1px solid #ccc;
   border-radius: var(--border-radius);
   font-size: 15px;
@@ -1232,4 +1232,5 @@ body.lightbox-open {
   color: #aaa;             /* нежный серый (любой подходящий вам) */
   line-height: 1;          /* чтобы не давило сверху/снизу */
   margin: 0;               /* сбрасываем отступы браузера */
+  margin-bottom: 27px;
 }
