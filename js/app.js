@@ -593,6 +593,21 @@ function getCarPrice(car, mode) {
   return "Цена не указана";
 }
 
+function getNumericPrice(car, mode) {
+  const priceRaw = getCarPrice(car, mode);
+  // если цена не указана или не может быть приведена – возвращаем 0
+  if (!priceRaw || typeof priceRaw === 'string' && !/\d/.test(priceRaw)) {
+    return 0;
+  }
+  // если уже число — возвращаем как есть
+  if (typeof priceRaw === 'number') {
+    return priceRaw;
+  }
+  // из строки убираем всё, кроме цифр
+  return parseInt(priceRaw.replace(/[^\d]/g, ''), 10) || 0;
+}
+
+
   // === Сортировка ===
 
 function sortCars() {
@@ -657,8 +672,12 @@ function sortCars() {
     let aVal, bVal;
 
     if (field === 'price') {
-      aVal = getCarPrice(a, currentMode);
-      bVal = getCarPrice(b, currentMode);
+      aVal = getNumericPrice(a, currentMode);
+      bVal = getNumericPrice(b, currentMode);
+      // «Цена не указана» — всегда в конец
+      if (aVal === 0 && bVal !== 0) return order === 'asc' ? 1 : -1;
+      if (bVal === 0 && aVal !== 0) return order === 'asc' ? -1 : 1;
+      return order === 'asc' ? aVal - bVal : bVal - aVal;
     } else if (field === 'mileage') {
       aVal = parseInt(a.odometer || 0, 10);
       bVal = parseInt(b.odometer || 0, 10);
@@ -672,7 +691,9 @@ function sortCars() {
     return order === 'asc' ? aVal - bVal : bVal - aVal;
   });
 
-  originalCars = [...sorted];
+  // originalCars = [...sorted];
+  // renderFiltered(sorted);
+  allCars = originalCars = sorted;
   renderFiltered(sorted);
 }
 
