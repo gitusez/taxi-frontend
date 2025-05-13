@@ -114,16 +114,33 @@ function renderCarDetails(car, mode) {
   let features = [];
   let description = "";
 
+  // if (typeof car.equipment === 'string') {
+  //   const lines = car.equipment.split('\n').map(line => line.trim()).filter(Boolean);
+  //   const descStart = lines.findIndex(line => line.toLowerCase().startsWith('описание'));
+  //   if (descStart !== -1) {
+  //     features = lines.slice(0, descStart);
+  //     description = lines.slice(descStart + 1).join('\n');
+  //   } else {
+  //     features = lines;
+  //   }
+  // }
+
   if (typeof car.equipment === 'string') {
-    const lines = car.equipment.split('\n').map(line => line.trim()).filter(Boolean);
-    const descStart = lines.findIndex(line => line.toLowerCase().startsWith('описание'));
+    // разбиваем по '\n', сохраняем пустые строки для абзацев
+    const lines = car.equipment.split('\n').map(line => line.trim());
+    const descStart = lines.findIndex(line =>
+      line.toLowerCase().startsWith('описание')
+    );
+
     if (descStart !== -1) {
       features = lines.slice(0, descStart);
+      // сохраняем все переносы, включая пустые строки
       description = lines.slice(descStart + 1).join('\n');
     } else {
       features = lines;
     }
   }
+
 
   Object.entries(fields).forEach(([key, value]) => {
     const el = document.querySelector(`.detail-${key}`);
@@ -145,13 +162,15 @@ function renderCarDetails(car, mode) {
     if (!description) {
       descEl.textContent = "Описание отсутствует";
     } else {
-      // разбиваем по любым переносам, сохраняем пустые строки
+      // разбиваем по любым переносам и вставляем <br>, а для пустых строк — двойной <br>
       const parts = description.split(/[\r\n\u2028\u2029]/);
       descEl.innerHTML = parts
-        .map(line => line === "" ? "" : line)  // пустые остаются пустыми
+        .map(line => line === "" ? "<br>" : line)
         .join("<br>");
     }
   }
+  
+  
   
 
 
