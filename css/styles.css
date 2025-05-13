@@ -1197,23 +1197,46 @@ body.lightbox-open {
 
 
 /* Блок цены в деталях */
-.detail-price {
+/* font-weight: 500; */
+/* .detail-price {
   background-color: #1e1e1e;
   padding: 16px;
   border-radius: 8px;
-  margin: 0%;               /* отступы со всех сторон */
+  margin: 0%;
 }
 
 .detail-price h3 {
   margin: 0;
   font-size: 1rem;
   color: #ffffff;
-  /* font-weight: 500; */
+  
   line-height: 1.2;
 }
 
 .detail-price .price-value {
-  color: #FFC800;             /* ваш фирменный жёлтый */
+  color: #FFC800;
+  font-weight: 600;
+} */
+
+
+/* Блок цены в деталях */
+.detail-price {
+  background: var(--card-bg);
+  padding: 16px;
+  border-radius: var(--border-radius);
+  margin: 0%;
+  transition: background var(--transition-speed), color var(--transition-speed);
+}
+
+.detail-price h3 {
+  margin: 0;
+  font-size: var(--price-size);
+  color: var(--text-color);
+  line-height: 1.2;
+}
+
+.detail-price .price-value {
+  color: var(--yellow);
   font-weight: 600;
 }
 
