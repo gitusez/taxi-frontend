@@ -99,24 +99,37 @@ function renderCarDetails(car, mode) {
     transmission: transmission
   };
 
-  let features = [];
-  let description = "";
+  // let features = [];
+  // let description = "";
 
-  if (typeof car.equipment === 'string') {
-    // разбиваем по '\n', сохраняем пустые строки для абзацев
-    const lines = car.equipment.split('\n').map(line => line.trim());
-    const descStart = lines.findIndex(line =>
-      line.toLowerCase().startsWith('описание')
-    );
+  // if (typeof car.equipment === 'string') {
+  //   // разбиваем по '\n', сохраняем пустые строки для абзацев
+  //   const lines = car.equipment.split('\n').map(line => line.trim());
+  //   const descStart = lines.findIndex(line =>
+  //     line.toLowerCase().startsWith('описание')
+  //   );
 
-    if (descStart !== -1) {
-      features = lines.slice(0, descStart);
-      // сохраняем все переносы, включая пустые строки
-      description = lines.slice(descStart + 1).join('\n');
-    } else {
-      features = lines;
-    }
-  }
+  //   if (descStart !== -1) {
+  //     features = lines.slice(0, descStart);
+  //     // сохраняем все переносы, включая пустые строки
+  //     description = lines.slice(descStart + 1).join('\n');
+  //   } else {
+  //     features = lines;
+  //   }
+  // }
+
+  // 👇 equipment оставим как есть
+let features = [];
+
+if (typeof car.equipment === 'string') {
+  features = car.equipment.split('\n').map(line => line.trim());
+}
+
+// 👇 а description возьмём напрямую из car.description
+const description = typeof car.description === 'string'
+  ? car.description.trim()
+  : "";
+
 
 
   Object.entries(fields).forEach(([key, value]) => {
