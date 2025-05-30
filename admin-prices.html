@@ -23,6 +23,8 @@
         <th>Прокат</th>
         <th>Аренда</th>
         <th>Выкуп</th>
+        <th>Комплектация</th>
+        <th>Описание</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -80,42 +82,97 @@
           <td><input value="${m.prokat||''}" data-number="${num}" data-type="prokat"></td>
           <td><input value="${m.rent||''}"  data-number="${num}" data-type="rent"></td>
           <td><input value="${m.buyout||''}" data-number="${num}" data-type="buyout"></td>
+          <td><textarea   data-number="${num}" data-type="equipment" placeholder="комплектация">${m.equipment||''}</textarea></td>
+          <td><textarea   data-number="${num}" data-type="description" placeholder="описание">${m.description||''}</textarea></td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    async function savePrices() {
-      const updated = {};
-      document.querySelectorAll("input").forEach(i => {
-        const num = i.dataset.number, t = i.dataset.type, v = i.value.trim();
-        if (!updated[num]) updated[num] = {};
-        if (v) updated[num][t] = isNaN(v) ? v : Number(v);
-      });
+    // async function savePrices() {
+    //   const updated = {};
+    //   document.querySelectorAll("input").forEach(i => {
+    //     const num = i.dataset.number, t = i.dataset.type, v = i.value.trim();
+    //     if (!updated[num]) updated[num] = {};
+    //     if (v) updated[num][t] = isNaN(v) ? v : Number(v);
+    //   });
 
-      try {
-        const res = await fetch('/api/manual-prices', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updated)
-        });
-        if (res.status === 401) {
-          window.location.reload();
-          return;
-        }
-        if (!res.ok) throw new Error(`Сервер вернул ${res.status}`);
-        const rj = await res.json();
-        if (rj.success) {
-          alert("Цены сохранены");
-          await loadPrices();
-        } else {
-          throw new Error(rj.error || 'Неизвестная ошибка');
-        }
-      } catch (err) {
-        alert("Ошибка сохранения: " + err.message);
-      }
+    //   try {
+    //     const res = await fetch('/api/manual-prices', {
+    //       method: 'POST',
+    //       credentials: 'include',
+    //       headers: { 'Content-Type': 'application/json' },
+    //       body: JSON.stringify(updated)
+    //     });
+    //     if (res.status === 401) {
+    //       window.location.reload();
+    //       return;
+    //     }
+    //     if (!res.ok) throw new Error(`Сервер вернул ${res.status}`);
+    //     const rj = await res.json();
+    //     if (rj.success) {
+    //       alert("Цены сохранены");
+    //       await loadPrices();
+    //     } else {
+    //       throw new Error(rj.error || 'Неизвестная ошибка');
+    //     }
+    //   } catch (err) {
+    //     alert("Ошибка сохранения: " + err.message);
+    //   }
+    // }
+
+  async function savePrices() {
+  const updated = {};
+
+  // Сохраняем все поля <input> (цены)
+  document.querySelectorAll("input[data-number][data-type]").forEach(i => {
+    const num   = i.dataset.number;
+    const type  = i.dataset.type;
+    const value = i.value.trim();
+    if (!updated[num]) updated[num] = {};
+    if (value) {
+      updated[num][type] = isNaN(value) ? value : Number(value);
     }
+  });
+
+  // Сохраняем все <textarea> (комплектация и описание)
+  document.querySelectorAll("textarea[data-number][data-type]").forEach(t => {
+    const num   = t.dataset.number;
+    const type  = t.dataset.type;
+    const value = t.value.trim();
+    if (!updated[num]) updated[num] = {};
+    // Записываем даже пустую строку, чтобы можно было очищать поля
+    updated[num][type] = value;
+  });
+
+  try {
+    const res = await fetch('/api/manual-prices', {
+      method:      'POST',
+      credentials: 'include',
+      headers:     { 'Content-Type': 'application/json' },
+      body:        JSON.stringify(updated)
+    });
+
+    if (res.status === 401) {
+      window.location.reload();
+      return;
+    }
+    if (!res.ok) {
+      throw new Error(`Сервер вернул ${res.status}`);
+    }
+
+    const rj = await res.json();
+    if (rj.success) {
+      alert("Данные успешно сохранены");
+      await loadPrices();
+    } else {
+      throw new Error(rj.error || 'Неизвестная ошибка');
+    }
+  } catch (err) {
+    alert("Ошибка сохранения: " + err.message);
+  }
+}
+
 
     // При старте
     loadPrices();
