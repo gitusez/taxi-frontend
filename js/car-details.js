@@ -162,20 +162,36 @@ const description = typeof car.description === 'string'
   const carNumber = toLatinNumber(rawNumber.toUpperCase());
 
   try {
+    // const res = await fetch(`/api/photos/${carNumber}`);
+    // const result = await res.json();
+
+    // let validImages = [];
+
+    // if (result.success && Array.isArray(result.photos)) {
+    //   validImages = result.photos.slice().sort((a, b) => {
+    //     const getNum = s => {
+    //       const match = s.match(/_(\d+)\./);
+    //       return match ? parseInt(match[1], 10) : 0;
+    //     };
+    //     return getNum(a) - getNum(b);
+    //   });
+    // }
+
     const res = await fetch(`/api/photos/${carNumber}`);
-    const result = await res.json();
+const photos = await res.json();
 
-    let validImages = [];
+let validImages = [];
 
-    if (result.success && Array.isArray(result.photos)) {
-      validImages = result.photos.slice().sort((a, b) => {
-        const getNum = s => {
-          const match = s.match(/_(\d+)\./);
-          return match ? parseInt(match[1], 10) : 0;
-        };
-        return getNum(a) - getNum(b);
-      });
-    }
+if (Array.isArray(photos) && photos.length > 0) {
+  validImages = photos.slice().sort((a, b) => {
+    const getNum = s => {
+      const match = s.match(/_(\d+)\./);
+      return match ? parseInt(match[1], 10) : 0;
+    };
+    return getNum(a) - getNum(b);
+  });
+}
+
 
     if (validImages.length === 0) {
       const model = (car.model || "").toLowerCase();
