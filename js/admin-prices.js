@@ -1,128 +1,161 @@
-const container = document.getElementById("cars-container");
+async function loadPrices() {
+  const res = await fetch('/api/manual-prices');
+  const manual = await res.json();
 
-let manualPrices = {};
-let cars = [];
+  const container = document.getElementById('cars-container');
+  container.innerHTML = '';
 
-async function loadManualPrices() {
-  const res = await fetch("/api/manual-prices");
-  manualPrices = await res.json();
-}
-
-async function loadCars() {
-  const res = await fetch("/api/cars/combined", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ items: 1000 })
-  });
-  const data = await res.json();
-  cars = data.cars_list;
-}
-
-function createCarCard(car) {
-  const number = car.number.replace(/\s/g, "").toUpperCase();
-  const card = document.createElement("div");
-  card.className = "car-card";
-
-  const price = manualPrices[number]?.price || "";
-  const description = manualPrices[number]?.description || "";
-  const equipment = manualPrices[number]?.equipment || "";
-
-  card.innerHTML = `
-    <h3>${number}</h3>
-    <input type="text" placeholder="Цена" value="${price}" class="input price">
-    <textarea placeholder="Описание" class="input desc">${description}</textarea>
-    <textarea placeholder="Комплектация" class="input eq">${equipment}</textarea>
-    <div class="photo-block" data-number="${number}">
-      <label class="photo-label">
-        📷 Выбрать файлы
-        <input type="file" class="photo-input" data-number="${number}" multiple>
-      </label>
-      <div class="preview" id="preview-${number}"></div>
-    </div>
-    <button class="save-btn" data-number="${number}">💾 Сохранить</button>
-  `;
-
-  container.appendChild(card);
-  loadUploadedPhotos(number);
-  setupFileInput(card.querySelector(".photo-input"));
-}
-
-function setupFileInput(input) {
-  input.addEventListener("change", () => {
-    const number = input.dataset.number;
-    const preview = document.getElementById("preview-" + number);
-
-    [...input.files].forEach((file, index) => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const div = document.createElement("div");
-        div.className = "photo-thumb";
-        div.innerHTML = `<img src="${e.target.result}"><span class="remove">&times;</span>`;
-        div.querySelector(".remove").onclick = () => div.remove();
-        preview.appendChild(div);
-      };
-      reader.readAsDataURL(file);
-    });
+  Object.entries(manual).forEach(([number, data]) => {
+    container.appendChild(createCarCard(number, data));
   });
 }
 
-async function loadUploadedPhotos(number) {
-  const preview = document.getElementById("preview-" + number);
-  preview.innerHTML = "";
+function createInput(labelText, value, name, type = 'text') {
+  const label = document.createElement('label');
+  label.textContent = labelText;
 
+  const input = document.createElement('input');
+  input.type = type;
+  input.value = value || '';
+  input.dataset.type = name;
+
+  label.appendChild(input);
+  return label;
+}
+
+function createTextarea(labelText, value, name) {
+  const label = document.createElement('label');
+  label.textContent = labelText;
+
+  const textarea = document.createElement('textarea');
+  textarea.value = value || '';
+  textarea.dataset.type = name;
+
+  label.appendChild(textarea);
+  return label;
+}
+
+function createCarCard(number, data = {}) {
+  const card = document.createElement('div');
+  card.className = 'car-card';
+
+  const header = document.createElement('div');
+  header.className = 'car-header';
+  header.textContent = number;
+  card.appendChild(header);
+
+  const fields = document.createElement('div');
+  fields.className = 'car-fields';
+  fields.appendChild(createInput('Аренда (rent)', data.rent, 'rent'));
+  fields.appendChild(createInput('Выкуп (buyout)', data.buyout, 'buyout'));
+  fields.appendChild(createInput('Прокат (prokat)', data.prokat, 'prokat'));
+  fields.appendChild(createTextarea('Комплектация', data.equipment, 'equipment'));
+  fields.appendChild(createTextarea('Описание', data.description, 'description'));
+  card.appendChild(fields);
+
+  // Upload section
+  const upload = document.createElement('div');
+  upload.className = 'upload-section';
+
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.multiple = true;
+
+  const uploadBtn = document.createElement('button');
+  uploadBtn.textContent = '📸 Загрузить фото';
+  uploadBtn.onclick = () => uploadPhotos(number, fileInput.files);
+
+  upload.appendChild(fileInput);
+  upload.appendChild(uploadBtn);
+  card.appendChild(upload);
+
+  // Photo preview
+  const preview = document.createElement('div');
+  preview.className = 'photo-preview';
+  preview.dataset.number = number;
+  card.appendChild(preview);
+
+  loadCarPhotos(number, preview);
+
+  // Присваиваем каждому input госномер
+  card.querySelectorAll('input, textarea').forEach(el => {
+    el.dataset.number = number;
+  });
+
+  return card;
+}
+
+async function uploadPhotos(number, files) {
+  if (!files.length) return;
+
+  const formData = new FormData();
+  for (let file of files) formData.append('photos', file);
+  formData.append('number', number);
+
+  const res = await fetch('/api/photos/upload', {
+    method: 'POST',
+    body: formData
+  });
+
+  if (res.ok) {
+    const preview = document.querySelector(`.photo-preview[data-number="${number}"]`);
+    preview.innerHTML = '';
+    loadCarPhotos(number, preview);
+  } else {
+    alert("Ошибка загрузки фото");
+  }
+}
+
+async function loadCarPhotos(number, container) {
   const res = await fetch(`/api/photos/${number}`);
-  const data = await res.json();
+  if (!res.ok) return;
 
-  if (data.success && Array.isArray(data.photos)) {
-    data.photos.forEach(photoUrl => {
-      const filename = photoUrl.split("/").pop();
-      const div = document.createElement("div");
-      div.className = "photo-thumb";
-      div.innerHTML = `<img src="${photoUrl}"><span class="remove">&times;</span>`;
-      div.querySelector(".remove").onclick = async () => {
-        await fetch(`/api/photos/${number}/${filename}`, { method: "DELETE" });
-        div.remove();
-      };
-      preview.appendChild(div);
-    });
+  const list = await res.json();
+  list.forEach(filename => {
+    const item = document.createElement('div');
+    item.className = 'photo-item';
+
+    const img = document.createElement('img');
+    img.src = `/photos/${number}/${filename}`;
+
+    const del = document.createElement('button');
+    del.textContent = '×';
+    del.onclick = async () => {
+      await fetch(`/api/photos/${number}/${filename}`, { method: 'DELETE' });
+      item.remove();
+    };
+
+    item.appendChild(img);
+    item.appendChild(del);
+    container.appendChild(item);
+  });
+}
+
+async function savePrices() {
+  const updated = {};
+  document.querySelectorAll('input, textarea').forEach(el => {
+    const num = el.dataset.number;
+    const type = el.dataset.type;
+    const val = el.value.trim();
+    if (!updated[num]) updated[num] = {};
+    if (val) updated[num][type] = val;
+  });
+
+  const res = await fetch('/api/manual-prices', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(updated)
+  });
+
+  const rj = await res.json();
+  if (rj.success) {
+    alert("✅ Сохранено");
+    await loadPrices();
+  } else {
+    alert("Ошибка сохранения");
   }
 }
 
-document.addEventListener("click", async e => {
-  if (e.target.classList.contains("save-btn")) {
-    const card = e.target.closest(".car-card");
-    const number = e.target.dataset.number;
-    const price = card.querySelector(".price").value.trim();
-    const desc = card.querySelector(".desc").value.trim();
-    const eq = card.querySelector(".eq").value.trim();
-    const photos = card.querySelector(".photo-input").files;
-
-    manualPrices[number] = { price, description: desc, equipment: eq };
-
-    await fetch("/api/manual-prices", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(manualPrices)
-    });
-
-    if (photos.length) {
-      const form = new FormData();
-      for (const file of photos) form.append("photos", file);
-      form.append("number", number);
-
-      await fetch("/api/photos/upload", {
-        method: "POST",
-        body: form
-      });
-    }
-
-    alert(`Данные для ${number} сохранены!`);
-    loadUploadedPhotos(number);
-  }
-});
-
-(async () => {
-  await loadManualPrices();
-  await loadCars();
-  cars.forEach(createCarCard);
-})();
+// Запуск
+loadPrices();
