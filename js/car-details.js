@@ -197,16 +197,29 @@ const description = typeof car.description === 'string'
     }
 
     // Вставка отсортированных изображений
-    swiperWrapper.innerHTML = validImages.map((src, index) => `
-      <div class="swiper-slide">
-        <img src="${src}" alt="Фото авто" loading="lazy" data-index="${index}" class="car-photo">
-      </div>
-    `).join("");
+    // swiperWrapper.innerHTML = validImages.map((src, index) => `
+    //   <div class="swiper-slide">
+    //     <img src="${src}" alt="Фото авто" loading="lazy" data-index="${index}" class="car-photo">
+    //   </div>
+    // `).join("");
+
+    swiperWrapper.innerHTML = validImages.map((filename, index) => `
+  <div class="swiper-slide">
+    <img src="/photos/${carNumber}/${filename}" alt="Фото авто" loading="lazy" data-index="${index}" class="car-photo">
+  </div>
+`).join("");
+
 
     // Обработчики для лайтбокса
+    // document.querySelectorAll('.car-photo').forEach((img, i) => {
+    //   img.addEventListener('click', () => openLightbox(validImages, i));
+    // });
+
     document.querySelectorAll('.car-photo').forEach((img, i) => {
-      img.addEventListener('click', () => openLightbox(validImages, i));
-    });
+  img.addEventListener('click', () =>
+    openLightbox(validImages.map(name => `/photos/${carNumber}/${name}`), i)
+  );
+});
 
     requestAnimationFrame(() => {
       new Swiper('.car-swiper.swiper-container', {
