@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -225,5 +225,215 @@ document.addEventListener('change', (e) => {
       navigator.sendBeacon('/logout');
     });
   </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Панель управления ценами и фото</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background: #f4f4f9;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background: #f0f0f0;
+      color: #333;
+    }
+    tr:hover {
+      background: #f9f9f9;
+    }
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    .upload-preview {
+      margin-top: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .upload-preview img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    .btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 4px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .btn:hover {
+      background: #45a049;
+    }
+    .btn-secondary {
+      background: #2196F3;
+    }
+    .btn-secondary:hover {
+      background: #1976D2;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Панель управления ценами и фото</h1>
+
+<table id="price-table">
+  <thead>
+    <tr>
+      <th>Госномер</th>
+      <th>Аренда</th>
+      <th>Выкуп</th>
+      <th>Прокат</th>
+      <th>Комплектация</th>
+      <th>Описание</th>
+      <th>Фото</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="price-body">
+    <!-- JS заполнит -->
+  </tbody>
+</table>
+
+<br>
+<center>
+  <button class="btn" onclick="savePrices()">💾 Сохранить изменения</button>
+</center>
+
+<script>
+async function loadPrices() {
+  const res = await fetch('/api/manual-prices');
+  const data = await res.json();
+  const tbody = document.getElementById("price-body");
+  tbody.innerHTML = '';
+
+  Object.entries(data).forEach(([number, fields]) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${number}</td>
+      <td><input data-number="${number}" data-type="rent" value="${fields.rent || ''}"></td>
+      <td><input data-number="${number}" data-type="buyout" value="${fields.buyout || ''}"></td>
+      <td><input data-number="${number}" data-type="prokat" value="${fields.prokat || ''}"></td>
+      <td><textarea data-number="${number}" data-type="equipment">${fields.equipment || ''}</textarea></td>
+      <td><textarea data-number="${number}" data-type="description">${fields.description || ''}</textarea></td>
+      <td>
+        <input type="file" accept="image/*" multiple onchange="previewPhotos(event, '${number}')">
+        <div class="upload-preview" id="preview-${number}"></div>
+      </td>
+      <td>
+        <button class="btn-secondary" onclick="uploadPhotos('${number}', this)">📤</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+async function savePrices() {
+  const updated = {};
+  document.querySelectorAll("input, textarea").forEach(i => {
+    const num = i.dataset.number, t = i.dataset.type, v = i.value.trim();
+    if (!num || !t) return;
+    if (!updated[num]) updated[num] = {};
+    if (v) updated[num][t] = v;
+  });
+
+  try {
+    const res = await fetch('/api/manual-prices', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated)
+    });
+    const rj = await res.json();
+    if (rj.success) {
+      alert("✅ Сохранено");
+      await loadPrices();
+    } else {
+      throw new Error(rj.error || 'Ошибка сервера');
+    }
+  } catch (err) {
+    alert("❌ Ошибка: " + err.message);
+  }
+}
+
+function previewPhotos(event, number) {
+  const files = event.target.files;
+  const preview = document.getElementById(`preview-${number}`);
+  preview.innerHTML = '';
+  Array.from(files).forEach(file => {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    preview.appendChild(img);
+  });
+}
+
+async function uploadPhotos(number, btn) {
+  const input = btn.closest('tr').querySelector('input[type="file"]');
+  if (!input || !input.files.length) {
+    alert("⚠️ Выберите фото");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("number", number);
+  Array.from(input.files).forEach(file => formData.append("photos", file));
+
+  try {
+    btn.disabled = true;
+    btn.textContent = "⏳";
+    const res = await fetch('/api/photos/upload', {
+      method: "POST",
+      body: formData
+    });
+    const rj = await res.json();
+    if (rj.success) {
+      alert("✅ Загружено " + input.files.length + " фото");
+    } else {
+      throw new Error(rj.error || 'Ошибка при загрузке');
+    }
+  } catch (err) {
+    alert("❌ " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "📤";
+  }
+}
+
+loadPrices();
+</script>
+
 </body>
 </html>
