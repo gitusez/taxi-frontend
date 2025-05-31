@@ -11,6 +11,21 @@
     td, th { padding: 5px; }
     .save-btn { margin-top: 10px; padding: 10px 20px; }
     #spinner { display: none; }
+
+    input.photo-upload {
+  padding: 6px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  cursor: pointer;
+  width: 100%;
+}
+
+.upload-info {
+  font-size: 12px;
+  color: #555;
+  margin-top: 4px;
+}
+
   </style>
 </head>
 <body>
@@ -85,9 +100,13 @@
           <td><textarea   data-number="${num}" data-type="equipment" placeholder="комплектация">${m.equipment||''}</textarea></td>
           <td><textarea   data-number="${num}" data-type="description" placeholder="описание">${m.description||''}</textarea></td>
           <td>
+          <div>
           <input type="file" accept=".jpeg,.jpg,.png" multiple data-number="${num}" class="photo-upload">
+          <div class="upload-info" id="info-${num}">Файлы не выбраны</div>
           <button class="upload-btn" data-number="${num}">Загрузить</button>
+          </div>
           </td>
+
         `;
         tbody.appendChild(row);
       });
@@ -179,6 +198,22 @@ document.addEventListener('click', async (e) => {
     }
   }
 });
+
+
+document.addEventListener('change', (e) => {
+  if (e.target.classList.contains('photo-upload')) {
+    const number = e.target.dataset.number;
+    const files = e.target.files;
+    const info = document.getElementById(`info-${number}`);
+    if (!files.length) {
+      info.textContent = "Файлы не выбраны";
+    } else {
+      const names = Array.from(files).map(f => f.name).join(', ');
+      info.textContent = `${files.length} файл(ов): ${names}`;
+    }
+  }
+});
+
 
 
 
