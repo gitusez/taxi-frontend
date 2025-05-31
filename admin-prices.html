@@ -332,13 +332,41 @@ document.addEventListener('change', (e) => {
 </center>
 
 <script>
+// async function loadPrices() {
+//   const res = await fetch('/api/manual-prices');
+//   const data = await res.json();
+//   const tbody = document.getElementById("price-body");
+//   tbody.innerHTML = '';
+
+//   Object.entries(data).forEach(([number, fields]) => {
+//     const row = document.createElement("tr");
+
+//     row.innerHTML = `
+//       <td>${number}</td>
+//       <td><input data-number="${number}" data-type="rent" value="${fields.rent || ''}"></td>
+//       <td><input data-number="${number}" data-type="buyout" value="${fields.buyout || ''}"></td>
+//       <td><input data-number="${number}" data-type="prokat" value="${fields.prokat || ''}"></td>
+//       <td><textarea data-number="${number}" data-type="equipment">${fields.equipment || ''}</textarea></td>
+//       <td><textarea data-number="${number}" data-type="description">${fields.description || ''}</textarea></td>
+//       <td>
+//         <input type="file" accept="image/*" multiple onchange="previewPhotos(event, '${number}')">
+//         <div class="upload-preview" id="preview-${number}"></div>
+//       </td>
+//       <td>
+//         <button class="btn-secondary" onclick="uploadPhotos('${number}', this)">📤</button>
+//       </td>
+//     `;
+//     tbody.appendChild(row);
+//   });
+// }
+
 async function loadPrices() {
   const res = await fetch('/api/manual-prices');
   const data = await res.json();
   const tbody = document.getElementById("price-body");
   tbody.innerHTML = '';
 
-  Object.entries(data).forEach(([number, fields]) => {
+  Object.entries(data).forEach(async ([number, fields]) => {
     const row = document.createElement("tr");
 
     row.innerHTML = `
@@ -357,8 +385,23 @@ async function loadPrices() {
       </td>
     `;
     tbody.appendChild(row);
+
+    // Загружаем уже существующие фото
+    try {
+      const res = await fetch(`/api/photos/${number}`);
+      const files = await res.json();
+      const preview = document.getElementById(`preview-${number}`);
+      files.forEach(file => {
+        const img = document.createElement('img');
+        img.src = `/photos/${number}/${file}`;
+        preview.appendChild(img);
+      });
+    } catch (err) {
+      console.error('Ошибка загрузки фото для', number, err);
+    }
   });
 }
+
 
 async function savePrices() {
   const updated = {};
