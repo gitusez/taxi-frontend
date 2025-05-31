@@ -442,219 +442,116 @@ loadPrices();
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Панель редактирования</title>
+  <title>Управление ценами и фото</title>
   <link rel="stylesheet" href="css/styles.css" />
   <style>
-    .photo-preview-area {
+    body {
+      background: #fff;
+      color: #000;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 2rem;
+    }
+    h2 {
+      margin-bottom: 1rem;
+    }
+    .car-card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .car-header {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .car-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .car-fields label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+    }
+    .car-fields input,
+    .car-fields textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .photo-preview {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 1rem;
     }
     .photo-item {
       position: relative;
     }
-    .photo-item img.preview-img {
+    .photo-item img {
       width: 100px;
-      height: auto;
-      border-radius: 6px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 4px;
       border: 1px solid #ccc;
     }
     .photo-item button {
       position: absolute;
-      top: -5px;
-      right: -5px;
-      background: red;
-      color: white;
+      top: -6px;
+      right: -6px;
+      background: #ffc107;
       border: none;
       border-radius: 50%;
+      cursor: pointer;
       width: 20px;
       height: 20px;
-      cursor: pointer;
+      font-weight: bold;
+      color: #000;
     }
-    .existing-photo {
-      display: inline-block;
-      position: relative;
-      margin: 5px;
+    .actions {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
     }
-    .existing-photo img {
-      width: 100px;
-      height: auto;
+    .save-btn {
+      background: #000;
+      color: #fff;
+      padding: 0.5rem 1.5rem;
+      border: none;
       border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    .existing-photo button {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: black;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
       cursor: pointer;
+    }
+    .save-btn:hover {
+      background: #333;
+    }
+    .upload-section input[type="file"] {
+      border: none;
+      padding: 0;
     }
   </style>
 </head>
 <body>
-  <h1>Редактирование автомобилей</h1>
-  <div id="cars-container"></div>
+  <h2>Управление автомобилями</h2>
 
-  <script>
-    const selectedPhotos = {};
+  <!-- Контейнер для карточек машин -->
+  <div id="cars-list">
+    <!-- Карточки будут отрисованы через JS -->
+  </div>
 
-    async function loadPrices() {
-      const res = await fetch("/api/manual-prices");
-      const prices = await res.json();
-      const container = document.getElementById("cars-container");
-      container.innerHTML = "";
+  <div class="actions">
+    <button class="save-btn" onclick="savePrices()">💾 Сохранить изменения</button>
+  </div>
 
-      Object.keys(prices).forEach(number => {
-        const car = prices[number];
-        const block = document.createElement("div");
-        block.className = "car-block";
-        block.innerHTML = `
-          <h2>${number}</h2>
-          <label>Аренда: <input data-number="${number}" data-type="rent" value="${car.rent || ''}"></label><br>
-          <label>Выкуп: <input data-number="${number}" data-type="buyout" value="${car.buyout || ''}"></label><br>
-          <label>Прокат: <input data-number="${number}" data-type="prokat" value="${car.prokat || ''}"></label><br>
-          <label>Комплектация:<br><textarea data-number="${number}" data-type="equipment" rows="3">${car.equipment || ''}</textarea></label><br>
-          <label>Описание:<br><textarea data-number="${number}" data-type="description" rows="5">${car.description || ''}</textarea></label><br>
-
-          <input type="file" name="photos" multiple data-number="${number}" onchange="handlePhotoSelect(event)">
-          <div class="photo-preview-area" id="preview-${number}"></div>
-          <button onclick="uploadPhotos('${number}')">Загрузить фото</button>
-          <div id="existing-${number}"></div>
-          <hr>
-        `;
-        container.appendChild(block);
-        loadExistingPhotos(number);
-      });
-    }
-
-    async function savePrices() {
-      const updated = {};
-      document.querySelectorAll("input, textarea").forEach(i => {
-        const num = i.dataset.number, t = i.dataset.type, v = i.value.trim();
-        if (!updated[num]) updated[num] = {};
-        if (v) updated[num][t] = v;
-      });
-
-      try {
-        const res = await fetch('/api/manual-prices', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updated)
-        });
-        const rj = await res.json();
-        if (rj.success) {
-          alert("Цены сохранены");
-          await loadPrices();
-        } else {
-          throw new Error(rj.error || 'Неизвестная ошибка');
-        }
-      } catch (err) {
-        alert("Ошибка сохранения: " + err.message);
-      }
-    }
-
-    function handlePhotoSelect(event) {
-      const input = event.target;
-      const number = input.dataset.number;
-      const files = Array.from(input.files);
-      selectedPhotos[number] = files;
-
-      const previewArea = document.getElementById(`preview-${number}`);
-      previewArea.innerHTML = "";
-
-      files.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const imgEl = document.createElement('div');
-          imgEl.className = "photo-item";
-          imgEl.innerHTML = `
-            <img src="${e.target.result}" class="preview-img">
-            <button onclick="removeSelectedPhoto('${number}', ${index})">×</button>
-          `;
-          previewArea.appendChild(imgEl);
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    function removeSelectedPhoto(number, index) {
-      selectedPhotos[number].splice(index, 1);
-      const input = document.querySelector(`input[data-number="${number}"]`);
-      const dataTransfer = new DataTransfer();
-      selectedPhotos[number].forEach(file => dataTransfer.items.add(file));
-      input.files = dataTransfer.files;
-      handlePhotoSelect({ target: input });
-    }
-
-    async function uploadPhotos(number) {
-      const files = selectedPhotos[number];
-      if (!files || !files.length) {
-        alert("Нет выбранных файлов");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("number", number);
-      files.forEach(file => formData.append("photos", file));
-
-      const res = await fetch("/api/photos/upload", {
-        method: "POST",
-        body: formData
-      });
-      const rj = await res.json();
-      if (rj.success) {
-        alert("Фото загружены");
-        loadExistingPhotos(number);
-      } else {
-        alert("Ошибка загрузки");
-      }
-    }
-
-    async function loadExistingPhotos(number) {
-      const container = document.getElementById(`existing-${number}`);
-      container.innerHTML = "";
-
-      const res = await fetch(`/api/photos/${number}`);
-      const list = await res.json();
-
-      list.forEach(name => {
-        const photo = document.createElement("div");
-        photo.className = "existing-photo";
-        photo.innerHTML = `
-          <img src="/photos/${number}/${name}">
-          <button onclick="deleteUploadedPhoto('${number}', '${name}')">×</button>
-        `;
-        container.appendChild(photo);
-      });
-    }
-
-    async function deleteUploadedPhoto(number, filename) {
-      if (!confirm(`Удалить фото ${filename}?`)) return;
-
-      const res = await fetch('/api/photos/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ number, filename })
-      });
-      const rj = await res.json();
-      if (rj.success) {
-        alert("Фото удалено");
-        loadExistingPhotos(number);
-      } else {
-        alert("Ошибка при удалении");
-      }
-    }
-
-    loadPrices();
-  </script>
-
-  <button onclick="savePrices()">Сохранить все изменения</button>
+  <script src="js/admin-prices.js"></script>
 </body>
 </html>
