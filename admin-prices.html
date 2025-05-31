@@ -84,42 +84,14 @@
           <td><input value="${m.buyout||''}" data-number="${num}" data-type="buyout"></td>
           <td><textarea   data-number="${num}" data-type="equipment" placeholder="комплектация">${m.equipment||''}</textarea></td>
           <td><textarea   data-number="${num}" data-type="description" placeholder="описание">${m.description||''}</textarea></td>
+          <td>
+          <input type="file" accept=".jpeg,.jpg,.png" multiple data-number="${num}" class="photo-upload">
+          <button class="upload-btn" data-number="${num}">Загрузить</button>
+          </td>
         `;
         tbody.appendChild(row);
       });
     }
-
-    // async function savePrices() {
-    //   const updated = {};
-    //   document.querySelectorAll("input").forEach(i => {
-    //     const num = i.dataset.number, t = i.dataset.type, v = i.value.trim();
-    //     if (!updated[num]) updated[num] = {};
-    //     if (v) updated[num][t] = isNaN(v) ? v : Number(v);
-    //   });
-
-    //   try {
-    //     const res = await fetch('/api/manual-prices', {
-    //       method: 'POST',
-    //       credentials: 'include',
-    //       headers: { 'Content-Type': 'application/json' },
-    //       body: JSON.stringify(updated)
-    //     });
-    //     if (res.status === 401) {
-    //       window.location.reload();
-    //       return;
-    //     }
-    //     if (!res.ok) throw new Error(`Сервер вернул ${res.status}`);
-    //     const rj = await res.json();
-    //     if (rj.success) {
-    //       alert("Цены сохранены");
-    //       await loadPrices();
-    //     } else {
-    //       throw new Error(rj.error || 'Неизвестная ошибка');
-    //     }
-    //   } catch (err) {
-    //     alert("Ошибка сохранения: " + err.message);
-    //   }
-    // }
 
   async function savePrices() {
   const updated = {};
@@ -172,6 +144,42 @@
     alert("Ошибка сохранения: " + err.message);
   }
 }
+
+document.addEventListener('click', async (e) => {
+  if (e.target.classList.contains('upload-btn')) {
+    const number = e.target.dataset.number;
+    const input = document.querySelector(`input.photo-upload[data-number="${number}"]`);
+    const files = input.files;
+
+    if (!files.length) {
+      alert("Выберите хотя бы один файл");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('number', number);
+    for (const file of files) {
+      formData.append('photos', file);
+    }
+
+    try {
+      const res = await fetch('/api/photos/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert("Фото успешно загружены");
+        input.value = ""; // сбросить выбранные файлы
+      } else {
+        alert("Ошибка при загрузке фото");
+      }
+    } catch (err) {
+      alert("Сервер недоступен или ошибка загрузки");
+    }
+  }
+});
+
 
 
     // При старте
