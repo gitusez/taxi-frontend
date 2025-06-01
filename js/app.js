@@ -670,92 +670,203 @@ function getNumericPrice(car, mode) {
 
   // === Сортировка ===
 
+// function sortCars() {
+//   const sortValue = document.getElementById('sortSelect')?.value;
+//   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
+
+//   // Вспомогательная функция для расширенного списка прокатных машин
+//   function getProkatList() {
+//     const list = [...allCars];
+//     prokatNumbers.forEach(num => {
+//       if (!list.some(car => toLatinNumber(car.number || '') === num)) {
+//         const extra = unsortedCars.find(car => toLatinNumber(car.number || '') === num);
+//         if (extra) list.push(extra);
+//       }
+//     });
+//     return list;
+//   }
+
+//   // Вспомогательная функция для приоритизации по списку prokatNumbers
+//   function prioritize(list) {
+//     return list.sort((a, b) => {
+//       const na = toLatinNumber(a.number || '');
+//       const nb = toLatinNumber(b.number || '');
+//       const ia = prokatNumbers.indexOf(na);
+//       const ib = prokatNumbers.indexOf(nb);
+//       if (ia !== -1 || ib !== -1) {
+//         if (ia === -1) return 1;   // a не приоритет, b — приоритет → b выше
+//         if (ib === -1) return -1;  // b не приоритет, a — приоритет → a выше
+//         return ia - ib;            // оба приоритетные — по их порядку в prokatNumbers
+//       }
+//       return 0; // если ни одна не в приоритете — сохраняем относительный порядок
+//     });
+//   }
+
+//   // 1) Собираем исходный массив перед сортировкой
+//   let target;
+//   if (currentMode === 'prokat') {
+//     target = getProkatList();
+//   } else {
+//     target = allCars.filter(car =>
+//       !prokatNumbers.includes(toLatinNumber(car.number || ''))
+//     );
+//   }
+
+//   // 2) Если "Без сортировки":
+//   if (!sortValue) {
+//     if (currentMode === 'prokat') {
+//       // приоритетные номера наверх
+//       target = prioritize(target);
+//     }
+//     allCars = [...target];
+//     originalCars = [...target];
+//     renderFiltered(target);
+//     return;
+//   }
+
+//   // 3) Иначе — парсим направление и поле
+//   const [field, order] = sortValue.split('_');
+
+//   // 4) Сортируем копию target
+//   const sorted = [...target].sort((a, b) => {
+//     let aVal, bVal;
+
+//     if (field === 'price') {
+//       aVal = getNumericPrice(a, currentMode);
+//       bVal = getNumericPrice(b, currentMode);
+//       // «Цена не указана» — всегда в конец
+//       if (aVal === 0 && bVal !== 0) return order === 'asc' ? 1 : -1;
+//       if (bVal === 0 && aVal !== 0) return order === 'asc' ? -1 : 1;
+//       return order === 'asc' ? aVal - bVal : bVal - aVal;
+//     } else if (field === 'mileage') {
+//       aVal = parseInt(a.odometer || 0, 10);
+//       bVal = parseInt(b.odometer || 0, 10);
+//     } else {
+//       aVal = String(a[field] || '');
+//       bVal = String(b[field] || '');
+//       return order === 'asc'
+//         ? aVal.localeCompare(bVal)
+//         : bVal.localeCompare(aVal);
+//     }
+//     return order === 'asc' ? aVal - bVal : bVal - aVal;
+//   });
+
+//   // originalCars = [...sorted];
+//   // renderFiltered(sorted);
+//   allCars = originalCars = sorted;
+//   renderFiltered(sorted);
+// }
+
+
+// ========== Сортировка ==========
+
 function sortCars() {
+  // 1) Читаем, какая опция выбрана в селекте (или радиокнопках) «Сортировка»
   const sortValue = document.getElementById('sortSelect')?.value;
+  // 2) Список «прокатных» номеров (при режиме prokat) конвертируем в «латиницу»:
   const prokatNumbers = config.prokatNumbers.map(toLatinNumber);
 
-  // Вспомогательная функция для расширенного списка прокатных машин
-  function getProkatList() {
-    const list = [...allCars];
+  // Вспомогательная функция: на вход – какой-то базовый список (baseList),
+  // а возвращает его же, но с «прокатными» номерами, отданными наверх.
+  function getProkatListFrom(baseList) {
+    // Клонируем массив, чтобы не мутировать аргумент
+    const list = [...baseList];
     prokatNumbers.forEach(num => {
+      // Если в list ещё нет машины с этим «прокатным» номером, 
+      // то ищём её в unsortedCars (там лежит полный массив машин от сервера)
       if (!list.some(car => toLatinNumber(car.number || '') === num)) {
         const extra = unsortedCars.find(car => toLatinNumber(car.number || '') === num);
-        if (extra) list.push(extra);
+        if (extra) {
+          list.push(extra);
+        }
       }
     });
     return list;
   }
 
-  // Вспомогательная функция для приоритизации по списку prokatNumbers
-  function prioritize(list) {
-    return list.sort((a, b) => {
-      const na = toLatinNumber(a.number || '');
-      const nb = toLatinNumber(b.number || '');
-      const ia = prokatNumbers.indexOf(na);
-      const ib = prokatNumbers.indexOf(nb);
-      if (ia !== -1 || ib !== -1) {
-        if (ia === -1) return 1;   // a не приоритет, b — приоритет → b выше
-        if (ib === -1) return -1;  // b не приоритет, a — приоритет → a выше
-        return ia - ib;            // оба приоритетные — по их порядку в prokatNumbers
-      }
-      return 0; // если ни одна не в приоритете — сохраняем относительный порядок
-    });
-  }
-
-  // 1) Собираем исходный массив перед сортировкой
-  let target;
+  // === Собираем «базовый» список в зависимости от режима:
+  //     — ВСЕГДА берём его из originalCars (эталонный порядок, который дал сервер),
+  //     — не мутируем originalCars нигде в sortCars().
+  let baseList;
   if (currentMode === 'prokat') {
-    target = getProkatList();
+    // Для режима «прокат» сначала берём ВСЕ originalCars,
+    // а потом «подтягиваем» сверху прокатные номера:
+    baseList = getProkatListFrom(originalCars);
   } else {
-    target = allCars.filter(car =>
+    // Для режимов «rent» или «buyout» просто фильтруем originalCars,
+    // убирая «прокатные» (если они есть в массиве), но порядок самих originalCars не меняем:
+    baseList = originalCars.filter(car =>
       !prokatNumbers.includes(toLatinNumber(car.number || ''))
     );
   }
 
-  // 2) Если "Без сортировки":
+  // === Если выбрано «Без сортировки» (значение пустое или undefined) ===
   if (!sortValue) {
+    // Скопируем просто baseList, сохраняя его порядок:
+    let target = [...baseList];
+
+    // Но если режим prokat, то нужно ещё раз приоритизировать «прокатные» номера наверх:
     if (currentMode === 'prokat') {
-      // приоритетные номера наверх
-      target = prioritize(target);
+      target = target.sort((a, b) => {
+        const na = toLatinNumber(a.number || '');
+        const nb = toLatinNumber(b.number || '');
+        const ia = prokatNumbers.indexOf(na);
+        const ib = prokatNumbers.indexOf(nb);
+        // Если хотя бы у одной машины номер «прокатный»:
+        if (ia !== -1 || ib !== -1) {
+          if (ia === -1) return 1;   // «а» не прокатный, «b» прокатный → b выше
+          if (ib === -1) return -1;  // «а» прокатный, «b» не прокатный → a выше
+          return ia - ib;            // оба прокатные → сравниваем позиции в config.prokatNumbers
+        }
+        // Иначе возвращаем 0, чтобы порядок базовый не менялся
+        return 0;
+      });
     }
+
+    // Клонируем этот массив в рабочий allCars и рендерим:
     allCars = [...target];
-    originalCars = [...target];
     renderFiltered(target);
     return;
   }
 
-  // 3) Иначе — парсим направление и поле
+  // === Иначе: пользователь выбрал какую-то сортировку вида «поле_порядок» ===
+  //     Например: 'price_asc', 'price_desc', 'mileage_asc', 'mileage_desc', 'name_asc' и т. д.
   const [field, order] = sortValue.split('_');
 
-  // 4) Сортируем копию target
-  const sorted = [...target].sort((a, b) => {
+  // Берём ровно тот же baseList и создаём его отсортированную копию:
+  const sorted = [...baseList].sort((a, b) => {
     let aVal, bVal;
 
+    // Если сортируем по цене:
     if (field === 'price') {
       aVal = getNumericPrice(a, currentMode);
       bVal = getNumericPrice(b, currentMode);
-      // «Цена не указана» — всегда в конец
+      // Машины с ценой 0 (не указана) всегда ставим в конец:
       if (aVal === 0 && bVal !== 0) return order === 'asc' ? 1 : -1;
       if (bVal === 0 && aVal !== 0) return order === 'asc' ? -1 : 1;
       return order === 'asc' ? aVal - bVal : bVal - aVal;
-    } else if (field === 'mileage') {
+    }
+
+    // Если сортируем по пробегу (одометр):
+    if (field === 'mileage') {
       aVal = parseInt(a.odometer || 0, 10);
       bVal = parseInt(b.odometer || 0, 10);
-    } else {
-      aVal = String(a[field] || '');
-      bVal = String(b[field] || '');
-      return order === 'asc'
-        ? aVal.localeCompare(bVal)
-        : bVal.localeCompare(aVal);
+      return order === 'asc' ? aVal - bVal : bVal - aVal;
     }
-    return order === 'asc' ? aVal - bVal : bVal - aVal;
+
+    // Для прочих полей (например, 'model', 'driver', 'color' и т. д.) – строковое сравнение:
+    aVal = String(a[field] || '').toLowerCase();
+    bVal = String(b[field] || '').toLowerCase();
+    return order === 'asc'
+      ? aVal.localeCompare(bVal)
+      : bVal.localeCompare(aVal);
   });
 
-  // originalCars = [...sorted];
-  // renderFiltered(sorted);
-  allCars = originalCars = sorted;
+  // Перезаписываем только рабочий массив allCars и отрисовываем результат:
+  allCars = [...sorted];
   renderFiltered(sorted);
 }
+
 
     // === Поиск ===
     
