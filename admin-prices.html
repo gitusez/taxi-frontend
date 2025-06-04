@@ -228,7 +228,7 @@ document.addEventListener('change', (e) => {
 </body>
 </html> -->
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
@@ -475,6 +475,216 @@ async function uploadPhotos(number, btn) {
 }
 
 loadPrices();
+</script>
+
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Панель управления ценами и фото</title>
+  <style>
+    /* (тот же CSS, что у вас сейчас) */
+  </style>
+</head>
+<body>
+
+<h1>Панель управления ценами и фото</h1>
+
+<table id="price-table">
+  <thead>
+    <tr>
+      <th>Госномер</th>
+      <th>Прокат</th>
+      <th>Аренда</th>
+      <th>Выкуп</th>
+      <th>Комплектация</th>
+      <th>Описание</th>
+      <th>Фото</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="price-body"></tbody>
+</table>
+
+<br>
+<center>
+  <button class="btn" onclick="savePrices()">💾 Сохранить изменения</button>
+</center>
+
+<script>
+  let manualPrices = {};   // сюда загрузим JSON из /api/manual-prices
+  let allCars       = [];  // сюда загрузим cars_list из /api/cars/combined
+
+  async function loadPrices() {
+    // Покажем спиннер/завернем всё в try…catch, чтобы не было “сломанной” страницы
+    try {
+      // 1) Сначала запросим «ручные цены» (Basic Auth, если надо, credentials: 'include')
+      const prRes = await fetch('/api/manual-prices', { credentials: 'include' });
+      if (prRes.status === 401) {
+        // если авторизация не пройдена, браузер сам покажет popup Basic Auth
+        return;
+      }
+      if (!prRes.ok) {
+        throw new Error(`Ошибка при загрузке ручных цен: ${prRes.status}`);
+      }
+      manualPrices = await prRes.json();
+
+      // 2) Параллельно (или после) запросим список машин из CRM
+      //    (сервер ждёт «application/json», поэтому не забудем Content-Type и JSON-body)
+      const crRes = await fetch('/api/cars/combined', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: 1000, offset: 0 })
+      });
+      if (!crRes.ok) {
+        throw new Error(`Ошибка при загрузке списка авто: ${crRes.status}`);
+      }
+      const crJson = await crRes.json();
+      // по контракту сервер даёт { success: true, cars_list: [...], total: N }
+      allCars = Array.isArray(crJson.cars_list) ? crJson.cars_list : [];
+
+      renderTable();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById("price-body");
+    tbody.innerHTML = ""; // очистим старые строки
+
+    // Чтобы не дублировать один и тот же госномер
+    const seen = new Set();
+
+    allCars.forEach(car => {
+      // нормализуем номер (удаляем пробелы, приводим к uppercase)
+      const num = (car.number || "").replace(/\s/g, "").toUpperCase();
+      if (!num || seen.has(num)) return;
+      seen.add(num);
+
+      // «ручные» цены, если они есть
+      const m = manualPrices[num] || {};
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${num}</td>
+        <td><input data-number="${num}" data-type="prokat" value="${m.prokat || ''}"></td>
+        <td><input data-number="${num}" data-type="rent"   value="${m.rent   || ''}"></td>
+        <td><input data-number="${num}" data-type="buyout" value="${m.buyout || ''}"></td>
+        <td><textarea data-number="${num}" data-type="equipment" placeholder="комплектация">${m.equipment || car.equipment || ''}</textarea></td>
+        <td><textarea data-number="${num}" data-type="description" placeholder="описание">${m.description || ''}</textarea></td>
+        <td>
+          <input type="file" accept="image/*" multiple onchange="previewPhotos(event, '${num}')">
+          <div class="upload-preview" id="preview-${num}"></div>
+        </td>
+        <td>
+          <button class="btn-secondary" onclick="uploadPhotos('${num}', this)">📤</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+
+      // Подгрузим уже существующие фото (если есть) и покажем превью
+      fetch(`/api/photos/${num}`)
+        .then(r => r.ok ? r.json() : [])
+        .then(files => {
+          const preview = document.getElementById(`preview-${num}`);
+          if (!Array.isArray(files)) return;
+          files.forEach(fileUrl => {
+            const img = document.createElement('img');
+            // здесь сервер отдаёт либо имена, либо уже полный путь,
+            // в вашем коде после формирования URL-ов вы, кажется, возвращаете { success, photos:[ "/photos/XXX/имя.jpg", … ] }
+            img.src = fileUrl;
+            preview.appendChild(img);
+          });
+        })
+        .catch(err => console.error('Ошибка загрузки фото для', num, err));
+    });
+
+    // Если вообще нет машин (например, ещё в CRM ничего нет),
+    // можно вывести «нет машин» одной строкой.
+    if (allCars.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8">Нет машин для отображения</td></tr>';
+    }
+  }
+
+  async function savePrices() {
+    const updated = {};
+    document.querySelectorAll("input[data-number][data-type], textarea[data-number][data-type]").forEach(elem => {
+      const num  = elem.dataset.number;
+      const type = elem.dataset.type;
+      const val  = elem.value.trim();
+      if (!updated[num]) updated[num] = {};
+      if (val !== "") {
+        // если поле описания или комплектации — оставляем текст, иначе пытаемся привести к числу
+        updated[num][type] = (type === 'equipment' || type === 'description') ? val : (isNaN(val) ? val : Number(val));
+      }
+    });
+
+    try {
+      const res = await fetch('/api/manual-prices', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      });
+      if (!res.ok) throw new Error(`Сервер вернул ${res.status}`);
+      const rj = await res.json();
+      if (rj.success) {
+        alert("✅ Данные успешно сохранены");
+        await loadPrices(); // перезагружаем сразу, чтобы видеть изменения
+      } else {
+        throw new Error(rj.error || 'Неизвестная ошибка');
+      }
+    } catch (err) {
+      alert("❌ Ошибка при сохранении: " + err.message);
+    }
+  }
+
+  function previewPhotos(event, number) {
+    const files = Array.from(event.target.files);
+    const preview = document.getElementById(`preview-${number}`);
+    preview.innerHTML = '';
+    files.forEach(file => {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      preview.appendChild(img);
+    });
+  }
+
+  async function uploadPhotos(number, btn) {
+    const input = btn.closest('tr').querySelector('input[type="file"]');
+    if (!input.files.length) {
+      alert("⚠️ Выберите файлы");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("number", number);
+    Array.from(input.files).forEach(f => formData.append("photos", f));
+    try {
+      btn.disabled = true;
+      btn.textContent = "⏳";
+      const res = await fetch('/api/photos/upload', { method: 'POST', body: formData });
+      const rj = await res.json();
+      if (rj.success) {
+        alert(`✅ ${input.files.length} фото загружено`);
+      } else {
+        throw new Error(rj.error || 'Ошибка при загрузке');
+      }
+    } catch (err) {
+      alert("❌ " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "📤";
+    }
+  }
+
+  // При инициализации страницы сразу подтягиваем оба списка
+  loadPrices();
 </script>
 
 </body>
