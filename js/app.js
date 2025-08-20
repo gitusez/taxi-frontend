@@ -528,7 +528,6 @@ async function renderCars() {
 //   const rawNumber = car.number || "";
 //   const carNumber = toLatinNumber(rawNumber.toUpperCase());
 
-//   // 💰 Получаем цену как есть
 //   const price = getCarPrice(car, currentMode) || "";
 
 //   // 🖼 Загрузка изображения
@@ -546,12 +545,13 @@ async function renderCars() {
 //   try {
 //     const res = await fetch(`/api/photos/${carNumber}`);
 //     const result = await res.json();
-//     img.src = (result.success && result.photos.length > 0) ? result.photos[0] : fallback;
+//     img.src = (Array.isArray(result) && result.length > 0)
+//       ? `/photos/${carNumber}/${result[0]}`
+//       : fallback;
 //   } catch {
 //     img.src = fallback;
 //   }
 
-//   // 📋 Детали карточки
 //   const details = `
 //     <h3 class="car-price">Цена: ${price}</h3>
 //     <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
@@ -574,7 +574,6 @@ async function renderCars() {
 //     localStorage.setItem('savedMode', currentMode);
 //     const sortValue = document.getElementById('sortSelect')?.value || '';
 //     localStorage.setItem('savedSort', sortValue);
-//     // window.location.href = `car-details.html?car=${car.id}`;
 //     window.location.href = `car-details.html?car=${car.id}&mode=${currentMode}`;
 //   };
 
@@ -617,6 +616,7 @@ async function createCarCard(car) {
     <h3 class="car-price">Цена: ${price}</h3>
     <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
     <div class="car-detal">
+      <p>Лот: ${car.lot || '—'}</p>
       <p>Год: ${car.year || '—'}</p>
       <p>Цвет: ${car.color || '—'}</p>
       <p>Гос.Номер: ${car.number || '—'}</p>
