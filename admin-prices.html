@@ -175,6 +175,89 @@
   //   }
   // }
 
+// function renderTable() {
+//   const tbody = document.getElementById("price-body");
+//   tbody.innerHTML = "";
+//   const seen = new Set();
+
+//   allCars.forEach(car => {
+//     const num = (car.number || "").replace(/\s/g, "").toUpperCase();
+//     if (!num || seen.has(num)) return;
+//     seen.add(num);
+
+//     const m = manualPrices[num] || {};
+//     const row = document.createElement("tr");
+
+//     row.innerHTML = `
+//       <td>${num}</td>
+//       <td><input data-number="${num}" data-type="lot" value="${m.lot || car.lot || ''}"></td>
+//       <td><input data-number="${num}" data-type="prokat" value="${m.prokat || ''}"></td>
+//       <td><input data-number="${num}" data-type="rent" value="${m.rent || ''}"></td>
+//       <td><input data-number="${num}" data-type="buyout" value="${m.buyout || ''}"></td>
+//       <td><textarea data-number="${num}" data-type="equipment">${m.equipment || car.equipment || ''}</textarea></td>
+//       <td><textarea data-number="${num}" data-type="description">${m.description || ''}</textarea></td>
+//       <td style="text-align:center;">
+//         <input type="checkbox" data-number="${num}" data-type="discount" ${m.discount ? 'checked' : ''}>
+//       </td>
+//       <td>
+//         <input type="file" accept="image/*" multiple onchange="previewPhotos(event, '${num}')">
+//         <div class="upload-preview" id="preview-${num}"></div>
+//         <button class="btn-secondary" onclick="uploadPhotos('${num}', this)">📤</button>
+//       </td>
+//     `;
+//     tbody.appendChild(row);
+
+//     // Загружаем фото, как и раньше
+//     fetch(`/api/photos/${num}`)
+//       .then(r => r.ok ? r.json() : [])
+//       .then(files => {
+//         const preview = document.getElementById(`preview-${num}`);
+//         if (!Array.isArray(files)) return;
+//         files.forEach(fileUrl => {
+//           const img = document.createElement('img');
+//           img.src = fileUrl;
+//           preview.appendChild(img);
+//         });
+//       });
+//   });
+
+//   if (allCars.length === 0) {
+//     tbody.innerHTML = '<tr><td colspan="9">Нет машин для отображения</td></tr>';
+//   }
+// }
+
+
+
+//   async function savePrices() {
+//     const updated = {};
+//     document.querySelectorAll("input[data-number][data-type], textarea[data-number][data-type]").forEach(elem => {
+//       const num = elem.dataset.number;
+//       const type = elem.dataset.type;
+//       const val = elem.type === 'checkbox' ? elem.checked : elem.value.trim();
+//       if (!updated[num]) updated[num] = {};
+//       if (val !== "") updated[num][type] = val;
+//     });
+
+//     try {
+//       const res = await fetch('/api/manual-prices', {
+//         method: 'POST',
+//         credentials: 'include',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(updated)
+//       });
+//       if (!res.ok) throw new Error(`Сервер вернул ${res.status}`);
+//       const rj = await res.json();
+//       if (rj.success) {
+//         alert("✅ Данные успешно сохранены");
+//         await loadPrices();
+//       } else {
+//         throw new Error(rj.error || 'Неизвестная ошибка');
+//       }
+//     } catch (err) {
+//       alert("❌ Ошибка при сохранении: " + err.message);
+//     }
+//   }
+
 function renderTable() {
   const tbody = document.getElementById("price-body");
   tbody.innerHTML = "";
@@ -207,7 +290,7 @@ function renderTable() {
     `;
     tbody.appendChild(row);
 
-    // Загружаем фото, как и раньше
+    // Загружаем фото
     fetch(`/api/photos/${num}`)
       .then(r => r.ok ? r.json() : [])
       .then(files => {
@@ -226,37 +309,36 @@ function renderTable() {
   }
 }
 
+async function savePrices() {
+  const updated = {};
+  document.querySelectorAll("input[data-number][data-type], textarea[data-number][data-type]").forEach(elem => {
+    const num = elem.dataset.number;
+    const type = elem.dataset.type;
+    const val = elem.type === 'checkbox' ? elem.checked : elem.value.trim();
+    if (!updated[num]) updated[num] = {};
+    updated[num][type] = val; // сохраняем даже пустые значения
+  });
 
-
-  async function savePrices() {
-    const updated = {};
-    document.querySelectorAll("input[data-number][data-type], textarea[data-number][data-type]").forEach(elem => {
-      const num = elem.dataset.number;
-      const type = elem.dataset.type;
-      const val = elem.type === 'checkbox' ? elem.checked : elem.value.trim();
-      if (!updated[num]) updated[num] = {};
-      if (val !== "") updated[num][type] = val;
+  try {
+    const res = await fetch('/api/manual-prices', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated)
     });
-
-    try {
-      const res = await fetch('/api/manual-prices', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updated)
-      });
-      if (!res.ok) throw new Error(`Сервер вернул ${res.status}`);
-      const rj = await res.json();
-      if (rj.success) {
-        alert("✅ Данные успешно сохранены");
-        await loadPrices();
-      } else {
-        throw new Error(rj.error || 'Неизвестная ошибка');
-      }
-    } catch (err) {
-      alert("❌ Ошибка при сохранении: " + err.message);
+    if (!res.ok) throw new Error(`Сервер вернул ${res.status}`);
+    const rj = await res.json();
+    if (rj.success) {
+      alert("✅ Данные успешно сохранены");
+      await loadPrices();
+    } else {
+      throw new Error(rj.error || 'Неизвестная ошибка');
     }
+  } catch (err) {
+    alert("❌ Ошибка при сохранении: " + err.message);
   }
+}
+
 
   function previewPhotos(event, number) {
     const files = Array.from(event.target.files);
