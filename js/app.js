@@ -616,7 +616,7 @@ async function createCarCard(car) {
     <h3 class="car-price">Цена: ${price}</h3>
     <p class="car-title">${car.brand || 'Без марки'} ${car.model || ''}</p>
     <div class="car-detal">
-      <p>Лот: ${car.lot || '—'}</p>
+      <p>Лот: ${car.lot != null && car.lot !== '' ? car.lot : '—'}</p>
       <p>Год: ${car.year || '—'}</p>
       <p>Цвет: ${car.color || '—'}</p>
       <p>Гос.Номер: ${car.number || '—'}</p>
