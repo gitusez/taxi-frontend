@@ -175,7 +175,7 @@
   //   }
   // }
 
-  function renderTable() {
+function renderTable() {
   const tbody = document.getElementById("price-body");
   tbody.innerHTML = "";
   const seen = new Set();
@@ -189,6 +189,7 @@
     const row = document.createElement("tr");
 
     row.innerHTML = `
+      <td>${num}</td>
       <td><input data-number="${num}" data-type="lot" value="${m.lot || car.lot || ''}"></td>
       <td><input data-number="${num}" data-type="prokat" value="${m.prokat || ''}"></td>
       <td><input data-number="${num}" data-type="rent" value="${m.rent || ''}"></td>
@@ -224,6 +225,7 @@
     tbody.innerHTML = '<tr><td colspan="9">Нет машин для отображения</td></tr>';
   }
 }
+
 
 
   async function savePrices() {
