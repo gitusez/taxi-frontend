@@ -89,6 +89,7 @@ function renderCarDetails(car, mode) {
   }
 
   const fields = {
+    lot: car.manual_price?.lot,
     brand: car.brand,
     model: car.model,
     year: car.year,
